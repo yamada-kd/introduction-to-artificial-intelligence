@@ -16,10 +16,10 @@ parts:
   - file: notebook/scikit_learn_02
 - caption: PyTorch を利用した深層学習
   chapters:
-  - file: notebook/tensorflow_01
-  - file: notebook/tensorflow_02
-  - file: notebook/tensorflow_03
-  - file: notebook/tensorflow_04
-  - file: notebook/tensorflow_05
-  - file: notebook/tensorflow_06
-  - file: notebook/tensorflow_07
+  - file: notebook/pytorch_01
+  - file: notebook/pytorch_02
+  - file: notebook/pytorch_03
+  - file: notebook/pytorch_04
+  - file: notebook/pytorch_05
+  - file: notebook/pytorch_06
+  - file: notebook/pytorch_07
