@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>再帰型ニューラルネットワーク &#8212; 実践データ科学</title>
+    <title>9. 再帰型ニューラルネットワーク &#8212; 実践データ科学</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -55,6 +55,8 @@ const thebe_selector_output = ".output, .cell_output"
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="10. アテンションネットワーク" href="pytorch_05.html" />
+    <link rel="prev" title="8. Hugging Face の利用方法" href="pytorch_03.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -142,7 +144,7 @@ const thebe_selector_output = ".output, .cell_output"
   PyTorch を利用した深層学習
  </span>
 </p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="pytorch_01.html">
    6. TensorFlow の基本的な利用方法
@@ -151,6 +153,31 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1">
   <a class="reference internal" href="pytorch_02.html">
    7. 多層パーセプトロン
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="pytorch_03.html">
+   8. Hugging Face の利用方法
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   9. 再帰型ニューラルネットワーク
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="pytorch_05.html">
+   10. アテンションネットワーク
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="pytorch_06.html">
+   11. 敵対的生成ネットワーク
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="pytorch_07.html">
+   12. 強化学習法
   </a>
  </li>
 </ul>
@@ -194,7 +221,7 @@ const thebe_selector_output = ".output, .cell_output"
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/notebook/tensorflow_04.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/notebook/pytorch_04.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -234,7 +261,7 @@ const thebe_selector_output = ".output, .cell_output"
         
         
         
-        <a class="colab-button" href="https://colab.research.google.com/github/yamada-kd/introduction-to-artificial-intelligence/blob/main/notebook/tensorflow_04.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+        <a class="colab-button" href="https://colab.research.google.com/github/yamada-kd/introduction-to-artificial-intelligence/blob/main/notebook/pytorch_04.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
                 title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
                     src="../_static/images/logo_colab.png"
                     alt="Interact on Colab">Colab</button></a>
@@ -255,61 +282,61 @@ const thebe_selector_output = ".output, .cell_output"
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   基本的な事柄
+   9.1. 基本的な事柄
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#rnn">
-     RNN とは
+     9.1.1. RNN とは
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id3">
-     文字エンコード
+     9.1.2. 文字エンコード
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id4">
-     入出力データ形式
+     9.1.3. 入出力データ形式
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id5">
-   RNN の実装
+   9.2. RNN の実装
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#lstm">
-     LSTM とは
+     9.2.1. LSTM とは
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id6">
-     実装方法①
+     9.2.2. 実装方法①
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id7">
-     実装方法②
+     9.2.3. 実装方法②
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id8">
-   テキスト感情分析
+   9.3. テキスト感情分析
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id9">
-     対象のデータセット
+     9.3.1. 対象のデータセット
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id10">
-     LSTM による計算
+     9.3.2. LSTM による計算
     </a>
    </li>
   </ul>
@@ -336,61 +363,61 @@ const thebe_selector_output = ".output, .cell_output"
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   基本的な事柄
+   9.1. 基本的な事柄
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#rnn">
-     RNN とは
+     9.1.1. RNN とは
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id3">
-     文字エンコード
+     9.1.2. 文字エンコード
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id4">
-     入出力データ形式
+     9.1.3. 入出力データ形式
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id5">
-   RNN の実装
+   9.2. RNN の実装
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#lstm">
-     LSTM とは
+     9.2.1. LSTM とは
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id6">
-     実装方法①
+     9.2.2. 実装方法①
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id7">
-     実装方法②
+     9.2.3. 実装方法②
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id8">
-   テキスト感情分析
+   9.3. テキスト感情分析
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id9">
-     対象のデータセット
+     9.3.1. 対象のデータセット
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id10">
-     LSTM による計算
+     9.3.2. LSTM による計算
     </a>
    </li>
   </ul>
@@ -405,12 +432,12 @@ const thebe_selector_output = ".output, .cell_output"
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="id1">
-<h1>再帰型ニューラルネットワーク<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">9. </span>再帰型ニューラルネットワーク<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id2">
-<h2>基本的な事柄<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">9.1. </span>基本的な事柄<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>配列データを処理することが得意なニューラルネットワークである再帰型ニューラルネットワーク（recurrent neural network（RNN））とそれに関する基本的な事柄をまとめます．</p>
 <div class="section" id="rnn">
-<h3>RNN とは<a class="headerlink" href="#rnn" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.1.1. </span>RNN とは<a class="headerlink" href="#rnn" title="Permalink to this headline">¶</a></h3>
 <p>RNN とは配列データを処理することが得意なニューラルネットワークです．配列データの各要素（タイムステップと呼びます）を逐次的に処理して，各タイムステップに対応する何らかの出力をすることができます．配列データを入力として配列データを出力させることができるし，配列データを入力にしてスカラを出力させることもできます．</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -474,7 +501,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="section" id="id3">
-<h3>文字エンコード<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.1.2. </span>文字エンコード<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>人工知能に何かの情報を処理させる際には，機械がそれを理解できるように何らかの方法でデータを数字に変換しなければなりませんが，これをエンコードと言います．例えば，自然言語に含まれる単語を，処理したいデータセット中の登場順に数字に変換する，みたいなことです．機械に処理させるためには自然言語では都合が悪く，数字データが都合が良いからです．そのような単語を数字に割り振って人工知能に入力しても，もちろん計算自体は可能です．しかし，この整数エンコーディングにはふたつの欠点があるそうです．あるそうです，と書きましたが，これは TensorFlow の公式ウェブサイトにそう書いてあったことを抜き出したためです．</p>
 <ul class="simple">
 <li><p>整数エンコーディングは単語間のいかなる関係性を含まない．</p></li>
@@ -488,7 +515,7 @@ const thebe_selector_output = ".output, .cell_output"
 <a class="reference internal image-reference" href="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1"><img alt="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1" src="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1" style="width: 100%;" /></a>
 </div>
 <div class="section" id="id4">
-<h3>入出力データ形式<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.1.3. </span>入出力データ形式<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>次の節では，実際の LSTM の実装方法を紹介します．RNN を TensorFlow（や PyTorch）で利用する場合には，その入力データと出力データで少しずつ書き方が変わってしまい，これをしっかり書かないとエラーが起こってしまいます．また，RNN は入力ベクトルの最初から順々にデータを処理する単方向でのデータ処理と，最後から最初に遡りながらデータを処理する逆方向の処理を順方向の処理と同時に行う双方向のデータ処理があり，これを利用するかどうかでも出力が変化します．</p>
 <p>RNN を活用したい問題としては 0 か 1 という分類をする問題があると思います．また，これとは異なり，配列を入力に配列を出力させたいときもあるはずです．さらに，分類ではなく回帰をしたい場合もあるはずです．単語（整数）の多次元のベクトルへの埋め込み（embedding）が必要な場合もあります．例えば <code class="docutils literal notranslate"><span class="pre">1</span></code> という文字は人工知能に入力するためには <code class="docutils literal notranslate"><span class="pre">[0.2,</span> <span class="pre">0.1,</span> <span class="pre">0.3,</span> <span class="pre">0.4]</span></code> みたいなベクトルに変換しなければなりません．何次元のベクトルでも良いです．また，<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> みたいなワンホットエンコーディングと呼ばれる埋め込み方法でも良いです．これらの種類をまとめると以下の表のようになります．実装方法がそれぞれにおいてほんの少しずつ異なります．ちょっと厄介ですね．</p>
 <table class="colwidths-auto table">
@@ -607,10 +634,10 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="section" id="id5">
-<h2>RNN の実装<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">9.2. </span>RNN の実装<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>この節では RNN の使い方を紹介します．上述のように RNN を利用する際にはいくつかの書き方がありますが，そのうちのいくつかを紹介します．</p>
 <div class="section" id="lstm">
-<h3>LSTM とは<a class="headerlink" href="#lstm" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.2.1. </span>LSTM とは<a class="headerlink" href="#lstm" title="Permalink to this headline">¶</a></h3>
 <p>次に，簡単なデータを生成して RNN の使い方を紹介します．ここでは，LSTM を利用します．LSTM は様々な長さからなる配列情報を入力データとして受け取り，配列情報を出力することができるニューラルネットワークです．「長さの異なる入力ベクトルを同じ構造で扱うことができる」ことと「配列情報を逐次的に出力することができる」という点において MLP とは異なります．LSTM のアルゴリズムは以下の式で定義されます．</p>
 <p><span class="math notranslate nohighlight">\(
 \mathbf{v}_1=\sigma(\mathbf{W}_{1a}\mathbf{u}_t+\mathbf{W}_{1b}\mathbf{h}_{t-1}+\mathbf{b}_{1}),
@@ -640,7 +667,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="section" id="id6">
-<h3>実装方法①<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.2.2. </span>実装方法①<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>ここでは，「単方向で入力ベクトルが配列で出力ベクトルがスカラ（1要素からなるベクトル）で問題が分類で文字の埋め込みが不要なパターン」の実装方法を紹介します．ここでは以下のようなデータを生成して利用します．このデータセットは3つのインスタンスからなります．最初のインスタンスは4文脈からなる配列です．入力ベクトルの各 timestep は2要素からなるベクトルで構成されています．<span class="math notranslate nohighlight">\(t=1\)</span> のときの値は <code class="docutils literal notranslate"><span class="pre">[1.1,</span> <span class="pre">0.1]</span></code> で，<span class="math notranslate nohighlight">\(t=2\)</span> のときの値は <code class="docutils literal notranslate"><span class="pre">[2.2,</span> <span class="pre">0.3]</span></code> で，<span class="math notranslate nohighlight">\(t=3\)</span> のときの値は <code class="docutils literal notranslate"><span class="pre">[3.0,</span> <span class="pre">0.3]</span></code> で，<span class="math notranslate nohighlight">\(t=4\)</span> のときの値は <code class="docutils literal notranslate"><span class="pre">[4.0,</span> <span class="pre">1.0]</span></code> です．これに紐づいているターゲットベクトルは <code class="docutils literal notranslate"><span class="pre">[1]</span></code> です．これは分類問題なのでこのターゲットベクトルの <code class="docutils literal notranslate"><span class="pre">0</span></code> は <code class="docutils literal notranslate"><span class="pre">1</span></code> という値より <code class="docutils literal notranslate"><span class="pre">1</span></code> ほど小さい値を意味しているのでなく，単にクラスを意味する数字です．</p>
 <table class="colwidths-auto table">
 <thead>
@@ -773,7 +800,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>結果を確認すると，しっかりコストが下がっており，同時に正確度も上昇している様子が判ります．また，未学習の際には正解を導けていなかったところ，学習済みのモデルでは正解をしっかり出力できていることが確認できます．</p>
 </div>
 <div class="section" id="id7">
-<h3>実装方法②<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.2.3. </span>実装方法②<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>次に，「双方向で入力ベクトルと出力ベクトルがともに配列で問題が回帰で埋め込みが必要なパターン」の実装方法を紹介します．ここでは以下のようなデータを生成して利用します．このデータセットは3つのインスタンスからなります．最初のインスタンスは3文脈からなる配列です．入力ベクトルの各 timestep は整数です．ここでの7という数字は5よりも2ほど大きい値を意味しているのはなく，単なるダミー変数です．ターゲットベクトルの各 timestep は2要素からなるベクトルで構成されています．最初のインスタンスの <span class="math notranslate nohighlight">\(t=1\)</span> のときの値は <code class="docutils literal notranslate"><span class="pre">[6.2,</span> <span class="pre">1.1]</span></code> です．この6.2は1.1よりも5.1ほど大きい数値です．このインスタンスでは，最初に入力された7というダミー変数に対して，<code class="docutils literal notranslate"><span class="pre">[6.2,</span> <span class="pre">1.1]</span></code> を予測しなければなりません．これは，分類問題ではなく回帰問題です．</p>
 <table class="colwidths-auto table">
 <thead>
@@ -903,10 +930,10 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="section" id="id8">
-<h2>テキスト感情分析<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">9.3. </span>テキスト感情分析<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>この節では実際の自然言語から作られたデータセットを RNN で処理するためのコードを書きます．</p>
 <div class="section" id="id9">
-<h3>対象のデータセット<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.3.1. </span>対象のデータセット<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>ここでは，IMDb（Internet Movie Database）という映画に対するレビューデータを用いて，それに対する感情分析（sentiment analysis）を行います．レビューデータは元々は自然言語なので文字列データです．その文字列情報がポジティブな感じなのかネガティブな感じなのかということを判別する人工知能を構築します．IMDb は TensorFlow を利用することでダウンロードすることができます．以下のように書きます．また，IMDb の性質を調査します．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1001,7 +1028,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>学習セットとテストセットの入力ベクトルの長さの最小値と最大値が判りました．</p>
 </div>
 <div class="section" id="id10">
-<h3>LSTM による計算<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">9.3.2. </span>LSTM による計算<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>LSTM によって IMDb の感情分析をするには以下のようにプログラムを書きます．前述の MLP の書き方とかなり類似しています．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1180,7 +1207,21 @@ const thebe_selector_output = ".output, .cell_output"
               
             
                 <!-- Previous / next buttons -->
-<div class='prev-next-area'>
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="pytorch_03.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">8. </span>Hugging Face の利用方法</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="pytorch_05.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>アテンションネットワーク</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
             
         </div>
