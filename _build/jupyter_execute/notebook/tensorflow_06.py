@@ -1,189 +1,93 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # アテンションネットワーク
+# # 敵対的生成ネットワーク
 
 # ## 基本的な事柄
-
-# この節ではアテンションがどのようなものなのか，また，アテンションの計算方法について紹介します．
-
-# ### アテンションとは
-
-# アテンション機構とは単にアテンションとも呼ばれる，ニューラルネットワークが入力データのどの部分に注目するかを明示することで予測の性能向上をさせるため技術です．例えば，何らかの風景が写っている画像を人工知能に処理させ，その画像に関する何らかの説明を自然言語によってさせるタスクを考えます．そのような場合において，人工知能が空の色に関する話題に触れる場合には，空が写っている部分の色を重点的に処理するかもしれないし，海の大きさを話題にする場合は海が写っている部分の面積を重点的に処理するかもしれません．少なくとも人は何かの意思決定をする際に，意識を対象に集中させることで複雑な情報から自身が処理すべき情報のみを抽出する能力を有しています．人工知能は人とは全く違う情報処理をしているかもしれないので，このような直接的な対応があるかどうかは定かではないですが，人の情報処理方法にヒントを得て，このような注意を払うべき部分を人工知能に教えるための技術がアテンション機構です．アテンションを有するニューラルネットワークの性能は凄まじく，アテンションネットワークの登場は CNN や RNN 等のアテンション以前に用いられていたニューラルネットワークを過去のものとしました．
-
-# ### アテンションの計算方法
-
-# アテンション機構の処理は非常に単純で簡単な式によって定義されます．アテンションの基本的な計算は以下に示す通りです．アテンション機構とは，$[\boldsymbol{h}_1,\boldsymbol{h}_2,\dots,\boldsymbol{h}_I]$ のようなデータに対して以下のような計算をして，$\boldsymbol{c}$ を得るものです．
 # 
-# $
-# \displaystyle \boldsymbol{c}=\sum_{i=1}^I{\phi}_i\boldsymbol{h}_i
-# $
 # 
-# このとき，スカラである $\phi_i$ は $[0,1]$ の範囲にあり，また，以下の式を満たす値です．
-# 
-# $
-# \displaystyle \sum_{i=1}^I{\phi}_i=1
-# $
-# 
-# すなわち，${\phi}_i$ は何らかの入力に対して得られるソフトマックス関数の出力の $\boldsymbol{\phi}$ の $i$ 番目の要素です．よって，この $\boldsymbol{c}$ は単に $[\boldsymbol{h}_1,\boldsymbol{h}_2,\dots,\boldsymbol{h}_I]$ の加重平均です．人工知能にこのベクトル $\boldsymbol{c}$ を入力値として処理させる場合，$\boldsymbol{h}_i$ に対する ${\phi}_i$ の値を大きな値とすることで $\boldsymbol{h}_i$ が注目すべき要素として認識されるという仕組みです．
+
+# 敵対的生成ネットワークとは英語では generative adversarial network（GAN）と言う（主に）ニューラルネットワークを用いてデータを生成する方法です．入力データを変換することもできますが，やっていることは変更したデータを「生成」することであるため「生成する方法です」と書きました．GAN は現実世界の色々なところで既に応用されている技術です．とても重要な技術なのでここで紹介します．最も基本的な GAN を紹介した後に，その GAN の問題点を解決する GAN を紹介して，最後により便利な利用が可能な GAN を紹介します．
 
 # ```{note}
-# ソフトマックス関数とはベクトルを入力として，各要素が 0 から 1 の範囲内にあり，各要素の総和が 1 となるベクトルを出力する関数のひとつでした．出力データを確率として解釈できるようになるというものです．入力ベクトルと出力ベクトルの長さは等しいです．
-# ```
-
-# ### セルフアテンション
-
-# あるベクトル（ソースベクトル）の各要素が別のベクトル（ターゲットベクトル）のどの要素に関連性が強いかということを明らかにしたい際にはソース・ターゲットアテンションというアテンションを計算します．これに対してこの章ではセルフアテンションを主に扱うのでこれを紹介します．セルフアテンションとは配列データの各トークン間の関連性を計算するためのものです．
-# 
-# セルフアテンションを視覚的に紹介します．ここでは，$x_1$，$x_2$，$x_3$ という 3 個のトークン（要素）からなるベクトルを入力として $y_1$，$y_2$，$y_3$ という 3 個のトークンからなるベクトルを得ようとします．各々のトークンもベクトルであるとします．
-# 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/selfAttention.svg?raw=1" width="100%" />
-# 
-# アテンションの計算では最初に，$x_1$ に 3 個の別々の重みパラメータを掛け，キー，バリュー，クエリという値を得ます．図ではぞれぞれ，$k_1$，$v_1$，$q_1$ と表されています．同様の計算を $x_2$ と $x_3$ についても行います．この図は既に $y_1$ の計算は終了して $y_2$ の計算が行われているところなので，$x_2$ を例に計算を進めます．$x_2$ に対して計算したクエリの値，$q_2$ をすべてのキーの値との内積を計算します．図中の $\odot$ は内積を計算する記号です．これによって得られた 3 個のスカラ値をその合計値が 1 となるように標準化します．これによって，0.7，0.2，0.1 という値が得られています．次にこれらの値をバリューに掛けます．これによって得られた 3 個のベクトルを足し合わせた値が $y_2$ です．これがセルフアテンションの計算です．クエリとキーの内積を計算することで，元のトークンと別のトークンの関係性を計算し，それを元のトークンに由来するバリューに掛けることで最終的に得られるベクトル（ここでは $y_2$）は別のすべてのトークンの情報を保持しているということになります．文脈情報を下流のネットワークに伝えることができるということです．
-# 
-# 以下では数式を利用してセルフアテンションを紹介します．入力配列データを $x$ とします．これは，$N$ 行 $m$ 列の行列であるとします．つまり，$N$ 個のトークンからなる配列データです．各トークンの特徴量は $m$ の長さからなるということです．セルフアテンションの計算では最初に，クエリ，キー，バリューの値を計算するのでした．$W_q$，$W_k$，$W_v$ という 3 個の重みパラメータを用いて以下のように計算します．この重みパラメータはそれぞれ $m$ 行 $d$ 列であるとします．
-# 
-# $
-# Q=  xW_q
-# $
-# 
-# $
-# K=  xW_k
-# $
-# 
-# $
-# V=  xW_v
-# $
-# 
-# これらを用いてアテンション $A$ は以下のように計算します．
-# 
-# $
-# \displaystyle A(x)=\sigma\left(\frac{QK^\mathsf{T}}{\sqrt{d}}\right)V
-# $
-# 
-# この式の $\sigma$ は $QK^\mathsf{T}$ の行方向に対して計算するソフトマックス関数です．これでアテンションの計算は終わりなのですが，アテンションの計算に出てくる項の掛け算の順番を変更するという操作でアテンションの計算量を改良した線形アテンションというものがあるのでそれもあわせて紹介します．線形アテンション $L$ は以下のように計算します．
-# 
-# $
-# L(x)=\tau(Q)(\tau(K)^\mathsf{T}V)
-# $
-# 
-# ここで，$\tau$ は以下の関数です．
-# 
-# $
-# \displaystyle \tau(x)=\begin{cases}
-# x+1 & (x > 0) \\
-# e^x & (x \leq 0)
-# \end{cases}
-# $
-# 
-# アテンションの時間計算量は配列の長さ $N$ に対して $O(N^2)$ なのですが，線形アテンションの時間計算量は線形 $O(N)$ です．とても簡単な工夫なのに恐ろしくスピードアップしています．
-
-# ```{note}
-# この項ではベクトルを英小文字の太字ではなくて普通のフォントで記述していることに注意してください．
-# ```
-
-# ## トランスフォーマー
-
-# トランスフォーマーはアテンションの最も有用な応用先のひとつです．トランスフォーマーの構造やその構成要素を紹介します．
-
-# ### 基本構造
-
-# トランスフォーマーとはアテンションと位置エンコード（ポジショナルエンコード）といわれる技術を用いて，再帰型ニューラルネットワークとは異なる方法で文字列を処理することができるニューラルネットワークの構造です．機械翻訳や質問応答に利用することができます．
-# 
-# 例えば，機械翻訳の場合，翻訳したい文字列を入力データ，翻訳結果の文字列を教師データとして利用します．構築した人工知能は翻訳したい文字列を入力値として受け取り，配列を出力します．配列の各要素は文字の個数と同じサイズのベクトル（その要素が何の文字なのかを示す確率ベクトル）です．
-# 
-# トランスフォーマーはエンコーダーとデコーダーという構造からなります．エンコーダーは配列（機械翻訳の場合，翻訳したい配列）を入力にして，同じ長さの配列を出力します．デコーダーも配列（機械翻訳の場合，翻訳で得たい配列）とエンコーダーが出力した配列を入力にして同じ長さの配列（各要素は確率ベクトル）を出力します．エンコーダーが出力した配列情報をデコーダーで処理する際にアテンションが利用されます．
-# 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/transformer.svg?raw=1" width="100%" />
-# 
-# エンコーダーとデコーダー間のアテンション以外にも，エンコーダーとデコーダーの内部でもそれぞれアテンション（セルフアテンション）が計算されます．アテンションは文字列内における文字の関連性を計算します．
-# 
-# トランスフォーマーは再帰型ニューラルネットワークで行うような文字の逐次的な処理が不要です．よって，計算機の並列化性能をより引き出せます．扱える文脈の長さも無限です．
-# 
-# このトランスフォーマーはものすごい性能を発揮しており，これまでに作られてきた様々な構造を過去のものとしました．特に応用の範囲が広いのはトランスフォーマーのエンコーダーの部分です．BERT と呼ばれる方法を筆頭に自然言語からなる配列を入力にして何らかの分散表現を出力する方法として自然言語処理に関わる様々な研究開発に利用されています．
-
-# ```{note}
-# 再帰型ニューラルネットワークでも扱える配列の長さは理論上無限です．
-# ```
-
-# ```{note}
-# 会話でトランスフォーマーという場合は，トランスフォーマーのエンコーダーまたはデコーダーのことを言っている場合があります．エンコーダー・デコーダー，エンコーダー，デコーダー，この3個でそれぞれできることが異なります．
+# GAN の構造には必ずしもニューラルネットワークが含まれる必要はありません．
 # ```
 
 # ```{hint}
-# 実用上，配列を入力にして配列を返す構造とだけ覚えておけば問題はないと思います．
+# 計算終了までとても時間がかかるので全てのコードセルを最初に実行すると良いと思います．
 # ```
 
-# ### 構成要素
+# ### 原理と活用方法
 
-# トランスフォーマーは大きく分けると 3 個の要素から構成されています．アテンション（セルフアテンション），位置エンコード，ポイントワイズ MLP です．アテンションは上の節で紹介した通り，入力データのトークン間の関係性を下流のネットワークに伝えるための機構です．
+# GAN の構成要素はふたつです．生成器（generator）と識別器（discriminator）です．識別器は以下で紹介する Wasserstein GAN（WGAN）を利用する場合は critic と名前を変えます．これの和訳は多分ありません．ここではクリティックと表記します．GAN はデータを生成（その派生として変換）する人工知能を作る方法です．最終的に得たいのは性能良く育った生成器です．識別器の役割は生成器をより良く育てることです．
 # 
-# **位置エンコード**は入力データの各トークンの位置関係を下流のネットワークに伝える仕組みです．RNN では入力された配列情報を最初，または，最後から順番に処理します．よって，人工知能は読み込まれた要素の順序，位置情報を明確に認識できています．これに対して，セルフアテンションを導入して文脈情報を扱えるようにした MLP はその認識ができません．アテンションで計算しているものは要素間の関連性であり，位置関係は考慮されていないのです．例えば，「これ　は　私　の　ラーメン　です」という文を考えた場合，アテンション機構では「これ」に対して「は」，「私」，「の」，「ラーメン」，「です」の関連度を計算していますが，「2 番目のタイムステップのは」や「3 番目のタイムステップの私」を認識しているわけではありません．よって，この文章の要素を並び替え，「は　です　の　私　これ　ラーメン」としても同じ計算結果が得られます．この例においては，そのような処理をしたとしても最終的な結果に影響はないかもしれませんが，例えば，「ラーメン　より　牛丼　が　好き　です　か」のような文章を考えた場合には問題が生じます．この文章では「ラーメンより牛丼が好き」かということを問うているのであって，「牛丼よりラーメンが好き」かということは問うていないのです．「より」の前後にある文字列の登場順が重要な意味を持ちます．このような情報を処理する際には各要素の位置情報を人工知能に認識させる必要があります．これは様々な方法で実現できますが，トランスフォーマーで用いている方法を紹介します．ここでは，以下のような配列情報を処理するものとします．
+# GAN の学習は，より良い質の偽札を作ろうとする紙幣の偽造者とその偽札を見破る警察によるイタチごっこに例えられます．GAN においては偽造者が生成器で，警察が識別器です．GAN は以下のような構造をしています．生成器にはランダムに発生させられたノイズデータが入力されます．このランダムノイズを入力にして生成器は質の良い偽札を生成しようとします．これに対して，識別器には生成器から出力された偽札データ（偽物のデータ）または，本物の札（本物のデータ）のどちらかが入力されます．このどちらかのデータを入力にして識別器は入力データが本物か偽物かの値を出力します．例えば，生成したいデータが画像である場合，生成器から出力されるものは画像で，識別器から出力されるものは `0` または `1` です．
 # 
-# $
-# \boldsymbol{x}=[[x_{11},x_{12},\dots,x_{1d}],[x_{21},x_{22},\dots,x_{2d}],\dots,[x_{l1},x_{l2},\dots,x_{ld}]]
-# $
+# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/gan.svg?raw=1" width="100%" />
 # 
-# すなわち，配列 $\boldsymbol{x}$ は $l$ 個の長さからなり，その $l$ 個の各要素は $d$ 個の要素からなるベクトルです．この $[x_{11},x_{12},\dots,x_{1d}]$ のような要素は例えば自然言語においては単語のことを示します．単語が $d$ 個の要素からなる何らかのベクトルとしてエンコードされているとします．このような配列情報に位置情報を持たせるには以下のような位置情報を含んだ配列を用意します．
+# 学習の最中に，生成器の性能と識別器の性能がどちらも良くなるようにそれらを育てます．よって生成器が良い感じに成長するとより質の高い偽札が生成されます．これに対して，識別器も偽札と本物の札を見分ける能力が高まるので，生成器は識別器に見破られないためにはさらに性能を向上させなければなりません．GAN の学習ではこのようなイタチごっこを行うことで生成器の性能を極限まで高めようとしています．
 # 
-# $
-# \boldsymbol{p}=[[p_{11},p_{12},\dots,p_{1d}],[p_{21},p_{22},\dots,p_{2d}],\dots,[p_{l1},p_{l2},\dots,p_{ld}]]
-# $
+# GAN の学習においては生成器と識別器のどちらもを成長させなければなりません．具体的には以下のようなふたつのパラメータ更新を別々に行います．
 # 
-# この配列は入力配列 $\boldsymbol{x}$ と同じ形をしています．よって $\boldsymbol{x}$ に加算することができます．$\boldsymbol{x}$ に $\boldsymbol{p}$ を加算することで位置情報を保持した配列を生成することができるのです．トランスフォーマーでは位置情報を含んだ配列の要素 $p_{ik}$ を $p_{i(2j)}$ と $p_{i(2j+1)}$ によって，トークンを示すベクトルの要素の偶数番目と奇数番目で場合分けし，それぞれ正弦関数と余弦関数で定義します．偶数番目は以下のように表されます．
+# *   生成器を成長させる際には，ノイズを入力にして出力された偽物のデータを識別器の入力として識別器が真偽を識別した結果得られる出力に対して計算したコストから生成器のパラメータについて勾配を計算し，これを用いて生成器だけのパラメータの更新を行います．
+# *   識別器を成長させる際には，生成器から得られた偽物のデータか本物のデータを入力として識別器が真偽を識別した結果得られる出力に対して計算したコストから識別器のパラメータについて勾配を計算し，これを用いて識別器だけのパラメータ更新を行います．
 # 
-# $
-# \displaystyle p_{i(2j)}=\sin\left(\frac{i}{10000^{\frac{2j}{d}}}\right)
-# $
-# 
-# 奇数番目は以下のように表されます．
+# 生成器のコスト関数を $P$，識別器のコスト関数を $Q$ で表したとき，生成器を成長させるためのコストを計算するコスト関数は以下のように表されます．
 # 
 # $
-# \displaystyle  p_{i(2j+1)}=\cos\left(\frac{i}{10000^{\frac{2j}{d}}}\right)
+# \displaystyle P(\boldsymbol{\theta})=\frac{1}{N}\sum_{i=1}^{N}\log(1-D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i)))
+# $
+# 
+# ここで，生成器は $G$，識別器は $D$ で表しています．それぞれのニューラルネットワークのパラメータは $\boldsymbol{\theta}$ と $\boldsymbol{\phi}$ で，また，生成器と識別器へ入力されたデータの個数（サイズ）は $N$ です．生成器への入力データである $N$ 個のノイズの $i$ 番目のデータを $\boldsymbol{z}_i$ と表し，識別器への $i$ 番目の入力データを $\boldsymbol{x}_i$ と表記しています．識別器は入力されたデータが偽である場合 `0` を出力し，真である場合 `1` を出力するものとします．この場合，生成器の出力は全て真であると識別してほしいので，この $P$ を小さくすれば目的に適うわけです．一方で，識別器のコスト関数は以下のように表されます．
+# 
+# $
+# \displaystyle Q(\boldsymbol{\phi})=-\frac{1}{N}\sum_{i=1}^{N}(\log D(\boldsymbol{\phi},\boldsymbol{x}_i)+\log(1-D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))))
+# $
+# 
+# 本物のデータに対しては `1` を出力してほしいし，偽物のデータに対しては `0` を出力してほしいので，この $Q$ を小さくすれば良いのですね．
+# 
+# ここでは，このように生成器と識別器のコスト関数を分けて書きましたが，元の論文には以下のように書かれています．
+# 
+# $
+# \displaystyle \min_G \max_D V(D,G) = \min_G \max_D \mathbb E_{x \sim p_{data}(x)}[\log{D(x)}]+ \mathbb E_{z \sim p_z(z)}[\log{(1-D(G(z)))}]
 # $
 # 
 # 
-# **ポイントワイズ MLP** は可変長の配列データを処理するための MLP です．機械学習モデルを学習させる際には様々なデータをモデルに読み込ませますが，配列データにおいては，それらのデータの長さが不揃いであることがあります．そのような場合において固定長のデータを処理するための方法である MLP を使おうとするとどのような長さのデータに対応させるためにはかなり長い入力層のサイズを用意しなければなりません．かなり長い入力層を利用したとしても，その入力層よりさらに長い入力データを処理しなければならない可能性は排除できません．これに対してポイントワイズ MLP は入力配列の各トークンに対してたったひとつの MLP の計算をする方法です．入力配列のどのトークンに対しても同じパラメータを持った MLP の計算が行われます．10 の長さの入力配列に対しては同じ MLP による計算が 10 回行われ，10 の長さの配列が出力されます．100 の長さの入力配列に対しては同じ MLP による計算が 100 回行われ，100 の長さの配列が出力されます．
-
-# ### 現実世界での利用方法
-
-# トランスフォーマーの現実世界での応用先としては，感情分析，特徴抽出，穴埋め，固有表現抽出（文章中の固有表現を見つける），質問応答，要約，文章生成，翻訳等があります．これらの問題を解決しようとする際には，実際には，事前学習モデルを活用する場合が多いです．事前学習モデルとは解きたい問題ではなくて，あらかじめ別の何らかの問題に対して（大量の）データを利用して学習した学習済みのモデルです．学習済みモデルにはそのドメインにおける知識を獲得していることを期待しています．
 # 
-# 事前学習モデルとして有名なものには BERT（bidirectional encoder representations from transformers）があります．上述のようにトランスフォーマーはエンコーダー・デコーダー構造を有しますが，BERT はトランスフォーマーのエンコーダー構造を利用して構築されるものです．BERT は自然言語からなる配列データを入力として何らかの配列データを出力する汎用言語表現モデルです．利用方法は多岐にわたりますが，自然言語の分散表現を生成するモデルと言えます．事前学習モデルとして公開されており，自然言語からなる配列を入力として得られる BERT の出力を別の何らかの問題を解くための人工知能アルゴリズムの入力として用いることで，様々な問題を解決するための基礎として利用することができます．
-#     
 
 # ```{note}
-# 次の章では BERT の利用方法を紹介します．
+# 元論文の式，これ厳密でしょうか？これだけ見せられたら意味わからないです．
 # ```
 
-# ## エンコーダーの実装
+# ### 色々な GAN
 
-# この節ではトランスフォーマーのエンコーダーに相当する部分の実装をアテンションの計算部分から作ります．
-
-# ### 扱うデータ
-
-# この節では以下のようなデータを利用して，3 個の値の分類問題を解きます．入力データの長さは一定ではありません．このデータには特徴があります．`0` に分類される 3 個の入力データの最初の要素はそれぞれ `1`，`3`，`7` です．また，`1` に分類される 3 個の入力データの最初の要素もそれぞれ `1`，`3`，`7` です．さらに，`2` に分類される 3 個の入力データの最初の要素も同じく `1`，`3`，`7` です．
+# GAN は色々なところで使われています．元々の GAN は 2014 年に開発されたのですが，その後もその改良は様々な研究者によって行われてきました．GAN の特有の問題を解決するための研究や GAN の適用先を画像解析分野や文字列解析分野にした研究や GAN に新たな機能を加える研究等です．数多くの GAN が開発されており，それらの GAN をまとめて GAN Zoo という場合があります．GAN Zoo は以下のウェブサイトにまとめられています．
 # 
-# 入力ベクトル | ターゲットベクトル
-# :---: | :---:
-# [1, 2, 3, 4, 5, 6, 7, 8, 9, 1] | [0]
-# [3, 9, 3, 4, 7] | [0]
-# [7, 5, 8] | [0]
-# [1, 5, 8] | [1]
-# [3, 9, 3, 4, 6] | [1]
-# [7, 3, 4, 1] | [1]
-# [1, 3] | [2]
-# [3, 9, 3, 4, 1] | [2]
-# [7, 5, 5, 7, 7, 5] | [2]
+# https://github.com/hindupuravinash/the-gan-zoo
 # 
-# このような入力データに対してアテンションの計算を行い，その後ポイントワイズ MLP の計算を行った後に，その出力ベクトルの最初の要素（元データの最初のトークンに対応する値）のみに対して MLP の計算を行い，ターゲットベクトルの予測をします．図で示すと以下のようなネットワークです．つまり，この問題はアテンションの出力（の最初の要素）が入力データの全部の文脈情報を保持できていないと解けない問題です．
-# 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/contextNetwork.svg?raw=1" width="100%" />
+# 全ての GAN について説明することはできないため，ここでは，最も基本的な GAN を紹介した後に，GAN の特有の問題であるモード崩壊を抑制するために開発された方法である WGAN-gp と GAN の入力に何らかの条件を加えることで，その条件にあった出力をさせることができるようになる Conditional GAN（CGAN）の紹介を行います．
 # 
 
-# ### 普通のアテンション
+# ## 基本的な GAN
 
-# 普通のアテンションを利用してこの問題を解くには以下のようなコードを書きます．
+# この節では基本的な GAN の実装方法を紹介します．また，GAN に関してどのような問題が存在しているのかについてまとめます．
+
+# ### GAN の学習の手順
+
+# GAN の学習は以下のような手順で行われます．
+# 
+# 1.   ノイズを入力にして生成器が偽物のデータを生成する．
+# 2.   偽物のデータを識別器に入力し，識別器からの出力値を得る．
+# 3.   識別器の出力値を用いて計算したコスト関数 $P$ の値に基づいて生成器のパラメータを更新．
+# 4.   偽物のデータと本物のデータを識別器に入力し，識別器からの出力値を得る．
+# 5.   識別器の出力値を用いて計算したコスト関数 $Q$ の値に基づいて識別器のパラメータを更新．
+# 6.   識別器の評価指標が収束した場合，学習を終了．それ以外の場合，最初に戻る．
+# 
+# 実際の学習の際には適した最適化法を選ぶとか，生成器と識別器の学習回数を変えるとか，真とラベルを 1 ではなくて 0.8 から 1.2 の範囲に含まれる値にするとかのテクニックが存在しますが，そのようなものは以下の実装の部分で紹介します．
+
+# ### GAN の実装
+
+# 最も基本的な GAN を実装します．このプログラムでは MNIST の学習データセットを読み込んで，類似した数字画像を出力する人工知能を構築します．以下のように書きます．
 
 # In[ ]:
 
@@ -191,339 +95,338 @@
 #!/usr/bin/env python3
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
 tf.random.set_seed(0)
 np.random.seed(0)
 
 def main():
-    # データの生成．
-    trainx = [[1,2,3,4,5,6,7,8,9,1], [3,9,3,4,7], [7,5,8], [1,5,8], [3,9,3,4,6], [7,3,4,1], [1,3], [3,9,3,4,1], [7,5,5,7,7,5]]
-    trainx = tf.keras.preprocessing.sequence.pad_sequences(trainx, padding="post", dtype=np.int32, value=0) # 短い配列の後ろにゼロパディングする．
-    traint = np.asarray([0, 0, 0, 1, 1, 1, 2, 2, 2], dtype=np.int32)
+    # ハイパーパラメータの設定
+    MiniBatchSize = 300
+    NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
+    MaxEpoch = 500
     
-    # ハイパーパラメータの設定．
-    maxEpochSize = 2000
-    embedSize = 16
-    attentionUnitSize = 32
-    middleUnitSize = 32
-    dropoutRate = 0.5
-    minibatchSize = 3
+    # データセットの読み込み
+    (learnX, learnT), (_, _) = tf.keras.datasets.mnist.load_data()
+    learnX = np.asarray(learnX.reshape([60000, 784]), dtype="float32")
+    learnX = (learnX - 127.5) / 127.5
     
-    # データのサイズや長さの取得．
-    trainSize = trainx.shape[0]
-    outputSize = len(np.unique(traint))
-    vocabNumber = len(np.unique(trainx))
-    minibatchNumber = trainSize // minibatchSize
+    # 生成器と識別器の構築
+    generator = Generator() # 下のクラスを参照．
+    discriminator = Discriminator() # 下のクラスを参照．
     
-    # モデルの生成．
-    model = Network(attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate)
-    cceComputer = tf.keras.losses.SparseCategoricalCrossentropy()
-    accComputer = tf.keras.metrics.SparseCategoricalAccuracy()
-    optimizer = tf.keras.optimizers.Adam()
+    # コスト関数と正確度を計算する関数の生成
+    costComputer = tf.keras.losses.SparseCategoricalCrossentropy()
+    accuracyComputer = tf.keras.metrics.SparseCategoricalAccuracy()
     
-    # tf.keras.Modelを継承したクラスからモデルを生成したとき，以下のように入力データの形に等しいデータを読み込ませてsummary()を利用するとモデルの詳細を表示可能．
-    model(tf.zeros((minibatchSize, trainx.shape[1])), False)
-    model.summary()
+    # オプティマイザは生成器と識別器で別々のものを利用
+    optimizerGenerator = tf.keras.optimizers.Adam(learning_rate=0.0001)
+    optimizerDiscriminator = tf.keras.optimizers.Adam(learning_rate=0.00004)
     
-    # デバッグプリント．入力に対してどのような出力が得られるかを確認する．
-#    dp = model.call(trainx, False)
-#    print(dp)
-#    exit()
+    # 生成器を成長させるためのコストを計算する関数
+    def generatorCostFunction(discriminatorOutputFromGenerated):
+        cost = costComputer(tf.ones(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated) # 生成器のコストの引数は生成器の出力を識別器に入れた結果．生成器としては全部正解を出しているはずなので教師はすべて1となるはず．そのように学習すべき．
+        accuracy = accuracyComputer(tf.ones(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated)
+        return cost, accuracy
     
-    # 以下は勾配を計算してコストや正確度を計算するための記述．
-    @tf.function
-    def run(tx, tt, flag):
-        with tf.GradientTape() as tape:
-            model.trainable = flag
-            ty = model.call(tx, flag)
-            costvalue = cceComputer(tt, ty)
-        gradient = tape.gradient(costvalue, model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient, model.trainable_variables))
-        accvalue = accComputer(tt, ty)
-        return costvalue, accvalue
+    # 識別器を成長させるためのコストを計算する関数
+    def discriminatorCostFunction(discriminatorOutputFromReal,discriminatorOutputFromGenerated): # 識別器のコストの引数は本物の情報を識別器に入れた結果と生成器の出力を識別器に入れた結果．
+        realCost = costComputer(tf.ones(discriminatorOutputFromReal.shape[0]), discriminatorOutputFromReal) # 本物の情報の場合はすべて正例（1）と判断すべき．これが例のコスト関数の左の項に相当．
+        fakeCost = costComputer(tf.zeros(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated) # 偽物の情報の場合はすべて負例（0）と判断すべき．これが例のコスト関数の右の項に相当．
+        cost = realCost + fakeCost
+        realAccuracy = accuracyComputer(tf.ones(discriminatorOutputFromReal.shape[0]), discriminatorOutputFromReal)
+        fakeAccuracy = accuracyComputer(tf.zeros(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated)
+        accuracy=(realAccuracy + fakeAccuracy) / 2
+        return cost, accuracy
     
-    # 以下は学習のための記述．
-    for epoch in range(1, maxEpochSize+1):
-        trainIndex = np.random.permutation(trainSize) # トレーニングデータセットのサイズに相当する整数からなるランダムな配列を生成．
-        trainCost, trainAcc = 0, 0
-        for subepoch in range(minibatchNumber):
-            startIndex = subepoch * minibatchSize
-            endIndex = (subepoch+1) * minibatchSize
-            miniTrainx = trainx[trainIndex[startIndex:endIndex]] # ランダムに決められた数だけデータを抽出する．
-            miniTraint = traint[trainIndex[startIndex:endIndex]]
-            miniTrainCost, miniTrainAcc = run(miniTrainx, miniTraint, True) # パラメータの更新をするのでフラッグはTrueにする．
-            trainCost += miniTrainCost * minibatchNumber**(-1)
-            trainAcc += miniTrainAcc * minibatchNumber**(-1)
-        if epoch % 50 == 0:
-            print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch, trainCost, trainAcc))
-            prediction = model.call(trainx, False)
-            print("Prediction:", np.argmax(prediction, axis=1)) # 予測値を出力．
+    @tf.function()
+    def run(generator, discriminator, noiseVector, realInputVector):
+        with tf.GradientTape() as generatorTape, tf.GradientTape() as discriminatorTape:
+            generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
+            discriminatorOutputFromGenerated = discriminator(generatedInputVector) # その生成データを識別器に入れる．
+            discriminatorOutputFromReal = discriminator(realInputVector) # 本物データを識別器に入れる．
+            # 識別器の成長
+            discriminatorCost, discriminatorAccuracy = discriminatorCostFunction(discriminatorOutputFromReal, discriminatorOutputFromGenerated)
+            gradientDiscriminator = discriminatorTape.gradient(discriminatorCost, discriminator.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
+            optimizerDiscriminator.apply_gradients(zip(gradientDiscriminator, discriminator.trainable_variables))
+            # 生成器の成長
+            generatorCost, generatorAccuracy = generatorCostFunction(discriminatorOutputFromGenerated)
+            gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
+            optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
+            return discriminatorCost, discriminatorAccuracy, generatorCost, generatorAccuracy
+    
+    # ミニバッチセットの生成
+    learnX = tf.data.Dataset.from_tensor_slices(learnX) # このような方法を使うと簡単にミニバッチを実装することが可能．
+    learnT = tf.data.Dataset.from_tensor_slices(learnT)
+    learnA = tf.data.Dataset.zip((learnX, learnT)).shuffle(60000).batch(MiniBatchSize) # 今回はインプットデータしか使わないけど後にターゲットデータを使う場合があるため．
+    miniBatchNumber = len(list(learnA.as_numpy_iterator()))
+    # 学習ループ
+    for epoch in range(1,MaxEpoch+1):
+        discriminatorCost, discriminatorAccuracy, generatorCost, generatorAccuracy = 0, 0, 0, 0
+        for learnx, _ in learnA:
+            noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+            discriminatorCostPiece, discriminatorAccuracyPiece, generatorCostPiece, generatorAccuracyPiece = run(generator, discriminator, noiseVector, learnx)
+            discriminatorCost += discriminatorCostPiece / miniBatchNumber
+            discriminatorAccuracy += discriminatorAccuracyPiece / miniBatchNumber
+            generatorCost += generatorCostPiece / miniBatchNumber
+            generatorAccuracy += generatorAccuracyPiece / miniBatchNumber
+        # 疑似的なテスト
+        if epoch%10 == 0:
+            print("Epoch {:10d} D-cost {:6.4f} D-acc {:6.4f} G-cost {:6.4f} G-acc {:6.4f}".format(epoch,float(discriminatorCost),float(discriminatorAccuracy),float(generatorCost),float(generatorAccuracy)))
+            validationNoiseVector = generateNoise(1, NoiseSize)
+            validationOutput = generator(validationNoiseVector)
+            validationOutput = np.asarray(validationOutput).reshape([1, 28, 28])
+            plt.imshow(validationOutput[0], cmap = "gray")
+            plt.pause(1)
 
-class Network(tf.keras.Model):
-    def __init__(self, attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate):
-        super(Network, self).__init__()
-        self.a = Attention(attentionUnitSize, dropoutRate)
-        self.embed = tf.keras.layers.Embedding(input_dim=vocabNumber, output_dim=embedSize, mask_zero=True)
-        self.pe = PositionalEncoder()
-        self.masker = Masker()
-        self.w1 = tf.keras.layers.Dense(middleUnitSize)
-        self.w2 = tf.keras.layers.Dense(outputSize)
-        self.lr = tf.keras.layers.LeakyReLU()
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x, learningFlag):
-        maskSeq, minNumber = self.masker(x)
-        x = self.embed(x) # エンベッド．質的変数をエンコードする．1を[0.3 0.1 0.7]，2を[0.4 0.9 0.3]のような指定した長さの浮動小数点数からなるベクトルへ変換する行為．
-        x = self.pe(x) # 位置エンコード情報の計算．
-        y = self.a(x, x, maskSeq, minNumber, learningFlag)
-        y = self.lr(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.w1(y)
-        y = self.lr(y)
-        y = y[:, 0, :] # 入力データの最初のトークンに相当する値だけを用いて以降の計算を行う．
-        y = self.w2(y)
-        y = tf.nn.softmax(y) # 3個の値の分類問題であるため．
+# 入力されたデータを0か1に分類するネットワーク
+class Discriminator(tf.keras.Model):
+    def __init__(self):
+        super(Discriminator,self).__init__()
+        self.d1 = tf.keras.layers.Dense(units=128)
+        self.d2 = tf.keras.layers.Dense(units=128)
+        self.d3 = tf.keras.layers.Dense(units=128)
+        self.d4 = tf.keras.layers.Dense(units=2, activation="softmax")
+        self.a = tf.keras.layers.LeakyReLU()
+        self.d = tf.keras.layers.Dropout(0.5)
+    def call(self,x):
+        y = self.d1(x)
+        y = self.a(y)
+        y = self.d(y)
+        y = self.d2(y)
+        y = self.a(y)
+        y = self.d(y)
+        y = self.d3(y)
+        y = self.a(y)
+        y = self.d(y)
+        y = self.d4(y)
         return y
 
-class Attention(tf.keras.Model):
-    def __init__(self, attentionUnitSize, dropoutRate):
-        super(Attention, self).__init__()
-        self.attentionUnitSize = attentionUnitSize
-        self.queryLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.keyLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.valueLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.outputLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-        q = self.queryLayer(x1) # クエリベクトルの生成．
-        k = self.keyLayer(x2) # キーベクトルの生成．
-        v = self.valueLayer(x2) # バリューベクトルの生成．
-        q = q * self.attentionUnitSize**(-0.5) # 正規化のため．
-        a = tf.matmul(q, k, transpose_b=True)
-        a = a + tf.cast(maskSeq, dtype=tf.float32) * minNumber # 次のソフトマックス関数の操作でゼロパディングした要素の値をゼロと出力するためにとても小さい値を加える．
-        a = tf.nn.softmax(a) # ゼロパティングされたところの値はゼロになる．
-        y = tf.matmul(a, v)
-        y = tf.keras.activations.relu(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.outputLayer(y)
+# 入力されたベクトルから別のベクトルを生成するネットワーク
+class Generator(tf.keras.Model):
+    def __init__(self):
+        super(Generator,self).__init__()
+        self.d1=tf.keras.layers.Dense(units=256)
+        self.d2=tf.keras.layers.Dense(units=256)
+        self.d3=tf.keras.layers.Dense(units=784)
+        self.a=tf.keras.layers.LeakyReLU()
+        self.b1=tf.keras.layers.BatchNormalization()
+        self.b2=tf.keras.layers.BatchNormalization()
+    def call(self,x):
+        y = self.d1(x)
+        y = self.a(y)
+        y = self.b1(y)
+        y = self.d2(y)
+        y = self.a(y)
+        y = self.b2(y)
+        y = self.d3(y)
+        y = tf.keras.activations.tanh(y)
         return y
 
-class Masker(tf.keras.Model):
-    # 以下は入力データが質的データのときに利用するもので，ゼロパディングされたトークンの位置（と小さい値）を返すもの．
-    def call(self, x):
-        x = tf.cast(x, dtype=tf.int32) # 浮動小数点数を整数にする．扱うデータがラベルデータのため．入力データが浮動小数点数であるなら不要．
-        inputBatchSize, inputLength = tf.unstack(tf.shape(x)) # バッチサイズと入力データの長さを取得．
-        maskSeq = tf.equal(x, 0) # 元データのゼロパディングした要素をTrue，そうでない要素をFalseとしたデータを生成．
-        maskSeq = tf.reshape(maskSeq, [inputBatchSize, 1, inputLength]) # データの形の整形．
-        return maskSeq, x.dtype.min # 整数の最も小さい値を後で利用するため返す．
-
-class PositionalEncoder(tf.keras.layers.Layer):
-    # 以下は位置エンコードをしたデータを返すもの．
-    def call(self, x):
-        inputBatchSize, inputLength, inputEmbedSize = tf.unstack(tf.shape(x)) # バッチサイズ，入力データの長さ，エンベッドサイズを取得．
-        j = tf.range(inputEmbedSize) // 2 * 2 # 2jの生成．2jではなくjという変数名を利用．
-        j = tf.tile(tf.expand_dims(j, 0),[inputLength, 1]) # データの形の整形．
-        denominator = tf.pow(float(10000), tf.cast(j/inputEmbedSize, x.dtype)) # 10000**(2j/d)の計算．
-        phase = tf.cast(tf.range(inputEmbedSize)%2, x.dtype) * np.pi / 2 # 位相の計算．後でsin(90度+x)=cos(x)を利用するため．np.piは3.14ラジアン（180度）．
-        phase = tf.tile(tf.expand_dims(phase, 0), [inputLength, 1]) # データの形の整形
-        i = tf.range(inputLength) # iの生成．
-        i = tf.cast(tf.tile(tf.expand_dims(i, 1), [1, inputEmbedSize]), x.dtype) # データの形の整形．
-        encordedPosition = tf.sin(i / denominator + phase) # 位置エンコードの式の計算．
-        encordedPosition = tf.tile(tf.expand_dims(encordedPosition, 0), [inputBatchSize, 1, 1]) # データの形の整形．
-        return x + encordedPosition
+def generateNoise(miniBatchSize, randomNoiseSize):
+    return np.random.uniform(-1, 1, size=(miniBatchSize,randomNoiseSize)).astype("float32")
 
 if __name__ == "__main__":
     main()
 
 
-# プログラムを実行すると以下のような結果が得られたと思います．この `Prediction` が入力データに対する予測結果です．正解を導けたことがわかります．
-# 
-# ```shell
-# .
-# .
-# .
-# Epoch  2000: Training cost= 0.0079, Training ACC= 0.9302
-# Prediction: [0 0 0 1 1 1 2 2 2]
-# ```
+# 実行した結果，エポックを経るに従って数字が含まれたような画像が生成されたはずです．GAN の学習の過程では，生成器と識別器の性能は拮抗するはずなので，生成器の正確度と識別器の正確度はどちらも 0.5 に収束すると良いと考えられます．
 
-# 以降でプログラムの説明をします．以下の部分はデータを生成するための記述です．入力配列の長さを揃えるためにゼロパディングをしています．
+# 以下の部分ではハイパーパラメータを設定します．ミニバッチに含まれるデータのサイズは 300 個にしました．GAN はランダムに発生させたノイズから何らかのデータを生成するものですが，このノイズのサイズ `NoiseSize` を 100 に設定しました．変更しても良いです．学習は今回の場合，500 回行うことにしました．実際はコストの値を観察しながら過学習が起こっていないエポックで学習を止めると良いと思います．
 # 
 # ```python
-#     # データの生成．
-#     trainx = [[1,2,3,4,5,6,7,8,9,1], [3,9,3,4,7], [7,5,8], [1,5,8], [3,9,3,4,6], [7,3,4,1], [1,3], [3,9,3,4,1], [7,5,5,7,7,5]]
-#     trainx = tf.keras.preprocessing.sequence.pad_sequences(trainx, padding="post", dtype=np.int32, value=0) # 短い配列の後ろにゼロパディングする．
-#     traint = np.asarray([0, 0, 0, 1, 1, 1, 2, 2, 2], dtype=np.int32)
+#     # ハイパーパラメータの設定
+#     MiniBatchSize = 300
+#     NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
+#     MaxEpoch = 500
 # ```
 
-# ```{note}
-# ゼロパディングしない世界に生まれたかったです．
-# ```
-
-# ハイパーパラメータの設定部分やデータサイズ等の取得の部分の説明は省略して，以下の部分ですが，これはモデルを生成するための記述です．この問題は分類問題なのでクロスエントロピーをコスト関数にします．
+# データセットの読み込みの部分ですが，TensorFlow が提要してくれる MNIST は 0 から 255 の値からなるデータなので，これを -1 から 1 の範囲からなるデータに変換しています．
 # 
 # ```python
-#     # モデルの生成．
-#     model = Network(attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate)
-#     cceComputer = tf.keras.losses.SparseCategoricalCrossentropy()
-#     accComputer = tf.keras.metrics.SparseCategoricalAccuracy()
-#     optimizer = tf.keras.optimizers.Adam()
+#     # データセットの読み込み
+#     (learnX, learnT), (_, _) = tf.keras.datasets.mnist.load_data()
+#     learnX = np.asarray(learnX.reshape([60000, 784]), dtype="float32")
+#     learnX = (learnX - 127.5) / 127.5
 # ```
 
-# 以下の部分はプログラム実行のために必要なものではありませんが，これを加えておくとネットワーク全体のパラメータサイズやネットワークの構造のまとめを表示することができます．モデル構造を記述したクラスで `tf.keras.Model` を継承することがポイントです．
+# 以下の部分では生成器と識別器を生成しています．
 # 
 # ```python
-#     # tf.keras.Modelを継承したクラスからモデルを生成したとき，以下のように入力データの形に等しいデータを読み込ませてsummary()を利用するとモデルの詳細を表示可能．
-#     model(tf.zeros((minibatchSize, trainx.shape[1])), False)
-#     model.summary()
+#     # 生成器と識別器の構築
+#     generator = Generator() # 下のクラスを参照．
+#     discriminator = Discriminator() # 下のクラスを参照．
 # ```
-
-# ```{note}
-# 論文を書くときとかは便利です．
-# ```
-
-# Subclassing API でネットワーク構造を作る際，つまり，ネットワーク構造を定義するクラスを作る際には以下のようなデバッグプリントで入力に対してどのような出力が得られるかを確認しながらトライアンドエラーでコーディングすると良いです．
+# 
+# 生成器を生成するためのクラスは以下に示す通りです．入力されたノイズデータに対して 3 層の全結合層の計算がされます．各層の活性化関数は Leaky ReLU です．また，バッチノーマライゼーションも利用しています．最終層のユニットサイズは 784 ですが，これは MNIST 画像のピクセル数に相当します．
 # 
 # ```python
-#     # デバッグプリント．入力に対してどのような出力が得られるかを確認する．
-# #    dp = model.call(trainx, False)
-# #    print(dp)
-# #    exit()
+# # 入力されたベクトルから別のベクトルを生成するネットワーク
+# class Generator(tf.keras.Model):
+#     def __init__(self):
+#         super(Generator,self).__init__()
+#         self.d1=tf.keras.layers.Dense(units=256)
+#         self.d2=tf.keras.layers.Dense(units=256)
+#         self.d3=tf.keras.layers.Dense(units=784)
+#         self.a=tf.keras.layers.LeakyReLU()
+#         self.b1=tf.keras.layers.BatchNormalization()
+#         self.b2=tf.keras.layers.BatchNormalization()
+#     def call(self,x):
+#         y = self.d1(x)
+#         y = self.a(y)
+#         y = self.b1(y)
+#         y = self.d2(y)
+#         y = self.a(y)
+#         y = self.b2(y)
+#         y = self.d3(y)
+#         y = tf.keras.activations.tanh(y)
+#         return y
 # ```
-
-# 以下の部分は Subclassing API で勾配を計算したり，最適化法を適用したり，コスト値を計算したりするためのお決まりの書き方です．
+# 
+# 識別器を生成するためのクラスは以下に示す通りです．今回の場合，識別器の入力データは 784 ピクセルの画像データです．これを入力にして，このデータが真か偽かを識別します．よって，最終層のユニットサイズは 2 です．
 # 
 # ```python
-#     # 以下は勾配を計算してコストや正確度を計算するための記述．
-#     @tf.function
-#     def run(tx, tt, flag):
-#         with tf.GradientTape() as tape:
-#             model.trainable = flag
-#             ty = model.call(tx, flag)
-#             costvalue = cceComputer(tt, ty)
-#         gradient = tape.gradient(costvalue, model.trainable_variables)
-#         optimizer.apply_gradients(zip(gradient, model.trainable_variables))
-#         accvalue = accComputer(tt, ty)
-#         return costvalue, accvalue
-# ```
-
-# 学習ループの記述は以下の部分です．ミニバッチの計算部分について説明します．最初に，0 からトレーニングデータセットのサイズに相当する整数（この場合 9）までの整数すべてがランダムに並べられたベクトルを生成します．このベクトルからミニバッチのサイズ（`minibatchSize`）分スライスをして抜き出すデータのインデックスを決めます．これをミニバッチの個数（`minibatchNumber`）分行うことで全部のデータをミニバッチ処理することができます．
-# 
-# ```python
-#     # 以下は学習のための記述．
-#     for epoch in range(1, maxEpochSize+1):
-#         trainIndex = np.random.permutation(trainSize) # トレーニングデータセットのサイズに相当する整数からなるランダムな配列を生成．
-#         trainCost, trainAcc = 0, 0
-#         for subepoch in range(minibatchNumber):
-#             startIndex = subepoch * minibatchSize
-#             endIndex = (subepoch+1) * minibatchSize
-#             miniTrainx = trainx[trainIndex[startIndex:endIndex]] # ランダムに決められた数だけデータを抽出する．
-#             miniTraint = traint[trainIndex[startIndex:endIndex]]
-#             miniTrainCost, miniTrainAcc = run(miniTrainx, miniTraint, True) # パラメータの更新をするのでフラッグはTrueにする．
-#             trainCost += miniTrainCost * minibatchNumber**(-1)
-#             trainAcc += miniTrainAcc * minibatchNumber**(-1)
-#         if epoch % 50 == 0:
-#             print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch, trainCost, trainAcc))
-#             prediction = model.call(trainx, False)
-#             print("Prediction:", np.argmax(prediction, axis=1)) # 予測値を出力．
-# ```
-
-# 次に，ネットワークの全体構造の説明をします．コンストラクタの部分ですが，アテンションを計算するクラスを最初に呼び出します．これは後で説明します．エンベッド層も呼び出します．エンベッドとは質的変数を指定したサイズのベクトルに包埋するためのものです．計算機で処理させるために行います．ここで行っているのはワンホットエンコーディングではなくて，浮動小数点数からなるベクトルへの包埋です．位置エンコードとマスク（ゼロパディングされた配列の特別な処理）を行うためのクラスの説明は後でします．その他の変数はよくある構成要素です．これらを用いて，このネットワークでは入力データの各トークをエンベッドし，位置エンコードし，アテンションの計算を行い，ポイントワイズ MLP（`self.w1`）の計算をした後に，その出力ベクトルの最初の要素（`y[:, 0, :]`）に MLP（`self.w2`）の計算をします．
-# 
-# ```python
-# class Network(tf.keras.Model):
-#     def __init__(self, attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate):
-#         super(Network, self).__init__()
-#         self.a = Attention(attentionUnitSize, dropoutRate)
-#         self.embed = tf.keras.layers.Embedding(input_dim=vocabNumber, output_dim=embedSize, mask_zero=True)
-#         self.pe = PositionalEncoder()
-#         self.masker = Masker()
-#         self.w1 = tf.keras.layers.Dense(middleUnitSize)
-#         self.w2 = tf.keras.layers.Dense(outputSize)
-#         self.lr = tf.keras.layers.LeakyReLU()
-#         self.dropout = tf.keras.layers.Dropout(dropoutRate)
-#     def call(self, x, learningFlag):
-#         maskSeq, minNumber = self.masker(x)
-#         x = self.embed(x) # エンベッド．質的変数をエンコードする．1を[0.3 0.1 0.7]，2を[0.4 0.9 0.3]のような指定した長さの浮動小数点数からなるベクトルへ変換する行為．
-#         x = self.pe(x) # 位置エンコード情報の計算．
-#         y = self.a(x, x, maskSeq, minNumber, learningFlag)
-#         y = self.lr(y)
-#         y = self.dropout(y, training=learningFlag)
-#         y = self.w1(y)
-#         y = self.lr(y)
-#         y = y[:, 0, :] # 入力データの最初のトークンに相当する値だけを用いて以降の計算を行う．
-#         y = self.w2(y)
-#         y = tf.nn.softmax(y) # 3個の値の分類問題であるため．
+# # 入力されたデータを0か1に分類するネットワーク
+# class Discriminator(tf.keras.Model):
+#     def __init__(self):
+#         super(Discriminator,self).__init__()
+#         self.d1 = tf.keras.layers.Dense(units=128)
+#         self.d2 = tf.keras.layers.Dense(units=128)
+#         self.d3 = tf.keras.layers.Dense(units=128)
+#         self.d4 = tf.keras.layers.Dense(units=2, activation="softmax")
+#         self.a = tf.keras.layers.LeakyReLU()
+#         self.d = tf.keras.layers.Dropout(0.5)
+#     def call(self,x):
+#         y = self.d1(x)
+#         y = self.a(y)
+#         y = self.d(y)
+#         y = self.d2(y)
+#         y = self.a(y)
+#         y = self.d(y)
+#         y = self.d3(y)
+#         y = self.a(y)
+#         y = self.d(y)
+#         y = self.d4(y)
 #         return y
 # ```
 
-# マスクした配列を処理するためのクラスは以下に示す通りです．ゼロパディング（マスク）した要素はアテンションの計算をする際に除外をしなければなりません．そのために，入力データのどこがマスクされたのかを知る必要がありますが，それを返す関数のみからなるクラスです．
+# 最適化法は生成器と識別器で異なるものを利用した方が良い場合があります．経験的に識別器の方が性能が出やすいので，ここでは学習率を少し小さく設定しています．
 # 
 # ```python
-# class Masker(tf.keras.Model):
-#     # 以下は入力データが質的データのときに利用するもので，ゼロパディングされたトークンの位置（と小さい値）を返すもの．
-#     def call(self, x):
-#         x = tf.cast(x, dtype=tf.int32) # 浮動小数点数を整数にする．扱うデータがラベルデータのため．入力データが浮動小数点数であるなら不要．
-#         inputBatchSize, inputLength = tf.unstack(tf.shape(x)) # バッチサイズと入力データの長さを取得．
-#         maskSeq = tf.equal(x, 0) # 元データのゼロパディングした要素をTrue，そうでない要素をFalseとしたデータを生成．
-#         maskSeq = tf.reshape(maskSeq, [inputBatchSize, 1, inputLength]) # データの形の整形．
-#         return maskSeq, x.dtype.min # 整数の最も小さい値を後で利用するため返す．
+#     # オプティマイザは生成器と識別器で別々のものを利用
+#     optimizerGenerator = tf.keras.optimizers.Adam(learning_rate=0.0001)
+#     optimizerDiscriminator = tf.keras.optimizers.Adam(learning_rate=0.00004)
 # ```
 
-# 位置エンコードのためのクラスは以下に示す通りです．位置エンコードの式に沿った記述です．最初に $2j$（`j`）を計算し，$10000^{(2j/d)}$（`denominator`）を求めます．位置エンコードの計算ではサインとコサインの計算が登場しますが，ここでは以下の変換公式を利用します．
-# 
-# $
-# \sin(\theta+90^{\circ})=\cos(\theta)
-# $
-# 
-# よって，位相を計算します．この位相を角度ベクトル（実際にはラジアン）に加え，まとめてサインの計算をすることでコサインの計算を同時に行います．最終的に得られた位置エンコードの値を入力データに加えることで位置エンコード情報の付加が終わります．
+# 以下の部分は生成器を成長させるためのコストを計算するコスト関数を含む記述です．これの引数は `discriminatorOutputFromGenerated` と書いていますが，これは生成器がノイズから生成したデータを識別器に入力したときに識別器が出力した値です．つまり，`0` または `1` です．`cost` からはじまる行では `tf.ones` で `1` という値からなるデータをミニバッチのサイズ分生成しています．それを `discriminatorOutputFromGenerated` と比較しています．この差を小さくしたいわけなので，つまり，生成器から出力されたデータはすべて真であると学習させるということを意味しています．
 # 
 # ```python
-# class PositionalEncoder(tf.keras.layers.Layer):
-#     # 以下は位置エンコードをしたデータを返すもの．
-#     def call(self, x):
-#         inputBatchSize, inputLength, inputEmbedSize = tf.unstack(tf.shape(x)) # バッチサイズ，入力データの長さ，エンベッドサイズを取得．
-#         j = tf.range(inputEmbedSize) // 2 * 2 # 2jの生成．2jではなくjという変数名を利用．
-#         j = tf.tile(tf.expand_dims(j, 0),[inputLength, 1]) # データの形の整形．
-#         denominator = tf.pow(float(10000), tf.cast(j/inputEmbedSize, x.dtype)) # 10000**(2j/d)の計算．
-#         phase = tf.cast(tf.range(inputEmbedSize)%2, x.dtype) * np.pi / 2 # 位相の計算．後でsin(90度+x)=cos(x)を利用するため．np.piは3.14ラジアン（180度）．
-#         phase = tf.tile(tf.expand_dims(phase, 0), [inputLength, 1]) # データの形の整形
-#         i = tf.range(inputLength) # iの生成．
-#         i = tf.cast(tf.tile(tf.expand_dims(i, 1), [1, inputEmbedSize]), x.dtype) # データの形の整形．
-#         encordedPosition = tf.sin(i / denominator + phase) # 位置エンコードの式の計算．
-#         encordedPosition = tf.tile(tf.expand_dims(encordedPosition, 0), [inputBatchSize, 1, 1]) # データの形の整形．
-#         return x + encordedPosition
+#     # 生成器を成長させるためのコストを計算する関数
+#     def generatorCostFunction(discriminatorOutputFromGenerated):
+#         cost = costComputer(tf.ones(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated) # 生成器のコストの引数は生成器の出力を識別器に入れた結果．生成器としては全部正解を出しているはずなので教師はすべて1となるはず．そのように学習すべき．
+#         accuracy = accuracyComputer(tf.ones(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated)
+#         return cost, accuracy
 # ```
 
-# これらのパーツを利用した最後のアテンションの計算は以下に示す通りです．コンストラクタの最初で入力ベクトルからクエリ，キー，バリューベクトルを生成するための重みパラメータを生成します．これらを用いてそれぞれ，クエリ，キー，バリューベクトルを生成します．この節で計算するアテンションはセルフアテンションであるため，計算の入力出る `x1` と `x2` を分ける必要はなかったのですが，ソース・ターゲットアテンションへの応用のことも考慮して分けています．その後正規化の計算（式の $\sqrt{d}$ の計算）を行った後に，クエリとキーの内積をとりアテンションを生成します．さらに，マスクした要素にとても小さい値（負の値）を加えます．これを加えた後にソフトマックス関数の計算を行うことで，ゼロパディングされた要素のアテンションの値は 0 になります．得られたアテンションにバリューの値を掛けることでアテンション機構の出力値が得られます．さらに，活性化関数やドロップアウトの計算を行い，出力層であるポイントワイズ MLP の計算を行います．
+# 以下は識別器を成長させるためのコストを計算するコスト関数を含む記述です．識別器の引数は `discriminatorOutputFromReal` と `discriminatorOutputFromGenerated` で，それぞれ，本物のデータを入力されたときの識別器の出力値と偽物のデータを入力されたときの識別器の出力値です．上の生成器の場合と同じ書き方をしているので確認してほしいのですが，識別器は本物のデータが入力されたら本物と識別するように，また，偽物のデータが入力されたら偽物と識別するように成長させられます．
 # 
 # ```python
-# class Attention(tf.keras.Model):
-#     def __init__(self, attentionUnitSize, dropoutRate):
-#         super(Attention, self).__init__()
-#         self.attentionUnitSize = attentionUnitSize
-#         self.queryLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-#         self.keyLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-#         self.valueLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-#         self.outputLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-#         self.dropout = tf.keras.layers.Dropout(dropoutRate)
-#     def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-#         q = self.queryLayer(x1) # クエリベクトルの生成．
-#         k = self.keyLayer(x2) # キーベクトルの生成．
-#         v = self.valueLayer(x2) # バリューベクトルの生成．
-#         q = q * self.attentionUnitSize**(-0.5) # 正規化のため．
-#         a = tf.matmul(q, k, transpose_b=True)
-#         a = a + tf.cast(maskSeq, dtype=tf.float32) * minNumber # 次のソフトマックス関数の操作でゼロパディングした要素の値をゼロと出力するためにとても小さい値を加える．
-#         a = tf.nn.softmax(a) # ゼロパティングされたところの値はゼロになる．
-#         y = tf.matmul(a, v)
-#         y = tf.keras.activations.relu(y)
-#         y = self.dropout(y, training=learningFlag)
-#         y = self.outputLayer(y)
-#         return y
+#     # 識別器を成長させるためのコストを計算する関数
+#     def discriminatorCostFunction(discriminatorOutputFromReal,discriminatorOutputFromGenerated): # 識別器のコストの引数は本物の情報を識別器に入れた結果と生成器の出力を識別器に入れた結果．
+#         realCost = costComputer(tf.ones(discriminatorOutputFromReal.shape[0]), discriminatorOutputFromReal) # 本物の情報の場合はすべて正例（1）と判断すべき．これが例のコスト関数の左の項に相当．
+#         fakeCost = costComputer(tf.zeros(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated) # 偽物の情報の場合はすべて負例（0）と判断すべき．これが例のコスト関数の右の項に相当．
+#         cost = realCost + fakeCost
+#         realAccuracy = accuracyComputer(tf.ones(discriminatorOutputFromReal.shape[0]), discriminatorOutputFromReal)
+#         fakeAccuracy = accuracyComputer(tf.zeros(discriminatorOutputFromGenerated.shape[0]), discriminatorOutputFromGenerated)
+#         accuracy=(realAccuracy + fakeAccuracy) / 2
+#         return cost, accuracy
+# ```
+
+# 以下は 1 回あたりの学習のための記述です．`tf.GradientTape()` を 2 個利用している点がちょっと珍しい書き方かもしれません．`generatedInputVector` からはじまる行はノイズデータからデータを生成する記述です．そしてそのデータを識別器に入力して得られる値が次の行の `discriminatorOutputFromGenerated` で，また，本物のデータを識別器に入力して得られる値が次の行の `discriminatorOutputFromReal` です．
+# 
+# ```python
+#     @tf.function()
+#     def run(generator, discriminator, noiseVector, realInputVector):
+#         with tf.GradientTape() as generatorTape, tf.GradientTape() as discriminatorTape:
+#             generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
+#             discriminatorOutputFromGenerated = discriminator(generatedInputVector) # その生成データを識別器に入れる．
+#             discriminatorOutputFromReal = discriminator(realInputVector) # 本物データを識別器に入れる．
+#             # 識別器の成長
+#             discriminatorCost, discriminatorAccuracy = discriminatorCostFunction(discriminatorOutputFromReal, discriminatorOutputFromGenerated)
+#             gradientDiscriminator = discriminatorTape.gradient(discriminatorCost, discriminator.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
+#             optimizerDiscriminator.apply_gradients(zip(gradientDiscriminator, discriminator.trainable_variables))
+#             # 生成器の成長
+#             generatorCost, generatorAccuracy = generatorCostFunction(discriminatorOutputFromGenerated)
+#             gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
+#             optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
+#             return discriminatorCost, discriminatorAccuracy, generatorCost, generatorAccuracy
+# ```
+
+# 以下の記述はミニバッチセットを生成するために TensorFlow が用意してくれたユーティリティを使うためのものです．
+# 
+# ```python
+#     # ミニバッチセットの生成
+#     learnX = tf.data.Dataset.from_tensor_slices(learnX) # このような方法を使うと簡単にミニバッチを実装することが可能．
+#     learnT = tf.data.Dataset.from_tensor_slices(learnT)
+#     learnA = tf.data.Dataset.zip((learnX, learnT)).shuffle(60000).batch(MiniBatchSize) # 今回はインプットデータしか使わないけど後にターゲットデータを使う場合があるため．
+#     miniBatchNumber = len(list(learnA.as_numpy_iterator()))
 # ```
 
 # ```{note}
-# とっても簡単なコードでアテンションが実装できますね．
+# 便利ですねこれ．
 # ```
 
-# アテンションの計算をこの問題に利用することで正解が導き出されたことから，アテンションを利用するとしっかり入力配列データの文脈情報を下流のネットワークに伝えることが出来たと思いますが，もうひとつ比較のための実験を行います．以下ではアテンションを利用せず，つまり，単なるポイントワイズ MLP を利用したときにこの問題を解くことができるかどうかを調べます．できないはずです．以下のようなコードを書いて実行します．
+# 学習ループに関しては特に説明しませんが，ループ内で用いられている `generateNoise` という名の関数はランダムなノイズを発生させるためのものです．
+# 
+# ```python
+# def generateNoise(miniBatchSize, randomNoiseSize):
+#     return np.random.uniform(-1, 1, size=(miniBatchSize,randomNoiseSize)).astype("float32")
+# ```
+
+# ### GAN の問題点
+
+# 上のプログラムを実行した際には観測できなかったかもしれませんが，GAN の学習を行った結果得られる人工知能（学習済み生成器）が同じような出力しかしなくなる現象があります．MNIST を例にすると 1 が含まれる画像しか生成しなくなるような現象です．この現象のことをモード崩壊と言います．英語では mode collpase と書きます．データを生成するために利用する GAN なので，利用目的にも依りますが，この現象は普通好ましくないものであると考えられます．これを解決しようとした WGAN-gp を以下で紹介します．
+# 
+# また，生成器の学習がとても進みにくいという問題もあります．最適化法を変更するとか，ハイパーパラメータの設定を慎重に行うとか，学習データサイズを増やすとかの色々な対策をとる必要があります．GAN の学習をうまく進めるために様々なテクニックがインターネット上でまとめられていますが，それらを自分の問題に合わせて取捨選択すると良いと思います．
+# 
+# その他の GAN の問題点としては，上のプログラムを実行した結果から確認できたと思いますが，生成したいデータの条件を指定できないことです．例えば，MNIST のような数字が含まれた画像の中でも 2 が含まれる画像のみを生成したい場合，上のプログラムではかなり蕪雑な方法を使わないとできません．これを解決しようとした方法を以下で紹介します．
+
+# ## WGAN-gp の実装
+
+# 基本的な GAN の改良版である WGAN-gp の実装方法を紹介します．
+
+# ### WGAN-gp とは
+
+# WGAN-gp は基本的な GAN で起こりやすく問題となるモード崩壊を解決しようとした方法です．GAN では何らかの分布に従ってデータが生成していると考えますが，この分布と本物のデータが生成される分布を近づけようとします．基本的な GAN の学習で行っている行為はそのふたつの分布間のヤンセン・シャノンダイバージェンスと言う値を小さくしようとすることに相当します．これに対して WGAN-gp ではより収束性能に優れたワッサースタイン距離を小さくしようとします．詳しくは元の論文を参照してください．
+# 
+# WGAN-gp の学習における生成器のコスト関数は以下の式で表されます．
+# 
+# $
+# \displaystyle P(\boldsymbol{\theta})=-\frac{1}{N}\sum_{i=1}^{N}D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))
+# $
+# 
+# また，WGAN-gp において識別器は真か偽の二値を識別して出力するものではなくて，実数を出力するものへと変わるため，これを識別器と呼ばず，クリティックと呼ぶ場合があるため，ここでもそのように呼びます．クリティックのコスト関数は以下の式で表されます．
+# 
+# $
+# \displaystyle Q(\boldsymbol{\phi})=\frac{1}{N}\sum_{i=1}^{N}(D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))-D(\boldsymbol{\phi},\boldsymbol{x}_i)+\lambda(\|\boldsymbol{g}(\boldsymbol{\phi},\boldsymbol{\hat{x}}_i)\|_2-1)^2)
+# $
+# 
+# ここでも，生成器を $G$，クリティックを $D$ で表します．それぞれのニューラルネットワークのパラメータは $\boldsymbol{\theta}$ と $\boldsymbol{\phi}$ で，また，生成器とクリティックへ入力されたデータの個数を $N$ とします．生成器への入力データである $N$ 個のノイズの $i$ 番目のデータを $\boldsymbol{z}_i$ と表し，クリティックへの $i$ 番目の入力データを $\boldsymbol{x}_i$ と表します．最後に，生成器のコスト関数を $P$，クリティックのコスト関数を $Q$ で表します．このクリティックのコスト関数にあるラムダを含む項は勾配ペナルティです．英語では gradient penalty（gp）です．このラムダはハイパーパラメータであり元の論文では10に設定されています．また，$\boldsymbol{g}$ は勾配ベクトル場であり，以下のように定義されます．
+# 
+# $
+# \displaystyle \boldsymbol{g}(\boldsymbol{\phi},\boldsymbol{x})=\frac{\partial D(\boldsymbol{\phi},\boldsymbol{x})}{\partial\boldsymbol{x}}
+# $
+# 
+# また，$\boldsymbol{\hat{x}}_i$ は以下の式で計算される値です．
+# 
+# $
+# \boldsymbol{\hat{x}}_i=\epsilon\boldsymbol{x}_i+(1-\epsilon)G(\boldsymbol{\theta},\boldsymbol{z}_i)
+# $
+# 
+# 式中で用いられている $\epsilon$ は，最小値が 0 で最大値が 1 の一様分布からサンプリングしたランダムな値です．
+
+# ### WGAN-gp の実装
+
+# WGAN-gp を実装します．このプログラムでも MNIST の学習データセットを読み込んで，類似した数字画像を出力する人工知能を構築します．以下のように書きます．
 
 # In[ ]:
 
@@ -531,224 +434,253 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
 tf.random.set_seed(0)
 np.random.seed(0)
 
 def main():
-    # データの生成．
-    trainx = [[1,2,3,4,5,6,7,8,9,1], [3,9,3,4,7], [7,5,8], [1,5,8], [3,9,3,4,6], [7,3,4,1], [1,3], [3,9,3,4,1], [7,5,5,7,7,5]]
-    trainx = tf.keras.preprocessing.sequence.pad_sequences(trainx, padding="post", dtype=np.int32, value=0) # 短い配列の後ろにゼロパディングする．
-    traint = np.asarray([0, 0, 0, 1, 1, 1, 2, 2, 2], dtype=np.int32)
+    # ハイパーパラメータの設定
+    MiniBatchSize = 300
+    NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
+    MaxEpoch = 300
+    CriticLearningNumber = 5
+    GradientPenaltyCoefficient = 10
     
-    # ハイパーパラメータの設定．
-    maxEpochSize = 2000
-    embedSize = 16
-    attentionUnitSize = 32
-    middleUnitSize = 32
-    dropoutRate = 0.5
-    minibatchSize = 3
+    # データセットの読み込み
+    (learnX, learnT), (_, _) = tf.keras.datasets.mnist.load_data()
+    learnX = np.asarray(learnX.reshape([60000, 784]), dtype="float32")
+    learnX = (learnX - 127.5) / 127.5
     
-    # データのサイズや長さの取得．
-    trainSize = trainx.shape[0]
-    outputSize = len(np.unique(traint))
-    vocabNumber = len(np.unique(trainx))
-    minibatchNumber = trainSize // minibatchSize
+    # 生成器と識別器の構築
+    generator = Generator() # 下のクラスを参照．
+    critic = Critic() # 下のクラスを参照．
     
-    # モデルの生成．
-    model = Network(attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate)
-    cceComputer = tf.keras.losses.SparseCategoricalCrossentropy()
-    accComputer = tf.keras.metrics.SparseCategoricalAccuracy()
-    optimizer = tf.keras.optimizers.Adam()
+    # オプティマイザは生成器と識別器で同じで良い．が，ハイパーパラメータを変えたくなるかもしれないからふたつ用意．
+    optimizerGenerator = tf.keras.optimizers.Adam(learning_rate=0.0001,beta_1=0,beta_2=0.9)
+    optimizerCritic = tf.keras.optimizers.Adam(learning_rate=0.0001,beta_1=0,beta_2=0.9)
     
-    # tf.keras.Modelを継承したクラスからモデルを生成したとき，以下のように入力データの形に等しいデータを読み込ませてsummary()を利用するとモデルの詳細を表示可能．
-    model(tf.zeros((minibatchSize, trainx.shape[1])), False)
-    model.summary()
+    @tf.function()
+    def runCritic(generator, critic, noiseVector, realInputVector):
+        with tf.GradientTape() as criticTape:
+            generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
+            criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
+            criticOutputFromReal = critic(realInputVector) # 本物データを識別器に入れる．
+            epsilon = tf.random.uniform(generatedInputVector.shape, minval=0, maxval=1)
+            intermediateVector = generatedInputVector + epsilon * (realInputVector - generatedInputVector)
+            # 勾配ペナルティ
+            with tf.GradientTape() as gradientPenaltyTape:
+                gradientPenaltyTape.watch(intermediateVector)
+                criticOutputFromIntermediate = critic(intermediateVector)
+                gradientVector = gradientPenaltyTape.gradient(criticOutputFromIntermediate, intermediateVector)
+                gradientNorm = tf.norm(gradientVector, ord="euclidean", axis=1) # gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．
+                gradientPenalty = GradientPenaltyCoefficient * (gradientNorm - 1)**2
+            # 識別器の成長
+            criticCost = tf.reduce_mean(criticOutputFromGenerated - criticOutputFromReal + gradientPenalty) # 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．
+            gradientCritic = criticTape.gradient(criticCost, critic.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
+            optimizerCritic.apply_gradients(zip(gradientCritic, critic.trainable_variables))
+            return criticCost
     
-    # 以下は勾配を計算してコストや正確度を計算するための記述．
-    @tf.function
-    def run(tx, tt, flag):
-        with tf.GradientTape() as tape:
-            model.trainable = flag
-            ty = model.call(tx, flag)
-            costvalue = cceComputer(tt, ty)
-        gradient = tape.gradient(costvalue, model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient, model.trainable_variables))
-        accvalue = accComputer(tt, ty)
-        return costvalue, accvalue
+    @tf.function()
+    def runGenerator(generator, critic, noiseVector):
+        with tf.GradientTape() as generatorTape:
+            generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
+            criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
+            # 生成器の成長
+            generatorCost = -tf.reduce_mean(criticOutputFromGenerated) # 生成器を成長させるためのコストを計算．
+            gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
+            optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
+            return generatorCost
     
-    # 以下は学習のための記述．
-    for epoch in range(1, maxEpochSize+1):
-        trainIndex = np.random.permutation(trainSize) # トレーニングデータセットのサイズに相当する整数からなるランダムな配列を生成．
-        trainCost, trainAcc = 0, 0
-        for subepoch in range(minibatchNumber):
-            startIndex = subepoch * minibatchSize
-            endIndex = (subepoch+1) * minibatchSize
-            miniTrainx = trainx[trainIndex[startIndex:endIndex]] # ランダムに決められた数だけデータを抽出する．
-            miniTraint = traint[trainIndex[startIndex:endIndex]]
-            miniTrainCost, miniTrainAcc = run(miniTrainx, miniTraint, True) # パラメータの更新をするのでフラッグはTrueにする．
-            trainCost += miniTrainCost * minibatchNumber**(-1)
-            trainAcc += miniTrainAcc * minibatchNumber**(-1)
-        if epoch % 50 == 0:
-            print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch, trainCost, trainAcc))
-            prediction = model.call(trainx, False)
-            print("Prediction:", np.argmax(prediction, axis=1)) # 予測値を出力．
+    # ミニバッチセットの生成
+    learnX = tf.data.Dataset.from_tensor_slices(learnX) # このような方法を使うと簡単にミニバッチを実装することが可能．
+    learnT = tf.data.Dataset.from_tensor_slices(learnT)
+    learnA = tf.data.Dataset.zip((learnX, learnT)).shuffle(60000).batch(MiniBatchSize) # 今回はインプットデータしか使わないけど後にターゲットデータを使う場合があるため．
+    miniBatchNumber = len(list(learnA.as_numpy_iterator()))
+    # 学習ループ
+    for epoch in range(1,MaxEpoch+1):
+        criticCost, generatorCost = 0, 0
+        for learnx, _ in learnA:
+            # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
+            for _ in range(CriticLearningNumber):
+                noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+                criticCostPiece = runCritic(generator, critic, noiseVector, learnx)
+                criticCost += criticCostPiece / (CriticLearningNumber * miniBatchNumber)
+            # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
+            for _ in range(1):
+                noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+                generatorCostPiece = runGenerator(generator, critic, noiseVector)
+                generatorCost += generatorCostPiece / miniBatchNumber
+        # 疑似的なテスト
+        if epoch%10 == 0:
+            print("Epoch {:10d} D-cost {:6.4f} G-cost {:6.4f}".format(epoch,float(criticCost),float(generatorCost)))
+            validationNoiseVector = generateNoise(1, NoiseSize)
+            validationOutput = generator(validationNoiseVector)
+            validationOutput = np.asarray(validationOutput).reshape([1, 28, 28])
+            plt.imshow(validationOutput[0], cmap = "gray")
+            plt.pause(1)
 
-class Network(tf.keras.Model):
-    def __init__(self, attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate):
-        super(Network, self).__init__()
-        self.a = PointwiseMLP(attentionUnitSize, dropoutRate) # ここが変化．
-        self.embed = tf.keras.layers.Embedding(input_dim=vocabNumber, output_dim=embedSize, mask_zero=True)
-        self.pe = PositionalEncoder()
-        self.masker = Masker()
-        self.w1 = tf.keras.layers.Dense(middleUnitSize)
-        self.w2 = tf.keras.layers.Dense(outputSize)
-        self.lr = tf.keras.layers.LeakyReLU()
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x, learningFlag):
-        maskSeq, minNumber = self.masker(x)
-        x = self.embed(x) # エンベッド．質的変数をエンコードする．1を[0.3 0.1 0.7]，2を[0.4 0.9 0.3]のような指定した長さの浮動小数点数からなるベクトルへ変換する行為．
-        x = self.pe(x) # 位置エンコード情報の計算．
-        y = self.a(x, x, maskSeq, minNumber, learningFlag)
-        y = self.lr(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.w1(y)
-        y = self.lr(y)
-        y = y[:, 0, :] # 入力データの最初のトークンに相当する値だけを用いて以降の計算を行う．
-        y = self.w2(y)
-        y = tf.nn.softmax(y) # 3個の値の分類問題であるため．
+# 入力されたデータを評価するネットワーク
+class Critic(tf.keras.Model):
+    def __init__(self):
+        super(Critic,self).__init__()
+        self.d1 = tf.keras.layers.Dense(units=128)
+        self.d2 = tf.keras.layers.Dense(units=128)
+        self.d3 = tf.keras.layers.Dense(units=128)
+        self.d4 = tf.keras.layers.Dense(units=1)
+        self.a = tf.keras.layers.LeakyReLU()
+        self.dropout = tf.keras.layers.Dropout(0.5)
+    def call(self,x):
+        y = self.d1(x)
+        y = self.a(y)
+        y = self.dropout(y)
+        y = self.d2(y)
+        y = self.a(y)
+        y = self.dropout(y)
+        y = self.d3(y)
+        y = self.a(y)
+        y = self.dropout(y)
+        y = self.d4(y)
         return y
 
-class Attention(tf.keras.Model):
-    def __init__(self, attentionUnitSize, dropoutRate):
-        super(Attention, self).__init__()
-        self.attentionUnitSize = attentionUnitSize
-        self.queryLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.keyLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.valueLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.outputLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-        q = self.queryLayer(x1) # クエリベクトルの生成．
-        k = self.keyLayer(x2) # キーベクトルの生成．
-        v = self.valueLayer(x2) # バリューベクトルの生成．
-        q = q * self.attentionUnitSize**(-0.5) # 正規化のため．
-        a = tf.matmul(q, k, transpose_b=True)
-        a = a + tf.cast(maskSeq, dtype=tf.float32) * minNumber # 次のソフトマックス関数の操作でゼロパディングした要素の値をゼロと出力するためにとても小さい値を加える．
-        a = tf.nn.softmax(a) # ゼロパティングされたところの値はゼロになる．
-        y = tf.matmul(a, v)
-        y = tf.keras.activations.relu(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.outputLayer(y)
+# 入力されたベクトルから別のベクトルを生成するネットワーク
+class Generator(tf.keras.Model):
+    def __init__(self):
+        super(Generator,self).__init__()
+        self.d1=tf.keras.layers.Dense(units=128)
+        self.d2=tf.keras.layers.Dense(units=128)
+        self.d3=tf.keras.layers.Dense(units=128)
+        self.d4=tf.keras.layers.Dense(units=784)
+        self.a=tf.keras.layers.LeakyReLU()
+        self.b1=tf.keras.layers.BatchNormalization()
+        self.b2=tf.keras.layers.BatchNormalization()
+        self.b3=tf.keras.layers.BatchNormalization()
+    def call(self,x):
+        y = self.d1(x)
+        y = self.a(y)
+        y = self.b1(y)
+        y = self.d2(y)
+        y = self.a(y)
+        y = self.b2(y)
+        y = self.d3(y)
+        y = self.a(y)
+        y = self.b3(y)
+        y = self.d4(y)
+        y = tf.keras.activations.tanh(y)
         return y
 
-class PointwiseMLP(Attention): # Attentionを継承．
-    def __init__(self, attentionUnitSize, dropoutRate):
-        super().__init__(attentionUnitSize, dropoutRate)
-    def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-        q = self.queryLayer(x1)
-        k = self.keyLayer(x2)
-        b = tf.transpose(maskSeq, perm=[0, 2, 1])
-        q = q * tf.cast(~b, dtype=tf.float32)
-        k = k * tf.cast(~b, dtype=tf.float32)
-        y = q * k
-        y = self.dropout(y, training=learningFlag)
-        y = self.valueLayer(y)
-        y = tf.keras.activations.relu(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.outputLayer(y)
-        return y
-
-class Masker(tf.keras.Model):
-    # 以下は入力データが質的データのときに利用するもので，ゼロパディングされたトークンの位置（と小さい値）を返すもの．
-    def call(self, x):
-        x = tf.cast(x, dtype=tf.int32) # 浮動小数点数を整数にする．扱うデータがラベルデータのため．入力データが浮動小数点数であるなら不要．
-        inputBatchSize, inputLength = tf.unstack(tf.shape(x)) # バッチサイズと入力データの長さを取得．
-        maskSeq = tf.equal(x, 0) # 元データのゼロパディングした要素をTrue，そうでない要素をFalseとしたデータを生成．
-        maskSeq = tf.reshape(maskSeq, [inputBatchSize, 1, inputLength]) # データの形の整形．
-        return maskSeq, x.dtype.min # 整数の最も小さい値を後で利用するため返す．
-
-class PositionalEncoder(tf.keras.layers.Layer):
-    # 以下は位置エンコードをしたデータを返すもの．
-    def call(self, x):
-        inputBatchSize, inputLength, inputEmbedSize = tf.unstack(tf.shape(x)) # バッチサイズ，入力データの長さ，エンベッドサイズを取得．
-        j = tf.range(inputEmbedSize) // 2 * 2 # 2jの生成．2jではなくjという変数名を利用．
-        j = tf.tile(tf.expand_dims(j, 0),[inputLength, 1]) # データの形の整形．
-        denominator = tf.pow(float(10000), tf.cast(j/inputEmbedSize, x.dtype)) # 10000**(2j/d)の計算．
-        phase = tf.cast(tf.range(inputEmbedSize)%2, x.dtype) * np.pi / 2 # 位相の計算．後でsin(90度+x)=cos(x)を利用するため．np.piは3.14ラジアン（180度）．
-        phase = tf.tile(tf.expand_dims(phase, 0), [inputLength, 1]) # データの形の整形
-        i = tf.range(inputLength) # iの生成．
-        i = tf.cast(tf.tile(tf.expand_dims(i, 1), [1, inputEmbedSize]), x.dtype) # データの形の整形．
-        encordedPosition = tf.sin(i / denominator + phase) # 位置エンコードの式の計算．
-        encordedPosition = tf.tile(tf.expand_dims(encordedPosition, 0), [inputBatchSize, 1, 1]) # データの形の整形．
-        return x + encordedPosition
+def generateNoise(miniBatchSize, randomNoiseSize):
+    return np.random.uniform(-1, 1, size=(miniBatchSize,randomNoiseSize)).astype("float32")
 
 if __name__ == "__main__":
     main()
 
 
-# 実行した結果，以下のような出力が得られました．学習がうまく進んでいません．3 個の値の分類問題なのでランダムに予測すると大体正確度は 0.33 になると思いますが，そのようになっています．
-# 
-# ```shell
-# .
-# .
-# .
-# Epoch  2000: Training cost= 1.1102, Training ACC= 0.3295
-# Prediction: [0 0 0 0 0 0 0 0 0]
+# このプログラムを実行すると，上の基本的な GAN を用いたときよりも奇麗な画像が出力されたのではないかと思います．また，生成器が綺麗な画像を出力しだす実時間も基本的な GAN を用いた場合よりも早かったのではないでしょうか．
+
+# ```{note}
+# WGAN-gp が優れた方法であることがわかりますね．
 # ```
 
-# ネットワーク構造で変化させた部分は以下の `PointwiseMLP` というクラスを呼び出すところです．
+# 以下の部分はハイパーパラメータの設定部分ですが，基本的な GAN と比べて，`CriticLearningNumber` が新たに加わっています．これは，生成器のパラメータ更新 1 回に対してクリティックのパラメータ更新をさせる回数です．基本的な GAN の学習をうまく進めるために生成器の学習回数を増やすことがあるのですが，WGAN-gp ではクリティックの方の学習回数を増やします．また，`GradientPenaltyCoefficient` は勾配ペナルティに欠ける係数です．これはハイパーパラメータなのですが，元の論文では 10 に設定されていたため，ここでも 10 にしました．
 # 
 # ```python
-# class Network(tf.keras.Model):
-#     def __init__(self, attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate):
-#         super(Network, self).__init__()
-#         self.a = PointwiseMLP(attentionUnitSize, dropoutRate) # ここが変化．
-#         self.embed = tf.keras.layers.Embedding(input_dim=vocabNumber, output_dim=embedSize, mask_zero=True)
-#         self.pe = PositionalEncoder()
-#         self.masker = Masker()
-#         self.w1 = tf.keras.layers.Dense(middleUnitSize)
-#         self.w2 = tf.keras.layers.Dense(outputSize)
-#         self.lr = tf.keras.layers.LeakyReLU()
-#         self.dropout = tf.keras.layers.Dropout(dropoutRate)
-#     def call(self, x, learningFlag):
-#         maskSeq, minNumber = self.masker(x)
-#         x = self.embed(x) # エンベッド．質的変数をエンコードする．1を[0.3 0.1 0.7]，2を[0.4 0.9 0.3]のような指定した長さの浮動小数点数からなるベクトルへ変換する行為．
-#         x = self.pe(x) # 位置エンコード情報の計算．
-#         y = self.a(x, x, maskSeq, minNumber, learningFlag)
-#         y = self.lr(y)
-#         y = self.dropout(y, training=learningFlag)
-#         y = self.w1(y)
-#         y = self.lr(y)
-#         y = y[:, 0, :] # 入力データの最初のトークンに相当する値だけを用いて以降の計算を行う．
-#         y = self.w2(y)
-#         y = tf.nn.softmax(y) # 3個の値の分類問題であるため．
-#         return y
+#     # ハイパーパラメータの設定
+#     MiniBatchSize = 300
+#     NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
+#     MaxEpoch = 300
+#     CriticLearningNumber = 5
+#     GradientPenaltyCoefficient = 10
 # ```
 
-# このクラスは以下のように書きました．折角アテンションのクラスを書いたのでそれを継承しました．パラメータのサイズはアテンションのものと同じです．
+# WGAN-gp では生成器とクリティックの学習回数を変えるため，パラメータ更新のための関数は別々に用意する必要があります．以下はクリティックのパラメータ更新を行うための記述です．
 # 
 # ```python
-# class PointwiseMLP(Attention): # Attentionを継承．
-#     def __init__(self, attentionUnitSize, dropoutRate):
-#         super().__init__(attentionUnitSize, dropoutRate)
-#     def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-#         q = self.queryLayer(x1)
-#         k = self.keyLayer(x2)
-#         b = tf.transpose(maskSeq, perm=[0, 2, 1])
-#         q = q * tf.cast(~b, dtype=tf.float32)
-#         k = k * tf.cast(~b, dtype=tf.float32)
-#         y = q * k
-#         y = self.dropout(y, training=learningFlag)
-#         y = self.valueLayer(y)
-#         y = tf.keras.activations.relu(y)
-#         y = self.dropout(y, training=learningFlag)
-#         y = self.outputLayer(y)
-#         return y
+#     @tf.function()
+#     def runCritic(generator, critic, noiseVector, realInputVector):
+#         with tf.GradientTape() as criticTape:
+#             generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
+#             criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
+#             criticOutputFromReal = critic(realInputVector) # 本物データを識別器に入れる．
+#             epsilon = tf.random.uniform(generatedInputVector.shape, minval=0, maxval=1)
+#             intermediateVector = generatedInputVector + epsilon * (realInputVector - generatedInputVector)
+#             # 勾配ペナルティ
+#             with tf.GradientTape() as gradientPenaltyTape:
+#                 gradientPenaltyTape.watch(intermediateVector)
+#                 criticOutputFromIntermediate = critic(intermediateVector)
+#                 gradientVector = gradientPenaltyTape.gradient(criticOutputFromIntermediate, intermediateVector)
+#                 gradientNorm = tf.norm(gradientVector, ord="euclidean", axis=1) # gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．
+#                 gradientPenalty = GradientPenaltyCoefficient * (gradientNorm - 1)**2
+#             # 識別器の成長
+#             criticCost = tf.reduce_mean(criticOutputFromGenerated - criticOutputFromReal + gradientPenalty) # 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．
+#             gradientCritic = criticTape.gradient(criticCost, critic.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
+#             optimizerCritic.apply_gradients(zip(gradientCritic, critic.trainable_variables))
+#             return criticCost
+# ```
+# 
+# 上で紹介したクリティックのコストを計算するための記述が含まれています．上の式の $\epsilon$ は `epsilon` からはじまる行で生成されます．単に一様分布からのサンプリングです．`intermediateVector` は $\hat{x}$ です．さらに，クリティックの出力に対してこの $\hat{x}$ に対する勾配を計算する必要がありますが，それを行っているのが `gradientVector` の行の記述です．引き続き `gradientPenalty` を行っています．その下の `criticCost` からはじまる行はクリティックのコストを求める上の式そのものです．
+
+# 以下の記述は生成器のコストを求めるためのものです．`generatorCost` からはじまる行が生成器を求めるための上の式そのものなので理解しやすいのではないでしょうか．
+# 
+# ```python
+#     @tf.function()
+#     def runGenerator(generator, critic, noiseVector):
+#         with tf.GradientTape() as generatorTape:
+#             generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
+#             criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
+#             # 生成器の成長
+#             generatorCost = -tf.reduce_mean(criticOutputFromGenerated) # 生成器を成長させるためのコストを計算．
+#             gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
+#             optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
+#             return generatorCost
 # ```
 
-# ### 線形計算量のアテンション
+# 学習ループの部分は基本的な GAN のものとほぼ同じなのですが，識別器のパラメータ更新の回数を生成器のそれと変えるため，`for _ in range(CriticLearningNumber):` の部分でハイパーパラメータとして設定した分だけパラメータ更新のループを設定しています．
+# 
+# ```python
+#     # 学習ループ
+#     for epoch in range(1,MaxEpoch+1):
+#         criticCost, generatorCost = 0, 0
+#         for learnx, _ in learnA:
+#             # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
+#             for _ in range(CriticLearningNumber):
+#                 noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+#                 criticCostPiece = runCritic(generator, critic, noiseVector, learnx)
+#                 criticCost += criticCostPiece / (CriticLearningNumber * miniBatchNumber)
+#             # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
+#             for _ in range(1):
+#                 noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+#                 generatorCostPiece = runGenerator(generator, critic, noiseVector)
+#                 generatorCost += generatorCostPiece / miniBatchNumber
+#         # 疑似的なテスト
+#         if epoch%10 == 0:
+#             print("Epoch {:10d} D-cost {:6.4f} G-cost {:6.4f}".format(epoch,float(criticCost),float(generatorCost)))
+#             validationNoiseVector = generateNoise(1, NoiseSize)
+#             validationOutput = generator(validationNoiseVector)
+#             validationOutput = np.asarray(validationOutput).reshape([1, 28, 28])
+#             plt.imshow(validationOutput[0], cmap = "gray")
+#             plt.pause(1)
+# ```
 
-# 線形計算量で計算が可能なアテンションの亜種を紹介します．以下のように書きます．
+# ## CGAN の実装
+
+# この節では条件を指定することで条件に合ったデータを生成することができる GAN の改良版である CGAN の実装方法を紹介します．
+
+# ### CGAN とは
+
+# GAN のプログラムで確認したように，0から9までの手書き数字の文字が含まれた画像を入力データとして学習させた学習済みのGANの生成器は，ランダムに生成されたノイズを入力データとして，ランダムに0から9までの数字が描かれた画像を生成することができます．生成される数字はノイズに応じたランダムなものであり，特定の数字が描かれた画像を意図的に出力させることはできません．これに対して，CGAN は生成器への入力データとしてノイズに加えて，何らかの条件を入力情報として与えることができる方法です．この条件を例えば0から9までの数字として設定して学習すれば，学習済みの生成器に特定の数字を条件として入力することで特定の数字を含む画像だけを生成させることができます．CGAN の全体像は以下の図に示す通りです．ほぼ GAN と同様なのですが，条件データを生成器と識別器に入れることができます．
+# 
+# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/cgan.svg?raw=1" width="100%" />
+# 
+# 基本的な GAN は新たなデータを生成することが可能でしたが，CGANを利用すれば，データの変換を行うことができます．例えば，人の顔画像を出力すように学習させた生成器に「笑う」，「怒る」，「悲しむ」のような条件を同時に与えることで画像中の人の表情を変化させることができます．また，風景画を出力するように学習させた生成器に「歌川広重」，「フェルメール」，「レンブラント」等のような画家（転じて画風）の条件を与えることで，指定した画家が描いたような風景画を出力させることができます．
+# 
+
+# ```{note}
+# 上手に使えば色々なことを実現できます．
+# ```
+
+# ### CGAN の実装
+
+# CGAN を実装します．ただし，この CGAN では基本的な GAN の学習法ではなくて WGAN-gp の方法を使っています．WGAN-gp が非常に強力な方法だからです．よって，これは元々の CGAN でなくて CWGAN-gp とでも呼ぶべきものです．このプログラムでも MNIST の学習データセットを読み込んで，類似した数字画像を出力する人工知能を構築します．以下のように書きます．
 
 # In[ ]:
 
@@ -756,212 +688,196 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
 tf.random.set_seed(0)
 np.random.seed(0)
 
 def main():
-    # データの生成．
-    trainx = [[1,2,3,4,5,6,7,8,9,1], [3,9,3,4,7], [7,5,8], [1,5,8], [3,9,3,4,6], [7,3,4,1], [1,3], [3,9,3,4,1], [7,5,5,7,7,5]]
-    trainx = tf.keras.preprocessing.sequence.pad_sequences(trainx, padding="post", dtype=np.int32, value=0) # 短い配列の後ろにゼロパディングする．
-    traint = np.asarray([0, 0, 0, 1, 1, 1, 2, 2, 2], dtype=np.int32)
+    # ハイパーパラメータの設定
+    MiniBatchSize = 300
+    NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
+    MaxEpoch = 300
+    CriticLearningNumber = 5
+    GradientPenaltyCoefficient = 10
     
-    # ハイパーパラメータの設定．
-    maxEpochSize = 2000
-    embedSize = 16
-    attentionUnitSize = 32
-    middleUnitSize = 32
-    dropoutRate = 0.5
-    minibatchSize = 3
+    # データセットの読み込み
+    (learnX, learnT), (_, _) = tf.keras.datasets.mnist.load_data()
+    learnX = np.asarray(learnX.reshape([60000, 784]), dtype="float32")
+    learnX = (learnX - 127.5) / 127.5
     
-    # データのサイズや長さの取得．
-    trainSize = trainx.shape[0]
-    outputSize = len(np.unique(traint))
-    vocabNumber = len(np.unique(trainx))
-    minibatchNumber = trainSize // minibatchSize
+    # 生成器と識別器の構築
+    generator = Generator() # 下のクラスを参照．
+    critic = Critic() # 下のクラスを参照．
     
-    # モデルの生成．
-    model = Network(attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate)
-    cceComputer = tf.keras.losses.SparseCategoricalCrossentropy()
-    accComputer = tf.keras.metrics.SparseCategoricalAccuracy()
-    optimizer = tf.keras.optimizers.Adam()
+    # オプティマイザは生成器と識別器で同じで良い．が，ハイパーパラメータを変えたくなるかもしれないからふたつ用意．
+    optimizerGenerator = tf.keras.optimizers.Adam(learning_rate=0.0001,beta_1=0,beta_2=0.9)
+    optimizerCritic = tf.keras.optimizers.Adam(learning_rate=0.0001,beta_1=0,beta_2=0.9)
     
-    # tf.keras.Modelを継承したクラスからモデルを生成したとき，以下のように入力データの形に等しいデータを読み込ませてsummary()を利用するとモデルの詳細を表示可能．
-    model(tf.zeros((minibatchSize, trainx.shape[1])), False)
-    model.summary()
+    @tf.function()
+    def runCritic(generator, critic, noiseVector, realInputVector, realConditionVector):
+        with tf.GradientTape() as criticTape:
+            generatedInputVector = generator(noiseVector, realConditionVector) # 生成器によるデータの生成．
+            criticOutputFromGenerated = critic(generatedInputVector, realConditionVector) # その生成データを識別器に入れる．
+            criticOutputFromReal = critic(realInputVector, realConditionVector) # 本物データを識別器に入れる．
+            epsilon = tf.random.uniform(generatedInputVector.shape, minval=0, maxval=1)
+            intermediateVector = generatedInputVector + epsilon * (realInputVector - generatedInputVector)
+            # 勾配ペナルティ
+            with tf.GradientTape() as gradientPenaltyTape:
+                gradientPenaltyTape.watch(intermediateVector)
+                criticOutputFromIntermediate = critic(intermediateVector, realConditionVector)
+                gradientVector = gradientPenaltyTape.gradient(criticOutputFromIntermediate, intermediateVector)
+                gradientNorm = tf.norm(gradientVector, ord="euclidean", axis=1) # gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．
+                gradientPenalty = GradientPenaltyCoefficient * (gradientNorm - 1)**2
+            # 識別器の成長
+            criticCost = tf.reduce_mean(criticOutputFromGenerated - criticOutputFromReal + gradientPenalty) # 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．
+            gradientCritic = criticTape.gradient(criticCost, critic.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
+            optimizerCritic.apply_gradients(zip(gradientCritic, critic.trainable_variables))
+            return criticCost
     
-    # 以下は勾配を計算してコストや正確度を計算するための記述．
-    @tf.function
-    def run(tx, tt, flag):
-        with tf.GradientTape() as tape:
-            model.trainable = flag
-            ty = model.call(tx, flag)
-            costvalue = cceComputer(tt, ty)
-        gradient = tape.gradient(costvalue, model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient, model.trainable_variables))
-        accvalue = accComputer(tt, ty)
-        return costvalue, accvalue
+    @tf.function()
+    def runGenerator(generator, critic, noiseVector, generatedConditionVector):
+        with tf.GradientTape() as generatorTape:
+            generatedInputVector = generator(noiseVector, generatedConditionVector) # 生成器によるデータの生成．
+            criticOutputFromGenerated = critic(generatedInputVector, generatedConditionVector) # その生成データを識別器に入れる．
+            # 生成器の成長
+            generatorCost = -tf.reduce_mean(criticOutputFromGenerated) # 生成器を成長させるためのコストを計算．
+            gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
+            optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
+            return generatorCost
     
-    # 以下は学習のための記述．
-    for epoch in range(1, maxEpochSize+1):
-        trainIndex = np.random.permutation(trainSize) # トレーニングデータセットのサイズに相当する整数からなるランダムな配列を生成．
-        trainCost, trainAcc = 0, 0
-        for subepoch in range(minibatchNumber):
-            startIndex = subepoch * minibatchSize
-            endIndex = (subepoch+1) * minibatchSize
-            miniTrainx = trainx[trainIndex[startIndex:endIndex]] # ランダムに決められた数だけデータを抽出する．
-            miniTraint = traint[trainIndex[startIndex:endIndex]]
-            miniTrainCost, miniTrainAcc = run(miniTrainx, miniTraint, True) # パラメータの更新をするのでフラッグはTrueにする．
-            trainCost += miniTrainCost * minibatchNumber**(-1)
-            trainAcc += miniTrainAcc * minibatchNumber**(-1)
-        if epoch % 50 == 0:
-            print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch, trainCost, trainAcc))
-            prediction = model.call(trainx, False)
-            print("Prediction:", np.argmax(prediction, axis=1)) # 予測値を出力．
+    # ミニバッチセットの生成
+    learnX = tf.data.Dataset.from_tensor_slices(learnX) # このような方法を使うと簡単にミニバッチを実装することが可能．
+    learnT = tf.data.Dataset.from_tensor_slices(learnT)
+    learnA = tf.data.Dataset.zip((learnX, learnT)).shuffle(60000).batch(MiniBatchSize) # インプットデータもターゲットデータも両方使うため．
+    miniBatchNumber = len(list(learnA.as_numpy_iterator()))
+    # 学習ループ
+    for epoch in range(1,MaxEpoch+1):
+        criticCost, generatorCost = 0, 0
+        for learnx, learnt in learnA:
+            # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
+            for _ in range(CriticLearningNumber):
+                noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+                criticCostPiece = runCritic(generator, critic, noiseVector, learnx, learnt)
+                criticCost += criticCostPiece / (CriticLearningNumber * miniBatchNumber)
+            # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
+            for _ in range(1):
+                noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
+                generatedConditionVector = generateConditionVector(MiniBatchSize)
+                generatorCostPiece = runGenerator(generator, critic, noiseVector, generatedConditionVector)
+                generatorCost += generatorCostPiece / miniBatchNumber
+        # 疑似的なテスト
+        if epoch%10 == 0:
+            print("Epoch {:10d} D-cost {:6.4f} G-cost {:6.4f}".format(epoch,float(criticCost),float(generatorCost)))
+            validationNoiseVector = generateNoise(1, NoiseSize)
+            validationConditionVector = generateConditionVector(1)
+            validationOutput = generator(validationNoiseVector, validationConditionVector)
+            validationOutput = np.asarray(validationOutput).reshape([1, 28, 28])
+            plt.imshow(validationOutput[0], cmap = "gray")
+            plt.text(1, 2.5, int(validationConditionVector[0]), fontsize=20, color="white")
+            plt.pause(1)
 
-class Network(tf.keras.Model):
-    def __init__(self, attentionUnitSize, middleUnitSize, vocabNumber, embedSize, outputSize, dropoutRate):
-        super(Network, self).__init__()
-        self.a = LinearAttention(attentionUnitSize, dropoutRate)
-        self.embed = tf.keras.layers.Embedding(input_dim=vocabNumber, output_dim=embedSize, mask_zero=True)
-        self.pe = PositionalEncoder()
-        self.masker = Masker()
-        self.w1 = tf.keras.layers.Dense(middleUnitSize)
-        self.w2 = tf.keras.layers.Dense(outputSize)
-        self.lr = tf.keras.layers.LeakyReLU()
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x, learningFlag):
-        maskSeq, minNumber = self.masker(x)
-        x = self.embed(x) # エンベッド．質的変数をエンコードする．1を[0.3 0.1 0.7]，2を[0.4 0.9 0.3]のような指定した長さの浮動小数点数からなるベクトルへ変換する行為．
-        x = self.pe(x) # 位置エンコード情報の計算．
-        y = self.a(x, x, maskSeq, minNumber, learningFlag)
-        y = self.lr(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.w1(y)
-        y = self.lr(y)
-        y = y[:, 0, :] # 入力データの最初のトークンに相当する値だけを用いて以降の計算を行う．
-        y = self.w2(y)
-        y = tf.nn.softmax(y) # 3個の値の分類問題であるため．
+# 入力されたデータを評価するネットワーク
+class Critic(tf.keras.Model):
+    def __init__(self):
+        super(Critic,self).__init__()
+        self.d1 = tf.keras.layers.Dense(units=128)
+        self.d2 = tf.keras.layers.Dense(units=128)
+        self.d3 = tf.keras.layers.Dense(units=128)
+        self.d4 = tf.keras.layers.Dense(units=1)
+        self.a = tf.keras.layers.LeakyReLU()
+        self.dropout = tf.keras.layers.Dropout(0.5)
+        self.embed = tf.keras.layers.Embedding(input_dim=10, output_dim=64, mask_zero=False)
+        self.concatenate = tf.keras.layers.Concatenate()
+    def call(self,x,c):
+        y = self.d1(x)
+        c = self.embed(c)
+        y = self.concatenate([y, c])
+        y = self.a(y)
+        y = self.dropout(y)
+        y = self.d2(y)
+        y = self.a(y)
+        y = self.dropout(y)
+        y = self.d3(y)
+        y = self.a(y)
+        y = self.dropout(y)
+        y = self.d4(y)
         return y
 
-class Attention(tf.keras.Model):
-    def __init__(self, attentionUnitSize, dropoutRate):
-        super(Attention, self).__init__()
-        self.attentionUnitSize = attentionUnitSize
-        self.queryLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.keyLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.valueLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.outputLayer = tf.keras.layers.Dense(attentionUnitSize, use_bias=False)
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-        q = self.queryLayer(x1) # クエリベクトルの生成．
-        k = self.keyLayer(x2) # キーベクトルの生成．
-        v = self.valueLayer(x2) # バリューベクトルの生成．
-        q = q * self.attentionUnitSize**(-0.5) # 正規化のため．
-        a = tf.matmul(q, k, transpose_b=True)
-        a = a + tf.cast(maskSeq, dtype=tf.float32) * minNumber # 次のソフトマックス関数の操作でゼロパディングした要素の値をゼロと出力するためにとても小さい値を加える．
-        a = tf.nn.softmax(a) # ゼロパティングされたところの値はゼロになる．
-        y = tf.matmul(a, v)
-        y = tf.keras.activations.relu(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.outputLayer(y)
+# 入力されたベクトルから別のベクトルを生成するネットワーク
+class Generator(tf.keras.Model):
+    def __init__(self):
+        super(Generator,self).__init__()
+        self.d1 = tf.keras.layers.Dense(units=128)
+        self.d2 = tf.keras.layers.Dense(units=128)
+        self.d3 = tf.keras.layers.Dense(units=128)
+        self.d4 = tf.keras.layers.Dense(units=784)
+        self.a = tf.keras.layers.LeakyReLU()
+        self.b1 = tf.keras.layers.BatchNormalization()
+        self.b2 = tf.keras.layers.BatchNormalization()
+        self.b3 = tf.keras.layers.BatchNormalization()
+        self.embed = tf.keras.layers.Embedding(input_dim=10, output_dim=64, mask_zero=False)
+        self.concatenate = tf.keras.layers.Concatenate()
+    def call(self,x,c):
+        y = self.d1(x)
+        c = self.embed(c)
+        y = self.concatenate([y, c])
+        y = self.a(y)
+        y = self.b1(y)
+        y = self.d2(y)
+        y = self.a(y)
+        y = self.b2(y)
+        y = self.d3(y)
+        y = self.a(y)
+        y = self.b3(y)
+        y = self.d4(y)
+        y = tf.keras.activations.tanh(y)
         return y
 
-class LinearAttention(Attention): # Attentionを継承．
-    def __init__(self, attentionUnitSize, dropoutRate):
-        super().__init__(attentionUnitSize, dropoutRate)
-        self.elu=tf.keras.layers.ELU() # Attentionと異なる非線形関数を導入．
-    def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-        q = self.queryLayer(x1)
-        q = self.elu(q)+1
-        k = self.keyLayer(x2)
-        v = self.valueLayer(x2)
-        q = q * x2.shape[2]**(-0.5)
-        maskSeqT = tf.transpose(maskSeq, perm=[0, 2, 1])
-        k = self.elu(k) + 1
-        m = tf.reduce_mean(k, axis=2)
-        m = tf.expand_dims(m, axis=2)
-        k = tf.nn.softmax(k)
-        k = k * tf.cast(~maskSeqT, dtype=tf.float32)
-        v = v * tf.cast(~maskSeqT, dtype=tf.float32)
-        a = tf.matmul(k, v, transpose_a=True)
-        a = self.dropout(a, training=learningFlag)
-        y = tf.matmul(q, a)
-        y = y * m**(-1)
-        y = tf.keras.activations.relu(y)
-        y = self.dropout(y,training=learningFlag)
-        y = self.outputLayer(y)
-        return y
+def generateNoise(miniBatchSize, randomNoiseSize):
+    return np.random.uniform(-1, 1, size=(miniBatchSize,randomNoiseSize)).astype("float32")
 
-class Masker(tf.keras.Model):
-    # 以下は入力データが質的データのときに利用するもので，ゼロパディングされたトークンの位置（と小さい値）を返すもの．
-    def call(self, x):
-        x = tf.cast(x, dtype=tf.int32) # 浮動小数点数を整数にする．扱うデータがラベルデータのため．入力データが浮動小数点数であるなら不要．
-        inputBatchSize, inputLength = tf.unstack(tf.shape(x)) # バッチサイズと入力データの長さを取得．
-        maskSeq = tf.equal(x, 0) # 元データのゼロパディングした要素をTrue，そうでない要素をFalseとしたデータを生成．
-        maskSeq = tf.reshape(maskSeq, [inputBatchSize, 1, inputLength]) # データの形の整形．
-        return maskSeq, x.dtype.min # 整数の最も小さい値を後で利用するため返す．
-
-class PositionalEncoder(tf.keras.layers.Layer):
-    # 以下は位置エンコードをしたデータを返すもの．
-    def call(self, x):
-        inputBatchSize, inputLength, inputEmbedSize = tf.unstack(tf.shape(x)) # バッチサイズ，入力データの長さ，エンベッドサイズを取得．
-        j = tf.range(inputEmbedSize) // 2 * 2 # 2jの生成．2jではなくjという変数名を利用．
-        j = tf.tile(tf.expand_dims(j, 0),[inputLength, 1]) # データの形の整形．
-        denominator = tf.pow(float(10000), tf.cast(j/inputEmbedSize, x.dtype)) # 10000**(2j/d)の計算．
-        phase = tf.cast(tf.range(inputEmbedSize)%2, x.dtype) * np.pi / 2 # 位相の計算．後でsin(90度+x)=cos(x)を利用するため．np.piは3.14ラジアン（180度）．
-        phase = tf.tile(tf.expand_dims(phase, 0), [inputLength, 1]) # データの形の整形
-        i = tf.range(inputLength) # iの生成．
-        i = tf.cast(tf.tile(tf.expand_dims(i, 1), [1, inputEmbedSize]), x.dtype) # データの形の整形．
-        encordedPosition = tf.sin(i / denominator + phase) # 位置エンコードの式の計算．
-        encordedPosition = tf.tile(tf.expand_dims(encordedPosition, 0), [inputBatchSize, 1, 1]) # データの形の整形．
-        return x + encordedPosition
+def generateConditionVector(miniBatchSize):
+    return np.random.choice(range(10), size=(miniBatchSize))
 
 if __name__ == "__main__":
     main()
 
 
-# アテンションを利用したとき同様，しっかり正解を導き出せています．この線形アテンションが本家アテンションに性能が劣っているかどうかというと，全くそんなことはありません．問題によってはこっちの方が性能が出る場合があります．
-# 
-# ```shell
-# .
-# .
-# .
-# Epoch  2000: Training cost= 0.0287, Training ACC= 0.8869
-# Prediction: [0 0 0 1 1 1 2 2 2]
-# ```
+# 実行した結果として生成される画像の中心から左上の辺りに数字が表示されていると思います．これはランダムに発生させた条件です．ランダムに 0 から 9 の範囲内にある整数が選択されます．この整数で指定した条件と同じような手書き数字（のようなもの）を出力してほしいのですが，結果を確認すると意図通りにできていますよね．
 
-# ```{note}
-# アテンションの亜種は他にもたくさんあります．
-# ```
-
-# 線形アテンションのクラスは以下に示す通りです．上で示した式通りの実装なので説明は省略します．
+# CGAN の説明はこれまでのプログラムが理解できている人には不要かもしれません．WGAN-gp の実装変わっている点は 1 点だけです．以下はクリティックのコストを求めるための記述ですが，引数がひとつ増えています．`realConditionVector` が増えているのですが，これは条件を指定するためのベクトルです．生成器とクリティックの入力ベクトルとして条件データを入力する必要があるため，これが新たに加わっただけです．その他の計算は WGAN-gp のものと全く同じです．
 # 
 # ```python
-# class LinearAttention(Attention): # Attentionを継承．
-#     def __init__(self, attentionUnitSize, dropoutRate):
-#         super().__init__(attentionUnitSize, dropoutRate)
-#         self.elu=tf.keras.layers.ELU() # Attentionと異なる非線形関数を導入．
-#     def call(self, x1, x2, maskSeq, minNumber, learningFlag):
-#         q = self.queryLayer(x1)
-#         q = self.elu(q)+1
-#         k = self.keyLayer(x2)
-#         v = self.valueLayer(x2)
-#         q = q * x2.shape[2]**(-0.5)
-#         maskSeqT = tf.transpose(maskSeq, perm=[0, 2, 1])
-#         k = self.elu(k) + 1
-#         m = tf.reduce_mean(k, axis=2)
-#         m = tf.expand_dims(m, axis=2)
-#         k = tf.nn.softmax(k)
-#         k = k * tf.cast(~maskSeqT, dtype=tf.float32)
-#         v = v * tf.cast(~maskSeqT, dtype=tf.float32)
-#         a = tf.matmul(k, v, transpose_a=True)
-#         a = self.dropout(a, training=learningFlag)
-#         y = tf.matmul(q, a)
-#         y = y * m**(-1)
-#         y = tf.keras.activations.relu(y)
-#         y = self.dropout(y,training=learningFlag)
-#         y = self.outputLayer(y)
-#         return y
+#     @tf.function()
+#     def runCritic(generator, critic, noiseVector, realInputVector, realConditionVector):
+#         with tf.GradientTape() as criticTape:
+#             generatedInputVector = generator(noiseVector, realConditionVector) # 生成器によるデータの生成．
+#             criticOutputFromGenerated = critic(generatedInputVector, realConditionVector) # その生成データを識別器に入れる．
+#             criticOutputFromReal = critic(realInputVector, realConditionVector) # 本物データを識別器に入れる．
+#             epsilon = tf.random.uniform(generatedInputVector.shape, minval=0, maxval=1)
+#             intermediateVector = generatedInputVector + epsilon * (realInputVector - generatedInputVector)
+#             # 勾配ペナルティ
+#             with tf.GradientTape() as gradientPenaltyTape:
+#                 gradientPenaltyTape.watch(intermediateVector)
+#                 criticOutputFromIntermediate = critic(intermediateVector, realConditionVector)
+#                 gradientVector = gradientPenaltyTape.gradient(criticOutputFromIntermediate, intermediateVector)
+#                 gradientNorm = tf.norm(gradientVector, ord="euclidean", axis=1) # gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．
+#                 gradientPenalty = GradientPenaltyCoefficient * (gradientNorm - 1)**2
+#             # 識別器の成長
+#             criticCost = tf.reduce_mean(criticOutputFromGenerated - criticOutputFromReal + gradientPenalty) # 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．
+#             gradientCritic = criticTape.gradient(criticCost, critic.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
+#             optimizerCritic.apply_gradients(zip(gradientCritic, critic.trainable_variables))
+#             return criticCost
+# ```
+
+# 以下のミニバッチを構築するための記述の `learnA` からはじまる行のコメントに注目してください．これまではここに，「今回はインプットデータしか使わないけど後にターゲットデータを使う場合があるため．」と書いていましたが，ここでは，「インプットデータもターゲットデータも両方使うため．」と書きました．CGAN では MNIST の教師データを学習ループ内で使うためです．
+# 
+# ```python
+#     # ミニバッチセットの生成
+#     learnX = tf.data.Dataset.from_tensor_slices(learnX) # このような方法を使うと簡単にミニバッチを実装することが可能．
+#     learnT = tf.data.Dataset.from_tensor_slices(learnT)
+#     learnA = tf.data.Dataset.zip((learnX, learnT)).shuffle(60000).batch(MiniBatchSize) # インプットデータもターゲットデータも両方使うため．
+#     miniBatchNumber = len(list(learnA.as_numpy_iterator()))
 # ```
 
 # ```{note}
