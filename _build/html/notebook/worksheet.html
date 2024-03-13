@@ -1,0 +1,1096 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>演習問題 &#8212; 実践データ科学</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="12. 強化学習法" href="tensorflow_10.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/neko.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">実践データ科学</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  データ科学を学ぶにあたって
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="introduction.html">
+   1. 機械学習とその周辺事項
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  プログラミングの基礎
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="python_01.html">
+   2. Python の基本的な使用方法
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="python_02.html">
+   3. Python の発展的な使用方法
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  scikit-learn を利用した機械学習
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="scikit_learn_01.html">
+   4. 教師あり学習法
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="scikit_learn_02.html">
+   5. 教師なし学習法
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  深層学習
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_01.html">
+   6. TensorFlow の基本的な利用方法
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_02.html">
+   7. 多層パーセプトロン
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_05.html">
+   8. 再帰型ニューラルネットワーク
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_06.html">
+   9. アテンションネットワーク
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_07.html">
+   10. Hugging Face の利用方法
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_08.html">
+   11. 敵対的生成ネットワーク
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tensorflow_10.html">
+   12. 強化学習法
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  付録
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   演習問題
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebook/worksheet.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/yamada-kd/introduction-to-artificial-intelligence/tree/main/notebook"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        
+        
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/yamada-kd/introduction-to-artificial-intelligence/blob/main/notebook/worksheet.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   はじめに
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     問題について
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     配点と採点基準
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id5">
+   プログラミングの基礎
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     1-1 行列の掛け算
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id7">
+     1-2 ファイルの処理
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scikit-learn">
+   scikit-learn を利用した機械学習
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id8">
+     2-1 探索的データ解析
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id9">
+     2-2 人工知能の性能比較
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id10">
+     2-3 計算の速さの比較
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id11">
+   深層学習
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id12">
+     3-1 性能向上テクニック
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id13">
+     3-2 感情分析
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id14">
+     3-3 アテンションの活用
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#cgan">
+     3-4 普通の CGAN の実装
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id15">
+     3-5 強化学習法の実装
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>演習問題</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   はじめに
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     問題について
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     配点と採点基準
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id5">
+   プログラミングの基礎
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     1-1 行列の掛け算
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id7">
+     1-2 ファイルの処理
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scikit-learn">
+   scikit-learn を利用した機械学習
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id8">
+     2-1 探索的データ解析
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id9">
+     2-2 人工知能の性能比較
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id10">
+     2-3 計算の速さの比較
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id11">
+   深層学習
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id12">
+     3-1 性能向上テクニック
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id13">
+     3-2 感情分析
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id14">
+     3-3 アテンションの活用
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#cgan">
+     3-4 普通の CGAN の実装
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id15">
+     3-5 強化学習法の実装
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="tex2jax_ignore mathjax_ignore section" id="id1">
+<h1>演習問題<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>はじめに<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>この演習問題集に関する説明をします．</p>
+<div class="section" id="id3">
+<h3>問題について<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>この演習問題集では，簡単に答えが見つからない，回答者に難易度の設定すら委ねるような問題がいくつか含まれています．この講義の対象者がデータ科学的な解析技術を有しないものの，自身の専門を持つ研究者であるからです．データ科学は問題解決のアプローチに過ぎず，既に研究をされている研究者なら解くべき問題に対する調査や取り組み方法を持っていると思ったからこのようにしました．解答のためのコードセルは適宜増やしてください．</p>
+</div>
+<div class="section" id="id4">
+<h3>配点と採点基準<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>配点は各問題についてそれぞれ 10 点です．プログラムは問題通りの出力を再現できたとしても意図通りかけていない場合があり採点の基準が必要であるため，採点者は以下のような採点基準で点数をつけます．</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>点</p></th>
+<th class="head"><p>基準</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>この解答が良い評価を得ないのであれば全ての採点を拒否する．</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>この解答が絶対に良い評価得るべきである．</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>この解答は良い評価を得るべきである．</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>この解答は良い評価を得るべきであるが，場合によって悪い評価を得たしても許容可能．</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>この解答が良い評価を得てほしいものの，そうでなくても問題ない．</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>この解答が良い評価を得てほしくないものの，そうでなくても問題ない．</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>この解答は良い評価を得ないべきであるが，場合によって良い評価を得たとしても許容可能．</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>この解答は良い評価を得ないべきである．</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>この解答に絶対に良い評価を与えるべきではない．</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>この解答が良い評価を得るのだとしたら全ての採点を拒否する．</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>解答がないため採点できない．</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>プログラミングの基礎<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>「プログラミングの基礎」で触れた事柄に関する問題集です．講義資料に載っていない事柄に取り組みますが，現実世界でプログラミングはそういう課題に取り組むことではじめて実力がつきます．</p>
+<div class="section" id="id6">
+<h3>1-1 行列の掛け算<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>以下の行列の掛け算を NumPy 等のライブラリを用いずに計算するためのプログラムを書いてください．</p>
+<p><span class="math notranslate nohighlight">\(
+  \left[
+    \begin{array}{ccc}
+      1 &amp; 2 &amp; 3 \\
+      3 &amp; 4 &amp; 5\\
+    \end{array}
+  \right]
+  \times
+  \left[
+    \begin{array}{cc}
+      5 &amp; 6 \\
+      6 &amp; 7 \\
+      7 &amp; 8 \\
+    \end{array}
+  \right]
+\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>行列の掛け算なんてライブラリ使わずにやることなんてないからなんて不毛な問題なんだ，と思うかもしれないのですが，プログラミング初心者がこれをできるようになるということは <code class="docutils literal notranslate"><span class="pre">for</span></code> の使い方と動き方をしっかり理解していることの確認となり，その観点からは有意義です．</p>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>1-2 ファイルの処理<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>シェルのコマンドに <code class="docutils literal notranslate"><span class="pre">wget</span></code> というものがありますが，これを使うとインターネット上から情報を取得することができます．Wikipedia の「334」という項目は以下の URL に載っています．</p>
+<p><a class="reference external" href="https://ja.wikipedia.org/wiki/334">https://ja.wikipedia.org/wiki/334</a></p>
+<p>この URL にアクセスして表示されるテキストの中に <code class="docutils literal notranslate"><span class="pre">334</span></code> という値が何個あるか数えるプログラムを作ってください．</p>
+<p>最初に，<code class="docutils literal notranslate"><span class="pre">wget</span></code> で URL にアクセスしてその情報全部を <code class="docutils literal notranslate"><span class="pre">wikipedia-334.txt</span></code> というファイル名で現在のディレクトリに保存してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ここにシェルのコマンドを書く．</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>オプションコマンド <code class="docutils literal notranslate"><span class="pre">-O</span></code> を利用するとファイル名を指定して保存できます．</p>
+</div>
+<p>次に，このファイルを Python で読んで <code class="docutils literal notranslate"><span class="pre">334</span></code> という文字列が何個あるかカウントして，カウントした結果だけを出力してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>ファイルがどこにあるかわからない人は「カレントディレクトリ」という概念を調べてみましょう．</p>
+</div>
+</div>
+</div>
+<div class="section" id="scikit-learn">
+<h2>scikit-learn を利用した機械学習<a class="headerlink" href="#scikit-learn" title="Permalink to this headline">¶</a></h2>
+<p>「scikit-learn を利用した機械学習」で触れた事柄に関する問題集です．これも講義資料に載っていない事柄に取り組みますが，現実世界でプログラミングはそういう課題に取り組むことではじめて実力がつきます．</p>
+<div class="section" id="id8">
+<h3>2-1 探索的データ解析<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>探索的データ解析とはこれから利用しようとするデータセットを様々な角度から観察してデータの性質を把握しようとする行為のことです．英語では exploratory data analysis（EDA）と呼ばれます．ここでは，scikit-learn から利用可能な breast cancer wisconsin (diagnostic) dataset なるデータセットを利用します．以下のように読み込むことができます．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">dBreastCancer</span> <span class="o">=</span> <span class="n">load_breast_cancer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dBreastCancer</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>なんとなく紹介したくなくて触れなかったのですが，<code class="docutils literal notranslate"><span class="pre">pandas</span></code> ていうライブラリのデータフレームというものの使い方を調べるとこのデータを上手に扱えるようになると思います．</p>
+</div>
+<p>最も簡単な解析はデータセットのインスタンスサイズを知ることであったり，各アトリビュートの意味を知ることであったり，教師データの性質を知ることであったりするでしょう．次に，各アトリビュートと教師データの関連性を図で表現することが考えられます．</p>
+<p>最初に，何か図を利用しない解析を行う何らかのプログラムを書いてください．思いつく限りの解析をたくさん行ってください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">dBreastCancer</span> <span class="o">=</span> <span class="n">load_breast_cancer</span><span class="p">()</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>平均値，中央値，最頻値，最大値，最小値とか色々ありますよね</p>
+</div>
+<p>次に，何か図を描画することでデータの性質を把握するためのプログラムを書いてください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">dBreastCancer</span> <span class="o">=</span> <span class="n">load_breast_cancer</span><span class="p">()</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>図示すると変数間の関連性を理解しやすいですよね．</p>
+</div>
+</div>
+<div class="section" id="id9">
+<h3>2-2 人工知能の性能比較<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>データセット breast cancer wisconsin (diagnostic) dataset は肺の良性腫瘍と悪性腫瘍に関するデータを含んでいます．この分類器を決定木を用いて構築してファイルとして保存してください．このとき，以下のことをやってください．</p>
+<ul class="simple">
+<li><p>元のデータセットの 20% をテストデータセットとする．</p></li>
+<li><p>乱数の種を固定する．</p></li>
+<li><p>グリッドサーチとクロスバリデーションでハイパーパラメータを最適化する．</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>上で保存した人工知能を新たに呼び出して，テストデータセットを利用していくつかの評価指標を用いて性能の評価値を出力してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>勾配ブースティングと呼ばれる機械学習モデルを利用して予測器を構築し，上と同様のテストデータセットで同様の評価指標を用いて性能の評価値を出力してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>決定木の性能と勾配ブースティングの性能の差に意味のある差がありそうなのかについて，適切な統計検定法を用いて，有意水準 1% で評価してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>対応のない t 検定，対応のある t 検定，ウィルコクソンの順位和検定，ウィルコクソンの符号順位検定，ダネット検定，チューキー・クレーマー検定，スティール検定，スティール・ドゥワス検定．たくさん検定法があってその比較に適した方法を選ばなければなりませんよね．フィッシャーの直接確率検定とかありますよね．</p>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>2-3 計算の速さの比較<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>以下のようにすると MNIST というデータセットをダウンとロードして読み込むことができます．ここでは MNIST が何であるかに触れませんが，10 個のクラス分類のためのデータセットであり，各インスタンスは 784 の長さのベクトルであり，公式から提供されている学習データセットのサイズは 60000 個であることだけお知らせします．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">learnX</span><span class="p">,</span> <span class="n">learnT</span><span class="p">),</span> <span class="p">(</span><span class="n">textX</span><span class="p">,</span> <span class="n">testT</span><span class="p">)</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>このデータセットは以下のようにすることで簡単に scikit-learn で利用することができます．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">learnX</span><span class="p">,</span> <span class="n">learnT</span><span class="p">),</span> <span class="p">(</span><span class="n">textX</span><span class="p">,</span> <span class="n">testT</span><span class="p">)</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+    <span class="n">learnX</span> <span class="o">=</span> <span class="n">learnX</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">784</span><span class="p">)</span>
+    <span class="n">predictor</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+    <span class="n">predictor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">learnX</span><span class="p">,</span> <span class="n">learnT</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>利用する機械学習モデルを変えるとその評価性能が変わるのと同じように，利用する機械学習モデルによって学習に要する計算時間も変わります．各モデルの計算時間はデータセットのサイズはデータセットに含まれるインスタンスのサイズや実装の方法に依存して変わります．例えば，サポートベクトルマシンはサンプルサイズの 3 乗に依存して計算時間が増加します．計算時間の観点から自身が解析したいデータセットの特性に合わせて機械学習モデルを選択することもあり得るでしょう．この問題では，サポートベクトルマシンを含めて少なくとも 3 個の機械学習モデルを自由に選択してそれらを MNIST を用いて学習させてください．テストデータセットにおける評価値と共にそれぞれの方法が学習に要した時間を出力してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">learnX</span><span class="p">,</span> <span class="n">learnT</span><span class="p">),</span> <span class="p">(</span><span class="n">textX</span><span class="p">,</span> <span class="n">testT</span><span class="p">)</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>良い予測性能が出るように工夫することも忘れないでくださいね．ただし，それぞれのモデルを同じ基準で比較しなければなりませんよね．</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ここではデータセットとして MNIST を利用しました．MNIST のデータセットのサイズが大きいため計算時間に差が出やすいためです．</p>
+</div>
+</div>
+</div>
+<div class="section" id="id11">
+<h2>深層学習<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<p>「深層学習」で触れた事柄に関する問題集です．またしても講義資料にギリ載っているか載っていないような事柄に取り組みますが，現実世界でプログラミングはそういう課題に取り組むことではじめて実力がつきます．</p>
+<div class="section" id="id12">
+<h3>3-1 性能向上テクニック<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>講義資料では MLP を MNIST で学習させて，その性能評価をしました．MNIST はとても簡単な問題なので，エポックを経ると簡単に評価値が良くなりました．ここでは普通には予測性能を高めることが難しい不均衡データセットを用います．正例と負例のインスタンスサイズが大きく違うデータセットのことです．このようなデータを scikit-learn を用いて以下のように生成します．生成されるデータの <code class="docutils literal notranslate"><span class="pre">wholeX</span></code> はインプットデータで，<code class="docutils literal notranslate"><span class="pre">wholeT</span></code> はターゲットデータです．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">wholeX</span><span class="p">,</span> <span class="n">wholeT</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">50000</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.96</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">],</span> <span class="n">flip_y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">wholeX</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>ここでは 50000 個のデータを生成していますが，ここから 10000 個だけテストデータセットとして用いて良い予測性能が出るように MLP を成長させてください．MLP は TensorFlow で実装してください．また，評価基準には ACC，MCC，F1 スコアを含んでください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>ナイーブにはコスト関数に重みをつけるという方法が考えられます．</p>
+</div>
+</div>
+<div class="section" id="id13">
+<h3>3-2 感情分析<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>インターネット上の映画レビューのデータセット IMDb と呼ばれるものを TensorFlow から簡単にダウンロードして利用することができます．以下のようにします．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">learnX</span><span class="p">,</span><span class="n">learnT</span><span class="p">),</span> <span class="p">(</span><span class="n">testX</span><span class="p">,</span><span class="n">testT</span><span class="p">)</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">imdb</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>このデータセットを用いて何らかのニューラルネットワークを学習させ，テストデータセットでその性能を評価してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">learnX</span><span class="p">,</span><span class="n">learnT</span><span class="p">),</span> <span class="p">(</span><span class="n">testX</span><span class="p">,</span><span class="n">testT</span><span class="p">)</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">imdb</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>上のデータセットは既にトークナイズされたデータでしたが，Hugging Face を利用すれば元のデータをダウンロードできるのでした．以下のようにします．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span> pip3 install datasets
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">imdb</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;imdb&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">imdb</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>このデータセットに対して Hugging Face を利用して感情分析の予測結果を計算し，また，その予測性能の評価値を計算して，上で作ったモデルとの比較をしてください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">imdb</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;imdb&quot;</span><span class="p">)</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>どうでしょう．「Hugging Face めちゃすげー」てなりますかね．</p>
+</div>
+</div>
+<div class="section" id="id14">
+<h3>3-3 アテンションの活用<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>サンプルデータセットとして利用してきた MNIST の各インスタンスは画像データではありますが，それらは 784 個の実数の要素からなるベクトルでもあります．アテンション機構によって扱いやすいデータの形式をしています．アテンション機構を含む何らかのニューラルネットワークを利用して MNIST の分類器を構築してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>同程度のパラメータサイズを持つ MLP による予測器も同時に構築して，同程度の予測性能に達するまでの時間を比較してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>やっぱ MLP て使い方次第じゃ最強なんすわ．</p>
+</div>
+</div>
+<div class="section" id="cgan">
+<h3>3-4 普通の CGAN の実装<a class="headerlink" href="#cgan" title="Permalink to this headline">¶</a></h3>
+<p>教材において CGAN の実装をしたときには WGAN-gp のコスト関数を利用しましたが，最も基本的な GAN と同じコスト関数を利用して CGAN を書き直してください．WGAN-gp を応用した場合の CGAN と比べて性能が落ちていることを目て見て確認してください．</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>基本的な GAN を少しずつ変えていく方が WGAN-gp のコスト関数を利用した CGAN を少しずつ変えるやり方より簡単でしょう．</p>
+</div>
+</div>
+<div class="section" id="id15">
+<h3>3-5 強化学習法の実装<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>以下のような 5 行 9 列の行列を考えます．このグリッドワールド上で何らかのオブジェクト動かしてゴール（G）を目指すこととします．オブジェクトはフィールド上のグリッド線で囲まれたどこかの位置に存在できることとします．オブジェクトは上下左右に動かせるものとします．ただし，フィールドは壁に囲まれており，オブジェクトはこのグリッドワールドの外には出られません．また，フィールドには障害物（X）があり，障害物が存在する位置にオブジェクトは行けないこととします．オブジェクトは最初ゴールでも障害物でもないオブジェクトが移動可能なマス（S）に位置しているものとします．このオブジェクトをうまく移動させてゴールまで導くエージェントを何らかの強化学習法を用いて作ってください．</p>
+<a class="reference internal image-reference" href="https://github.com/yamada-kd/binds-training/blob/main/image/largeField.svg?raw=1"><img alt="https://github.com/yamada-kd/binds-training/blob/main/image/largeField.svg?raw=1" src="https://github.com/yamada-kd/binds-training/blob/main/image/largeField.svg?raw=1" style="width: 100%;" /></a>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># ここにプログラムを書く．</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>深層 Q ネットワークを利用しても良いし，ニューラルネットワークを用いない Q 学習法でも他の方法でも何でも良いです．</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>終わりです．</p>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebook"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="tensorflow_10.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">12. </span>強化学習法</p>
+        </div>
+    </a>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      <div class="extra_footer">
+        <a href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img style="0;margin-bottom:0.2em;" src="https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png" /></a> © Copyright 2022 Graduate School of Information Sciences, Tohoku University．
+
+      </div>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>
