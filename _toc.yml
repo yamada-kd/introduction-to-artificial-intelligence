@@ -6,7 +6,7 @@ parts:
 - caption: データ科学を学ぶにあたって
   chapters:
   - file: notebook/introduction
-- caption: プログラミング
+- caption: Python プログラミング
   chapters:
   - file: notebook/python_01
   - file: notebook/python_02
