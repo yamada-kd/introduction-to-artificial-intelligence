@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>8. Hugging Face の利用方法 &#8212; 人工知能概論</title>
+    <title>8. 畳み込みニューラルネットワーク &#8212; 人工知能概論</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -99,13 +99,13 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="introduction.html">
-   1. 機械学習とその周辺事項
+   1. データ科学と人工知能
   </a>
  </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
-  プログラミングの基礎
+  プログラミング
  </span>
 </p>
 <ul class="nav bd-sidenav">
@@ -155,7 +155,7 @@ const thebe_selector_output = ".output, .cell_output"
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   8. Hugging Face の利用方法
+   8. 畳み込みニューラルネットワーク
   </a>
  </li>
  <li class="toctree-l1">
@@ -279,7 +279,7 @@ const thebe_selector_output = ".output, .cell_output"
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id1">
+  <a class="reference internal nav-link" href="#hugging-face">
    8.1. Hugging Face とは
   </a>
   <ul class="nav section-nav flex-column">
@@ -389,7 +389,7 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Hugging Face の利用方法</h1>
+                <h1>畳み込みニューラルネットワーク</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -400,7 +400,7 @@ const thebe_selector_output = ".output, .cell_output"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id1">
+  <a class="reference internal nav-link" href="#hugging-face">
    8.1. Hugging Face とは
   </a>
   <ul class="nav section-nav flex-column">
@@ -509,10 +509,10 @@ const thebe_selector_output = ".output, .cell_output"
             
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="hugging-face">
-<h1><span class="section-number">8. </span>Hugging Face の利用方法<a class="headerlink" href="#hugging-face" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2><span class="section-number">8.1. </span>Hugging Face とは<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+  <div class="tex2jax_ignore mathjax_ignore section" id="id1">
+<h1><span class="section-number">8. </span>畳み込みニューラルネットワーク<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="hugging-face">
+<h2><span class="section-number">8.1. </span>Hugging Face とは<a class="headerlink" href="#hugging-face" title="Permalink to this headline">¶</a></h2>
 <p>Hugging Face とは主にトランスフォーマーに関連する深層学習モデルやそれに付随する技術の提供を行っているサービスです．トランスフォーマー（のエンコーダーとデコーダー）はニューラルネットワーク等からなる，様々なタイプのデータを処理できる機械学習モデルです．トランスフォーマーは色々な問題を解決するために少しずつ違う構造を持ちますが，そのようなものをまとめてコマンド一発で利用可能にしてくれているのが Hugging Face です．また，自然言語処理の分野で扱うデータのサイズはとても大きい場合があるのですが，どこかの誰かがあらかじめ何かのデータを利用して学習済みのデータを提供してくれていることがあり，そのような学習済みモデルも簡単に利用できるように整備してくれています．Hugging Face を利用すれば，特に自然言語処理に関する問題を簡単に解けるようになるため紹介します．</p>
 <div class="section" id="id2">
 <h3><span class="section-number">8.1.1. </span>できること<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
@@ -560,7 +560,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">classifier</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;sentiment-analysis&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;I have a pen.&quot;</span>
@@ -578,7 +578,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">classifier</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;sentiment-analysis&quot;</span><span class="p">)</span>
     <span class="n">litext</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;I&#39;ve been waiting for a HuggingFace course my whole life.&quot;</span><span class="p">,</span> <span class="s2">&quot;I hate this so much!&quot;</span><span class="p">]</span>
@@ -599,7 +599,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">converter</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;feature-extraction&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;We are very happy to introduce pipeline to the transformers repository.&quot;</span>
@@ -624,7 +624,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">classifier</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;zero-shot-classification&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;This is a course about the Transformers library&quot;</span><span class="p">,</span>
@@ -650,7 +650,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;text-generation&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;In this course, we will teach you how to&quot;</span>
@@ -671,7 +671,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">unmasker</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;fill-mask&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;This course will teach you all about &lt;mask&gt; models.&quot;</span>
@@ -692,7 +692,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">ner</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;ner&quot;</span><span class="p">,</span> <span class="n">grouped_entities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;My name is Sylvain and I work at Hugging Face in Brooklyn.&quot;</span>
@@ -713,7 +713,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">question_answerer</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;question-answering&quot;</span><span class="p">)</span>
     <span class="n">question_text</span> <span class="o">=</span> <span class="s2">&quot;Where do I work?&quot;</span>
@@ -735,27 +735,27 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">summarizer</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;summarization&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        America has changed dramatically during recent years. Not only has the number of </span>
-<span class="s2">    graduates in traditional engineering disciplines such as mechanical, civil, </span>
-<span class="s2">    electrical, chemical, and aeronautical engineering declined, but in most of </span>
-<span class="s2">    the premier American universities engineering curricula now concentrate on </span>
-<span class="s2">    and encourage largely the study of engineering science. As a result, there </span>
-<span class="s2">    are declining offerings in engineering subjects dealing with infrastructure, </span>
-<span class="s2">    the environment, and related issues, and greater concentration on high </span>
-<span class="s2">    technology subjects, largely supporting increasingly complex scientific </span>
-<span class="s2">    developments. While the latter is important, it should not be at the expense </span>
+<span class="s2">        America has changed dramatically during recent years. Not only has the number of</span>
+<span class="s2">    graduates in traditional engineering disciplines such as mechanical, civil,</span>
+<span class="s2">    electrical, chemical, and aeronautical engineering declined, but in most of</span>
+<span class="s2">    the premier American universities engineering curricula now concentrate on</span>
+<span class="s2">    and encourage largely the study of engineering science. As a result, there</span>
+<span class="s2">    are declining offerings in engineering subjects dealing with infrastructure,</span>
+<span class="s2">    the environment, and related issues, and greater concentration on high</span>
+<span class="s2">    technology subjects, largely supporting increasingly complex scientific</span>
+<span class="s2">    developments. While the latter is important, it should not be at the expense</span>
 <span class="s2">    of more traditional engineering.</span>
 
-<span class="s2">    Rapidly developing economies such as China and India, as well as other </span>
-<span class="s2">    industrial countries in Europe and Asia, continue to encourage and advance </span>
-<span class="s2">    the teaching of engineering. Both China and India, respectively, graduate </span>
-<span class="s2">    six and eight times as many traditional engineers as does the United States. </span>
-<span class="s2">    Other industrial countries at minimum maintain their output, while America </span>
-<span class="s2">    suffers an increasingly serious decline in the number of engineering graduates </span>
+<span class="s2">    Rapidly developing economies such as China and India, as well as other</span>
+<span class="s2">    industrial countries in Europe and Asia, continue to encourage and advance</span>
+<span class="s2">    the teaching of engineering. Both China and India, respectively, graduate</span>
+<span class="s2">    six and eight times as many traditional engineers as does the United States.</span>
+<span class="s2">    Other industrial countries at minimum maintain their output, while America</span>
+<span class="s2">    suffers an increasingly serious decline in the number of engineering graduates</span>
 <span class="s2">    and a lack of well-educated engineers.</span>
 <span class="s2">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">summarizer</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
@@ -775,7 +775,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">translator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;translation_en_to_fr&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;This course is produced by Hugging Face.&quot;</span>
@@ -802,7 +802,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;distilgpt2&quot;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;In this course, we will teach you how to&quot;</span>
@@ -1106,8 +1106,8 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">batches_per_epoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenized_imdb</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">])</span> <span class="o">//</span> <span class="n">batch_size</span>
     <span class="n">total_train_steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">batches_per_epoch</span> <span class="o">*</span> <span class="n">num_epochs</span><span class="p">)</span>
     <span class="n">optimizer</span><span class="p">,</span> <span class="n">schedule</span> <span class="o">=</span> <span class="n">create_optimizer</span><span class="p">(</span>
-        <span class="n">init_lr</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span> 
-        <span class="n">num_warmup_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+        <span class="n">init_lr</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
+        <span class="n">num_warmup_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">num_train_steps</span><span class="o">=</span><span class="n">total_train_steps</span>
     <span class="p">)</span>
 
@@ -1164,11 +1164,11 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">batches_per_epoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenized_imdb</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">])</span> <span class="o">//</span> <span class="n">batch_size</span>
     <span class="n">total_train_steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">batches_per_epoch</span> <span class="o">*</span> <span class="n">num_epochs</span><span class="p">)</span>
     <span class="n">optimizer</span><span class="p">,</span> <span class="n">schedule</span> <span class="o">=</span> <span class="n">create_optimizer</span><span class="p">(</span>
-        <span class="n">init_lr</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span> 
-        <span class="n">num_warmup_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+        <span class="n">init_lr</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
+        <span class="n">num_warmup_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">num_train_steps</span><span class="o">=</span><span class="n">total_train_steps</span>
     <span class="p">)</span>
-    
+
     <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
         <span class="n">tf_train_dataset</span><span class="p">,</span>

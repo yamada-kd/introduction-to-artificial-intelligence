@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Hugging Face の利用方法
+# # 畳み込みニューラルネットワーク
 
 # ## Hugging Face とは
 
@@ -58,7 +58,7 @@ get_ipython().system(' pip3 install transformers')
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     classifier = pipeline("sentiment-analysis")
     text = "I have a pen."
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     classifier = pipeline("sentiment-analysis")
     litext = ["I've been waiting for a HuggingFace course my whole life.", "I hate this so much!"]
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     converter = pipeline("feature-extraction")
     text = "We are very happy to introduce pipeline to the transformers repository."
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     classifier = pipeline("zero-shot-classification")
     text = "This is a course about the Transformers library",
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     generator = pipeline("text-generation")
     text = "In this course, we will teach you how to"
@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     unmasker = pipeline("fill-mask")
     text = "This course will teach you all about <mask> models."
@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     ner = pipeline("ner", grouped_entities=True)
     text = "My name is Sylvain and I work at Hugging Face in Brooklyn."
@@ -205,7 +205,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     question_answerer = pipeline("question-answering")
     question_text = "Where do I work?"
@@ -226,27 +226,27 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     summarizer = pipeline("summarization")
     text = """
-        America has changed dramatically during recent years. Not only has the number of 
-    graduates in traditional engineering disciplines such as mechanical, civil, 
-    electrical, chemical, and aeronautical engineering declined, but in most of 
-    the premier American universities engineering curricula now concentrate on 
-    and encourage largely the study of engineering science. As a result, there 
-    are declining offerings in engineering subjects dealing with infrastructure, 
-    the environment, and related issues, and greater concentration on high 
-    technology subjects, largely supporting increasingly complex scientific 
-    developments. While the latter is important, it should not be at the expense 
+        America has changed dramatically during recent years. Not only has the number of
+    graduates in traditional engineering disciplines such as mechanical, civil,
+    electrical, chemical, and aeronautical engineering declined, but in most of
+    the premier American universities engineering curricula now concentrate on
+    and encourage largely the study of engineering science. As a result, there
+    are declining offerings in engineering subjects dealing with infrastructure,
+    the environment, and related issues, and greater concentration on high
+    technology subjects, largely supporting increasingly complex scientific
+    developments. While the latter is important, it should not be at the expense
     of more traditional engineering.
 
-    Rapidly developing economies such as China and India, as well as other 
-    industrial countries in Europe and Asia, continue to encourage and advance 
-    the teaching of engineering. Both China and India, respectively, graduate 
-    six and eight times as many traditional engineers as does the United States. 
-    Other industrial countries at minimum maintain their output, while America 
-    suffers an increasingly serious decline in the number of engineering graduates 
+    Rapidly developing economies such as China and India, as well as other
+    industrial countries in Europe and Asia, continue to encourage and advance
+    the teaching of engineering. Both China and India, respectively, graduate
+    six and eight times as many traditional engineers as does the United States.
+    Other industrial countries at minimum maintain their output, while America
+    suffers an increasingly serious decline in the number of engineering graduates
     and a lack of well-educated engineers.
     """
     result = summarizer(text)
@@ -265,7 +265,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     translator = pipeline("translation_en_to_fr")
     text = "This course is produced by Hugging Face."
@@ -294,7 +294,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 from transformers import pipeline
- 
+
 def main():
     generator = pipeline("text-generation", model="distilgpt2")
     text = "In this course, we will teach you how to"
@@ -595,8 +595,8 @@ def main():
     batches_per_epoch = len(tokenized_imdb["train"]) // batch_size
     total_train_steps = int(batches_per_epoch * num_epochs)
     optimizer, schedule = create_optimizer(
-        init_lr=2e-5, 
-        num_warmup_steps=0, 
+        init_lr=2e-5,
+        num_warmup_steps=0,
         num_train_steps=total_train_steps
     )
 
@@ -653,11 +653,11 @@ def main():
     batches_per_epoch = len(tokenized_imdb["train"]) // batch_size
     total_train_steps = int(batches_per_epoch * num_epochs)
     optimizer, schedule = create_optimizer(
-        init_lr=2e-5, 
-        num_warmup_steps=0, 
+        init_lr=2e-5,
+        num_warmup_steps=0,
         num_train_steps=total_train_steps
     )
-    
+
     model.compile(optimizer=optimizer)
     model.fit(
         tf_train_dataset,
