@@ -597,7 +597,7 @@ const thebe_selector_output = ".output, .cell_output"
 <h1><span class="section-number">3. </span>Python の発展的な使用方法<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="numpy">
 <h2><span class="section-number">3.1. </span>NumPy の利用方法<a class="headerlink" href="#numpy" title="Permalink to this headline">¶</a></h2>
-<p>NumPy とは Python で利用可能な数値計算のライブラリです．さまざまな計算をコマンド一発で行うことができます．後の章で紹介する TensorFlow の書き方がこの NumPy の書き方に似ていて，それらを相互に利用できたほうが良いので紹介します．</p>
+<p>NumPy とは Python で利用可能な数値計算のライブラリです．さまざまな計算をコマンド一発で行うことができます．後の章で紹介する PyTorch の書き方がこの NumPy の書き方に似ていて，それらを相互に利用できたほうが良いため紹介します．</p>
 <div class="section" id="id1">
 <h3><span class="section-number">3.1.1. </span>NumPy のインポート<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>NumPy は以下のようにしてインポートします．読み込んだ NumPy には <code class="docutils literal notranslate"><span class="pre">np</span></code> という略称を与えることが普通です．</p>
@@ -605,10 +605,10 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="k">pass</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -623,7 +623,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
 
@@ -638,7 +638,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -654,7 +654,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
     <span class="n">nb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
@@ -674,7 +674,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">nb</span> <span class="o">=</span> <span class="n">na</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -694,7 +694,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">nb</span> <span class="o">=</span> <span class="n">na</span>
@@ -717,12 +717,12 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -734,11 +734,11 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -750,7 +750,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span> <span class="c1"># all elements of row 1</span>
@@ -767,7 +767,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
@@ -785,14 +785,14 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>全知全能なんですね．</p>
+<p>色々と便利なことができます．</p>
 </div>
 <p>以下の <code class="docutils literal notranslate"><span class="pre">np.zeros()</span></code> や <code class="docutils literal notranslate"><span class="pre">np.ones()</span></code> を用いると引数で指定したサイズの，全要素が0または1の行列を生成することができます．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)))</span>
@@ -808,7 +808,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
     <span class="n">nb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
@@ -828,7 +828,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
     <span class="n">nb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
@@ -846,7 +846,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
@@ -865,7 +865,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">na</span><span class="p">))</span> <span class="c1"># determinant of matrix</span>
@@ -882,7 +882,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
     <span class="n">eigenvalue</span><span class="p">,</span> <span class="n">eigenvector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">na</span><span class="p">)</span>
@@ -900,7 +900,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
@@ -916,7 +916,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">na</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -932,7 +932,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
     <span class="n">eigenvalue</span><span class="p">,</span> <span class="n">eigenvector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">na</span><span class="p">)</span>
@@ -952,7 +952,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
@@ -971,7 +971,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -987,7 +987,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)</span>
@@ -1003,7 +1003,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">na</span><span class="p">[</span><span class="n">na</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">])</span>
@@ -1019,7 +1019,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">na</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
@@ -1045,7 +1045,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="k">pass</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1058,10 +1058,10 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="k">pass</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1078,13 +1078,13 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1098,13 +1098,13 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;forestgreen&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1118,7 +1118,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1126,7 +1126,7 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;forestgreen&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1140,7 +1140,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1154,7 +1154,7 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1171,7 +1171,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
@@ -1201,7 +1201,7 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;236&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
- 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -1212,8 +1212,8 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="section" id="id9">
 <h3><span class="section-number">3.2.4. </span>その他の描画の種類<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>上で紹介した <code class="docutils literal notranslate"><span class="pre">plt.plot()</span></code> 以外には，棒グラフを描くための <code class="docutils literal notranslate"><span class="pre">plt.bar()</span></code>，散布図を描くための <code class="docutils literal notranslate"><span class="pre">plt.scatter()</span></code>，ヒストグラムを描くための <code class="docutils literal notranslate"><span class="pre">plt.hist()</span></code> は研究の分野で利用することがあるかもしれません．</p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>その都度調べましょう．</p>
 </div>
 </div>
@@ -1227,7 +1227,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">クラス名</span><span class="p">:</span>
 </pre></div>
 </div>
-<p>以下のクラスには <code class="docutils literal notranslate"><span class="pre">__init__</span></code> という記述があります．これはクラスからインスタンスを生成したときに（<font color="Crimson">クラスからはインスタンスと言われるクラスの実体が生成されます</font>）自動的に実行されるメソッドです（コンストラクタと呼びます）．このコンストラクタの引数は2個です．<code class="docutils literal notranslate"><span class="pre">self</span></code> と <code class="docutils literal notranslate"><span class="pre">name</span></code> と <code class="docutils literal notranslate"><span class="pre">age</span></code> の3個があるように見えますが，<code class="docutils literal notranslate"><span class="pre">self</span></code> は（インスタンスを生成するまでは未知の）インスタンス名をとりあえず <code class="docutils literal notranslate"><span class="pre">self</span></code> にします，という記述です．</p>
+<p>以下のクラスには <code class="docutils literal notranslate"><span class="pre">__init__</span></code> という記述があります．これはクラスからインスタンスを生成したときに（クラスからはインスタンスと言われるクラスの実体が生成されます）自動的に実行されるメソッドです（コンストラクタと呼びます）．このコンストラクタの引数は2個です．<code class="docutils literal notranslate"><span class="pre">self</span></code> と <code class="docutils literal notranslate"><span class="pre">name</span></code> と <code class="docutils literal notranslate"><span class="pre">age</span></code> の3個があるように見えますが，<code class="docutils literal notranslate"><span class="pre">self</span></code> は（インスタンスを生成するまでは未知の）インスタンス名をとりあえず <code class="docutils literal notranslate"><span class="pre">self</span></code> にします，という記述です．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
@@ -1246,7 +1246,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>多分，ここまでで意味がわからなくなったと思うので，まずはインスタンスを生成してみます．以下のように書きます．これによって <code class="docutils literal notranslate"><span class="pre">mydog</span></code> というインスタンスが生成されました．引数には，<code class="docutils literal notranslate"><span class="pre">Ken</span></code> と <code class="docutils literal notranslate"><span class="pre">6</span></code> を与えました．6 歳の Ken という名前の犬の情報です．</p>
+<p>多分，ここまでで意味がわからなくなったと思うので，まずはインスタンスを生成してみます．以下のように書きます．これによって <code class="docutils literal notranslate"><span class="pre">mydog</span></code> というインスタンスが生成されました．引数には，<code class="docutils literal notranslate"><span class="pre">Ken</span></code> と <code class="docutils literal notranslate"><span class="pre">6</span></code> を与えました．6歳の Ken という名前の犬の情報です．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
@@ -1287,8 +1287,8 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <p>しっかりと出力されました．クラスを使う利点は処理をきれいに整理できることです．もし，クラスを使わずにこの挙動を再現するには <code class="docutils literal notranslate"><span class="pre">mydog_name</span> <span class="pre">=</span> <span class="pre">Ken</span></code>，<code class="docutils literal notranslate"><span class="pre">mydog_age</span> <span class="pre">=</span> <span class="pre">6</span></code> のような変数を生成しなければなりません．クラスを使うと <code class="docutils literal notranslate"><span class="pre">mydog</span> <span class="pre">=</span> <span class="pre">Dog(&quot;Ken&quot;,</span> <span class="pre">6)</span></code> だけ，たったひとつの記述だけで複数個の情報を含む変数を生成できるのです．</p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>以上のように複数のデータをまとめて管理できることがクラスを使うメリットです．クラスを使わない場合，個々の変数を個別に管理する必要が生じ，プログラムが煩雑なものになります．クラスを作る効果ってたったそれだけ？と思われるかもしれませんが，そうです，たったそれだけです．ただ，この後にも説明がある通りクラスは変数だけでなく関数も内部に有することができます．処理が複雑になればなるほど有難くなります．</p>
 </div>
 <p>また，上で <code class="docutils literal notranslate"><span class="pre">self</span></code> とはインスタンスの名前そのものであると言及しましたが，それは以下を比較していただくと解ります．出力の際には以下のように書きました．</p>
@@ -1563,7 +1563,7 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">trainer</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span> <span class="c1"># この super() は基底クラスを意味する</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">trainer</span> <span class="c1"># 新たなるインスタンス変数</span>
-    
+
     <span class="k">def</span> <span class="nf">sit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is now sitting and giving its paw to </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="p">))</span>
 
@@ -1584,10 +1584,10 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="id21">
 <h3><span class="section-number">3.4.2. </span>繰り返しによる読み込み<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
-<p>ここでは，以下のような内容の情報からなるファイルを使います．ファイルは全部で3行からなり，各行には文字列が存在します．これのファイル名は <code class="docutils literal notranslate"><span class="pre">ff.txt</span></code> です．</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Cloud</span> <span class="n">Strife</span>
-<span class="n">Squall</span> <span class="n">Leonhart</span>
-<span class="n">Zidane</span> <span class="n">Tribal</span>
+<p>ここでは，以下のような内容の情報からなるファイルを使います．ファイルは全部で3行からなり，各行には文字列が存在します．これのファイル名は <code class="docutils literal notranslate"><span class="pre">name.txt</span></code> とします．</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Samy</span> <span class="n">Baladram</span>
+<span class="n">Kazunori</span> <span class="n">Yamada</span>
+<span class="n">Michael</span> <span class="n">Zielewski</span>
 </pre></div>
 </div>
 <p>このようなファイルを使って練習するために以下の Linux コマンドでファイルをカレントディレクトリに生成します．</p>
@@ -1597,7 +1597,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span> <span class="nb">echo</span> -e <span class="s2">&quot;Cloud Strife\nSquall Leonhart\nZidane Tribal&quot;</span> &gt; ff.txt
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span> <span class="nb">echo</span> -e <span class="s2">&quot;Samy Baladram\nKazunori Yamada\nMichael Zielewski&quot;</span> &gt; name.txt
 </pre></div>
 </div>
 </div>
@@ -1624,7 +1624,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ff.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;name.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
     <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -1647,7 +1647,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ff.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;name.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
@@ -1666,7 +1666,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">liline</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ff.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;name.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
         <span class="n">liline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
@@ -1685,7 +1685,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ff.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;name.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
@@ -1704,7 +1704,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ff.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;name.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
     <span class="n">contents</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
