@@ -5,7 +5,7 @@
 
 # ## NumPy の利用方法
 
-# NumPy とは Python で利用可能な数値計算のライブラリです．さまざまな計算をコマンド一発で行うことができます．後の章で紹介する TensorFlow の書き方がこの NumPy の書き方に似ていて，それらを相互に利用できたほうが良いので紹介します．
+# NumPy とは Python で利用可能な数値計算のライブラリです．さまざまな計算をコマンド一発で行うことができます．後の章で紹介する PyTorch の書き方がこの NumPy の書き方に似ていて，それらを相互に利用できたほうが良いため紹介します．
 
 # ### NumPy のインポート
 
@@ -16,10 +16,10 @@
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     pass
- 
+
 if __name__ == "__main__":
     main()
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     print(np.array([1, 2, 3]))
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 2, 3])
     print(na[0])
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 2, 3])
     nb = np.array([5, 7, 9])
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 1])
     nb = na.copy()
@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 1])
     nb = na
@@ -126,12 +126,12 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[1, 2], [3, 4]])
     print(na)
     print(na.shape)
- 
+
 if __name__ == "__main__":
     main()
 
@@ -143,11 +143,11 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[1, 2], [3, 4]])
     print(na[0,0])
- 
+
 if __name__ == "__main__":
     main()
 
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[1, 2], [3, 4]])
     print(na[0,:]) # all elements of row 1
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[1, 2], [3, 4]])
     print(na.max())
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
 
 # ```{note}
-# 全知全能なんですね．
+# 色々と便利なことができます．
 # ```
 
 # 以下の `np.zeros()` や `np.ones()` を用いると引数で指定したサイズの，全要素が0または1の行列を生成することができます．
@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     print(np.zeros((3,3)))
     print(np.ones((4,4)))
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[1, 2], [3, 4]])
     nb = np.array([[5, 6], [7, 8]])
@@ -237,7 +237,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[1, 2], [3, 4]])
     nb = np.array([[5, 6], [7, 8]])
@@ -255,7 +255,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import numpy as np
 np.random.seed(0)
- 
+
 def main():
     print(np.random.rand(3, 3))
 
@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[4, 15, 4], [-11, 5, 6], [2, 4, 8]])
     print(np.linalg.det(na)) # determinant of matrix
@@ -291,7 +291,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[3, 4, 1, 4], [1, 2, 1, 1], [1, 1, 2, 1], [1, 1, 1, 2]])
     eigenvalue, eigenvector = np.linalg.eig(na)
@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[3, 4, 1, 4], [1, 2, 1, 1], [1, 1, 2, 1], [1, 1, 1, 2]])
     print(na ** 2)
@@ -325,7 +325,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[3, 4, 1, 4], [1, 2, 1, 1], [1, 1, 2, 1], [1, 1, 1, 2]])
     print(np.linalg.matrix_power(na, 2))
@@ -341,7 +341,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[3, 4, 1, 4], [1, 2, 1, 1], [1, 1, 2, 1], [1, 1, 1, 2]])
     eigenvalue, eigenvector = np.linalg.eig(na)
@@ -360,7 +360,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([[3, 4, 1, 4], [1, 2, 1, 1], [1, 1, 2, 1], [1, 1, 1, 2]])
     print(na + 2)
@@ -378,7 +378,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 2, 3, 4, 5, 6, 7])
     print(na[::-1])
@@ -394,7 +394,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 2, 3, 4, 5, 6, 7])
     print(na > 3)
@@ -410,7 +410,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 2, 3, 4, 5, 6, 7])
     print(na[na > 3])
@@ -426,7 +426,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
- 
+
 def main():
     na = np.array([1, 2, 3, 4, 5, 6, 3])
     print(np.where(na == 3))
@@ -451,7 +451,7 @@ import matplotlib.pyplot as plt
 
 def main():
     pass
- 
+
 if __name__ == "__main__":
     main()
 
@@ -464,10 +464,10 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
- 
+
 def main():
     pass
- 
+
 if __name__ == "__main__":
     main()
 
@@ -483,13 +483,13 @@ if __name__ == "__main__":
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import numpy as np
- 
+
 def main():
     x = np.linspace(0, 1, 100) * 2 * np.pi
     y = np.sin(x)
     plt.plot(x, y)
     plt.show()
- 
+
 if __name__ == "__main__":
     main()
 
@@ -503,13 +503,13 @@ if __name__ == "__main__":
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import numpy as np
- 
+
 def main():
     x = np.linspace(0, 1, 100) * 2 * np.pi
     y = np.sin(x)
     plt.plot(x, y, color="forestgreen")
     plt.show()
- 
+
 if __name__ == "__main__":
     main()
 
@@ -523,7 +523,7 @@ if __name__ == "__main__":
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import numpy as np
- 
+
 def main():
     x = np.linspace(0, 1, 100) * 2 * np.pi
     y = np.sin(x)
@@ -531,7 +531,7 @@ def main():
     plt.plot(x, y, color="forestgreen")
     plt.plot(x, z, color="orange")
     plt.show()
- 
+
 if __name__ == "__main__":
     main()
 
@@ -545,7 +545,7 @@ if __name__ == "__main__":
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import numpy as np
- 
+
 def main():
     x = np.linspace(0, 1, 100) * 2 * np.pi
     y = np.sin(x)
@@ -559,7 +559,7 @@ def main():
     plt.grid()
     plt.legend()
     plt.show()
- 
+
 if __name__ == "__main__":
     main()
 
@@ -575,7 +575,7 @@ if __name__ == "__main__":
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import numpy as np
- 
+
 def main():
     plt.figure(figsize=(12,6), tight_layout=True)
     x = np.linspace(0, 1, 100) * 2 * np.pi
@@ -605,7 +605,7 @@ def main():
     plt.plot(x, y, label="236")
     plt.legend()
     plt.show()
- 
+
 if __name__ == "__main__":
     main()
 
@@ -614,7 +614,7 @@ if __name__ == "__main__":
 
 # 上で紹介した `plt.plot()` 以外には，棒グラフを描くための `plt.bar()`，散布図を描くための `plt.scatter()`，ヒストグラムを描くための `plt.hist()` は研究の分野で利用することがあるかもしれません．
 
-# ```{hint}
+# ```{note}
 # その都度調べましょう．
 # ```
 
@@ -628,7 +628,7 @@ if __name__ == "__main__":
 # ```
 # class クラス名:
 # ```
-# 以下のクラスには `__init__` という記述があります．これはクラスからインスタンスを生成したときに（<font color="Crimson">クラスからはインスタンスと言われるクラスの実体が生成されます</font>）自動的に実行されるメソッドです（コンストラクタと呼びます）．このコンストラクタの引数は2個です．`self` と `name` と `age` の3個があるように見えますが，`self` は（インスタンスを生成するまでは未知の）インスタンス名をとりあえず `self` にします，という記述です．
+# 以下のクラスには `__init__` という記述があります．これはクラスからインスタンスを生成したときに（クラスからはインスタンスと言われるクラスの実体が生成されます）自動的に実行されるメソッドです（コンストラクタと呼びます）．このコンストラクタの引数は2個です．`self` と `name` と `age` の3個があるように見えますが，`self` は（インスタンスを生成するまでは未知の）インスタンス名をとりあえず `self` にします，という記述です．
 
 # In[ ]:
 
@@ -647,7 +647,7 @@ if __name__ == "__main__":
     main()
 
 
-# 多分，ここまでで意味がわからなくなったと思うので，まずはインスタンスを生成してみます．以下のように書きます．これによって `mydog` というインスタンスが生成されました．引数には，`Ken` と `6` を与えました．6 歳の Ken という名前の犬の情報です．
+# 多分，ここまでで意味がわからなくなったと思うので，まずはインスタンスを生成してみます．以下のように書きます．これによって `mydog` というインスタンスが生成されました．引数には，`Ken` と `6` を与えました．6歳の Ken という名前の犬の情報です．
 
 # In[ ]:
 
@@ -689,7 +689,7 @@ if __name__ == "__main__":
 
 # しっかりと出力されました．クラスを使う利点は処理をきれいに整理できることです．もし，クラスを使わずにこの挙動を再現するには `mydog_name = Ken`，`mydog_age = 6` のような変数を生成しなければなりません．クラスを使うと `mydog = Dog("Ken", 6)` だけ，たったひとつの記述だけで複数個の情報を含む変数を生成できるのです．
 
-# ```{hint}
+# ```{note}
 # 以上のように複数のデータをまとめて管理できることがクラスを使うメリットです．クラスを使わない場合，個々の変数を個別に管理する必要が生じ，プログラムが煩雑なものになります．クラスを作る効果ってたったそれだけ？と思われるかもしれませんが，そうです，たったそれだけです．ただ，この後にも説明がある通りクラスは変数だけでなく関数も内部に有することができます．処理が複雑になればなるほど有難くなります．
 # ```
 
@@ -965,7 +965,7 @@ class TrainedDog(Dog):
     def __init__(self, name, age, trainer):
         super().__init__(name, age) # この super() は基底クラスを意味する
         self.trainer = trainer # 新たなるインスタンス変数
-    
+
     def sit(self):
         print("{0} is now sitting and giving its paw to {1}.".format(self.name, self.trainer))
 
@@ -984,11 +984,11 @@ if __name__ == "__main__":
 
 # ### 繰り返しによる読み込み
 
-# ここでは，以下のような内容の情報からなるファイルを使います．ファイルは全部で3行からなり，各行には文字列が存在します．これのファイル名は `ff.txt` です．
+# ここでは，以下のような内容の情報からなるファイルを使います．ファイルは全部で3行からなり，各行には文字列が存在します．これのファイル名は `name.txt` とします．
 # ```
-# Cloud Strife
-# Squall Leonhart
-# Zidane Tribal
+# Samy Baladram
+# Kazunori Yamada
+# Michael Zielewski
 # ```
 
 # このようなファイルを使って練習するために以下の Linux コマンドでファイルをカレントディレクトリに生成します．
@@ -1000,7 +1000,7 @@ if __name__ == "__main__":
 # In[ ]:
 
 
-get_ipython().system(' echo -e "Cloud Strife\\nSquall Leonhart\\nZidane Tribal" > ff.txt')
+get_ipython().system(' echo -e "Samy Baladram\\nKazunori Yamada\\nMichael Zielewski" > name.txt')
 
 
 # ```{note}
@@ -1027,7 +1027,7 @@ get_ipython().system(' ls')
 #!/usr/bin/env python3
 
 def main():
-    fin = open("ff.txt", "r")
+    fin = open("name.txt", "r")
     for line in fin:
         print(line)
     fin.close()
@@ -1051,7 +1051,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 
 def main():
-    fin = open("ff.txt", "r")
+    fin = open("name.txt", "r")
     for line in fin:
         line = line.rstrip()
         print(line)
@@ -1070,7 +1070,7 @@ if __name__ == "__main__":
 
 def main():
     liline = []
-    fin = open("ff.txt", "r")
+    fin = open("name.txt", "r")
     for line in fin:
         line = line.rstrip()
         liline.append(line)
@@ -1089,7 +1089,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 
 def main():
-    with open("ff.txt", "r") as fin:
+    with open("name.txt", "r") as fin:
         for line in fin:
             print(line)
 
@@ -1107,7 +1107,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 
 def main():
-    fin = open("ff.txt", "r")
+    fin = open("name.txt", "r")
     contents = fin.read()
     fin.close()
     print(contents)
