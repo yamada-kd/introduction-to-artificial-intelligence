@@ -147,7 +147,7 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="pytorch_01.html">
-   6. TensorFlow の基本的な利用方法
+   6. PyTorch の基本的な利用方法
   </a>
  </li>
  <li class="toctree-l1">
@@ -463,7 +463,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">sklearn</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 
@@ -521,14 +521,14 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="id4">
 <h3><span class="section-number">4.1.3. </span>決定木による予測器の構築<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>決定木という機械学習アルゴリズムを用いて人工知能を構築します．最初にデータを学習データセットとテストデータセットに分割します．テストデータセットのサイズは全体の 2 割にします（何割でも良いのですが 2 割にしてみました）．データセットの分割もとても便利な方法が用意されています．以下のように書きます．</p>
+<p>決定木という機械学習アルゴリズムを用いて人工知能を構築します．最初にデータを学習データセットとテストデータセットに分割します．テストデータセットのサイズは全体の2割にします（何割でも良いのですが2割にしてみました）．データセットの分割もとても便利な方法が用意されています．以下のように書きます．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">sklearn</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span> <span class="c1"># このような関数がある</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># このように書くと分割できる．ランダムに並べ替えてくれる．</span>
@@ -551,7 +551,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
@@ -588,7 +588,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display_png</span>
 <span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Digraph</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">StringIO</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
@@ -606,8 +606,8 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <p>決定木はこのような選択肢の分岐を繰り返すことで入力データを分類する手法です．最上段からスタートします．この場合，咢の幅が <code class="docutils literal notranslate"><span class="pre">0.8</span></code> 以下であるなら（<code class="docutils literal notranslate"><span class="pre">True</span></code> の方向へ進む），データは <code class="docutils literal notranslate"><span class="pre">setosa</span></code> と分類されます．</p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>画像中に <code class="docutils literal notranslate"><span class="pre">gini</span></code> とありますが，これは決定木の目的関数です．決定木はこれを指標にしてデータが分割します．気になった場合は「ジニ不純度」のようなキーワードで検索してみてください．</p>
 </div>
 <div class="admonition note">
@@ -627,7 +627,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 全部正解してしまうから，乱数の種を変えてみた．</span>
@@ -657,7 +657,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 全部正解してしまうから，乱数の種を変えてみた．</span>
@@ -685,7 +685,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span> <span class="c1"># 決定木ではなくて SVC をインポートする．</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
@@ -714,7 +714,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.neural_network</span> <span class="kn">import</span> <span class="n">MLPClassifier</span> <span class="c1"># 変更する．</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
@@ -739,7 +739,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span> <span class="c1"># 変更する．</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
@@ -806,7 +806,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./predictor.sav&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="c1"># rは読み込みを意味します．</span>
     <span class="n">predictor</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span> <span class="c1"># 予測器の読み込み．</span>
@@ -842,7 +842,7 @@ f(x_1,x_2,x_3)=w_1x_1+w_2x_2+w_3x_3+b
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">GridSearchCV</span> <span class="c1"># インポートする</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
@@ -871,7 +871,7 @@ f(x_1,x_2,x_3)=w_1x_1+w_2x_2+w_3x_3+b
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">GridSearchCV</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">learnx</span><span class="p">,</span> <span class="n">testx</span><span class="p">,</span> <span class="n">learnt</span><span class="p">,</span> <span class="n">testt</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>

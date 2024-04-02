@@ -55,7 +55,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="6. TensorFlow の基本的な利用方法" href="pytorch_01.html" />
+    <link rel="next" title="6. PyTorch の基本的な利用方法" href="pytorch_01.html" />
     <link rel="prev" title="4. 教師あり学習法" href="scikit_learn_01.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -147,7 +147,7 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="pytorch_01.html">
-   6. TensorFlow の基本的な利用方法
+   6. PyTorch の基本的な利用方法
   </a>
  </li>
  <li class="toctree-l1">
@@ -577,7 +577,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
@@ -603,13 +603,13 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-    <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">cluster</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span>
-    
+
     <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;navy&quot;</span><span class="p">,</span> <span class="s2">&quot;turquoise&quot;</span><span class="p">]</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">color</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
@@ -624,7 +624,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>微妙な感じがします．</p>
+<p>これは違う気がします．</p>
 </div>
 <p>次に3個のクラスタに分割します．以下のように書きます．</p>
 <div class="cell docutils container">
@@ -637,11 +637,11 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-    <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">cluster</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span>
 
     <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;navy&quot;</span><span class="p">,</span> <span class="s2">&quot;turquoise&quot;</span><span class="p">,</span> <span class="s2">&quot;darkorange&quot;</span><span class="p">]</span>
@@ -681,12 +681,12 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">silhouette_score</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-    
+
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">):</span>
-        <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">cluster</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">silhouette_score</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cluster</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
@@ -709,7 +709,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="id6">
 <h2><span class="section-number">5.3. </span>階層的クラスタリング法<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
-<p>与えられたデータをクラスター化する階層的クラスタリング法の利用方法を紹介します．階層的クラスタリング法でクラスター化した各クラスターは階層構造を有します．</p>
+<p>与えられたデータをクラスタ化する階層的クラスタリング法の利用方法を紹介します．階層的クラスタリング法でクラスタ化した各クラスタは階層構造を有します．</p>
 <div class="section" id="id7">
 <h3><span class="section-number">5.3.1. </span>基本的な事柄<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>階層的クラスタリングは与えられたデータを任意の数のクラスタに分割する方法です．その計算の過程において各クラスタが階層構造を持つように分割することができるため「階層的」という名前がついています．階層的クラスタリング法は各クラスタリング法の総称です．単連結（最短距離）法，完全連結（最長距離）法，群平均法，ウォード法等のいくつかの方法が階層的クラスタリング法に属します．</p>
@@ -723,7 +723,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li><p>計算した指標を最も良くするようにクラスタと別のクラスタを連結して新たなクラスタを生成します．</p></li>
 <li><p>クラスタがひとつになるまで，上の 1，2 を繰り返します．</p></li>
 </ol>
-<p>例えば，ウォード法を利用するのであれば 1 番で計算する指標は，以下のクラスタ内平方和です．クラスタ <span class="math notranslate nohighlight">\(C_k\)</span> のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_k\)</span> は以下のように計算します．</p>
+<p>例えば，ウォード法を利用するのであれば指標として，以下のクラスタ内平方和を計算します．クラスタ <span class="math notranslate nohighlight">\(C_k\)</span> のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_k\)</span> は以下のように計算します．</p>
 <p><span class="math notranslate nohighlight">\(
 \displaystyle I_k=\sum_{i=1}^{n_k}\|x_i-\mu_k\|_2^2
 \)</span></p>
@@ -804,7 +804,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>主成分分析法の進め方を紹介します．</p>
 <div class="section" id="id11">
 <h3><span class="section-number">5.4.1. </span>基本的な事柄<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<p>与えられたデータに対して主成分分析を行う理由は，人が目で見て理解するには複雑なデータを人が理解しやすい形式に整えたいためです．4 個以上の要素からなるベクトル形式のデータを 2 個または 3 個（または稀に 1 個）の要素からなるベクトル形式のデータに変換し 2 次元または 3 次元（または 1 次元）平面上にインスタンスをプロットし直すことでデータの関連性を把握することができます．</p>
+<p>与えられたデータに対して主成分分析を行う理由は，人が目で見て理解するには複雑なデータを人が理解しやすい形式に整えたいためです．4個以上の要素からなるベクトル形式のデータを2個または3個（または稀に1個）の要素からなるベクトル形式のデータに変換し2次元または3次元（または1次元）平面上にインスタンスをプロットし直すことでデータの関連性を把握することができます．</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>この変換を次元削減と言います．</p>
@@ -824,7 +824,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="id13">
 <h3><span class="section-number">5.4.3. </span>次元の削減<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
-<p>アヤメのデータセットに対して次元の削減を行います．以下のようにこのデータセットにおける各インスタンスは 4 個の要素からなるベクトル形式のデータです．よってこれを 4 次元平面上にプロットしたとしてもその関係性を人は理解できません．</p>
+<p>アヤメのデータセットに対して次元の削減を行います．以下のようにこのデータセットにおける各インスタンスは4個の要素からなるベクトル形式のデータです．よってこれを4次元平面上にプロットしたとしてもその関係性を人は理解できません．</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>そもそも4次元平面なんて描画できませんね．</p>
@@ -834,7 +834,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">sklearn</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">diris</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -845,13 +845,13 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>主成分分析は以下のように行います．主成分分析で得られた全インスタンス（150 個）の値を出力させます．</p>
+<p>主成分分析は以下のように行います．主成分分析を実施することで得られた全インスタンス（150個）の値を出力させます．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">diris</span><span class="o">.</span><span class="n">data</span>
@@ -875,7 +875,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">diris</span><span class="o">.</span><span class="n">data</span>
@@ -896,7 +896,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>各種類のアヤメがそれぞれ集まっていることがわかります．2 次元平面上にプロットすることで各インスタンスの関係性を把握することができました．この主成分平面には横軸と縦軸がありますが，これらの軸が何を意味しているのかは解析者がデータの分布の様子を観察する等して決定しなければなりません．</p>
+<p>各種類のアヤメがそれぞれ集まっていることがわかります．2次元平面上にプロットすることで各インスタンスの関係性を把握することができました．この主成分平面には横軸と縦軸がありますが，これらの軸が何を意味しているのかは解析者がデータの分布の様子を観察する等して決定しなければなりません．</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>軸の意味の解釈のヒントは主成分負荷量を散布図上にプロットすることである程度は得られます．主成分負荷量とは最終的に得られた固有ベクトル（線形結合の係数）にそれに対応する固有値の正の平方根を掛けた値のことです．</p>
@@ -914,7 +914,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">diris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">diris</span><span class="o">.</span><span class="n">data</span>
@@ -965,15 +965,15 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>ハイパーパラメータの最適化は深層学習の分野で最も重要なトピックのひとつなので紹介してみました．</p>
+<p>ハイパーパラメータの最適化は深層学習の分野で最も重要なトピックのひとつなので紹介しました．</p>
 </div>
 </div>
 <div class="section" id="id18">
 <h3><span class="section-number">5.5.3. </span>元の確率分布の推定<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <p>ここでは，母数の異なるふたつの正規分布からいくつかのインスタンスをサンプリングして，そのサンプリングしたデータから元の正規分布ふたつからなる二峰性の確率分布を再現できるかということを試します．</p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>正規分布の母数（パラメータ）は平均値と分散ですね．母数の値が決まればそれに対応する正規分布の形状は一意に決まるのですね．</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>正規分布の母数（パラメータ）は平均値と分散ですね．母数の値が決まればそれに対応する正規分布の形状は一意に決まります．</p>
 </div>
 <p>以下のコードで <span class="math notranslate nohighlight">\(N(2, 1.5)\)</span> と <span class="math notranslate nohighlight">\(N(-3, 2)\)</span> の正規分布を描画します．</p>
 <div class="cell docutils container">
@@ -983,7 +983,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
@@ -1004,7 +1004,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
@@ -1030,7 +1030,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KernelDensity</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
- 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
     <span class="n">x2</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
@@ -1155,7 +1155,7 @@ const thebe_selector_output = ".output, .cell_output"
     <a class='right-next' id="next-link" href="pytorch_01.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6. </span>TensorFlow の基本的な利用方法</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>PyTorch の基本的な利用方法</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
