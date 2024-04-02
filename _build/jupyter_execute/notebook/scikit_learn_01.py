@@ -16,7 +16,7 @@
 
 #!/usr/bin/env python3
 import sklearn
- 
+
 def main():
     print(sklearn.__version__)
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
 # ### 決定木による予測器の構築
 
-# 決定木という機械学習アルゴリズムを用いて人工知能を構築します．最初にデータを学習データセットとテストデータセットに分割します．テストデータセットのサイズは全体の 2 割にします（何割でも良いのですが 2 割にしてみました）．データセットの分割もとても便利な方法が用意されています．以下のように書きます．
+# 決定木という機械学習アルゴリズムを用いて人工知能を構築します．最初にデータを学習データセットとテストデータセットに分割します．テストデータセットのサイズは全体の2割にします（何割でも良いのですが2割にしてみました）．データセットの分割もとても便利な方法が用意されています．以下のように書きます．
 
 # In[ ]:
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split # このような関数がある
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 0) # このように書くと分割できる．ランダムに並べ替えてくれる．
@@ -109,7 +109,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 0)
@@ -147,7 +147,7 @@ import pydotplus
 from IPython.display import Image, display_png
 from graphviz import Digraph
 from six import StringIO
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 0)
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
 # 決定木はこのような選択肢の分岐を繰り返すことで入力データを分類する手法です．最上段からスタートします．この場合，咢の幅が `0.8` 以下であるなら（`True` の方向へ進む），データは `setosa` と分類されます．
 
-# ```{hint}
+# ```{note}
 # 画像中に ` gini ` とありますが，これは決定木の目的関数です．決定木はこれを指標にしてデータが分割します．気になった場合は「ジニ不純度」のようなキーワードで検索してみてください．
 # ```
 
@@ -185,7 +185,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import confusion_matrix
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2) # 全部正解してしまうから，乱数の種を変えてみた．
@@ -216,7 +216,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2) # 全部正解してしまうから，乱数の種を変えてみた．
@@ -244,7 +244,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC # 決定木ではなくて SVC をインポートする．
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2)
@@ -272,7 +272,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier # 変更する．
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2)
@@ -296,7 +296,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression # 変更する．
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2)
@@ -366,7 +366,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 import pickle
- 
+
 def main():
     fin = open("./predictor.sav", "rb") # rは読み込みを意味します．
     predictor = pickle.load(fin) # 予測器の読み込み．
@@ -405,7 +405,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split, GridSearchCV # インポートする
 from sklearn.svm import SVC
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2)
@@ -434,7 +434,7 @@ import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.svm import SVC
- 
+
 def main():
     diris = load_iris()
     learnx, testx, learnt, testt = train_test_split(diris.data, diris.target, test_size = 0.2, random_state = 2)

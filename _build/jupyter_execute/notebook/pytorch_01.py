@@ -1,45 +1,42 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # TensorFlow の基本的な利用方法
+# # PyTorch の基本的な利用方法
 
 # ## 基本操作
 
-# この節では TensorFlow の基本的な操作方法を紹介します．
+# この節では PyTorch の基本的な操作方法を紹介します．
 
 # ### インポート
 
-# NumPy と同じように TensorFlow をインポートします．
+# NumPy と同じように PyTorch をインポートします．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
- 
+import torch
+
 def main():
-    pass
-    # TensorFlow のバージョンを出力．
- 
+    print(torch.__version__)
+
 if __name__ == "__main__":
     main()
 
 
 # ### テンソル
 
-# TensorFlow では「テンソル」と呼ばれる NumPy の多次元配列に類似したデータ構造を用います．2行目で TensorFlow をインポートします．5行目のテンソルを生成するためのコマンドは `tf.zeros()` で，これによって，全要素が `0` であるテンソルが生成されます．最初の引数には生成されるテンソルの次元数を指定します．また，データのタイプを指定することができますが以下の場合は32ビットのフロートの値を生成しています．
+# PyTorch では「テンソル」と呼ばれる NumPy の多次元配列に類似したデータ構造を用います．2行目で PyTorch をインポートします．5行目のテンソルを生成するためのコマンドは `torch.zeros()` で，これによって，全要素が `0` であるテンソルが生成されます．最初の引数には生成されるテンソルの次元数を指定します．また，データのタイプを指定することができますが以下の場合は32ビットのフロートの値を生成しています．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.zeros([3, 3], dtype=tf.float32)
+    tx = torch.zeros([3, 3], dtype=torch.float32)
     print(tx)
-    # 1階テンソルを生成．
-    # 3階テンソルを生成．
 
 if __name__ == "__main__":
     main()
@@ -51,13 +48,11 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.zeros([3, 3], dtype=tf.int32) # ここが整数を生成するための記述
+    tx = torch.zeros([3, 3], dtype=torch.int32)  # ここが整数を生成するための記述
     print(tx)
-    # 1階テンソルを生成．
-    # 3階テンソルを生成．
 
 if __name__ == "__main__":
     main()
@@ -69,13 +64,12 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.zeros([4, 3], dtype=tf.int32)
+    tx = torch.zeros([4, 3], dtype=torch.int32)
     print(tx.dtype)
     print(tx.shape)
-    # 浮動小数点数の2行2列の行列を生成して型と形を確認．
 
 if __name__ == "__main__":
     main()
@@ -92,13 +86,16 @@ import tensorflow as tf
 def main():
     tx = tf.random.uniform([4, 3], minval=-1, maxval=1, dtype=tf.float32)
     print(tx)
-    # 何度か実行して値が異なることを確認．
 
 if __name__ == "__main__":
     main()
 
 
 # 上のコードセルを何度か繰り返し実行すると一様分布に従う4行3列のテンソルの値が生成されますが，1回ごとに異なる値が出力されているはずです．これは計算機実験をする際にとても厄介です．再現性が取れないからです．これを防ぐために「乱数の種」というものを設定します．以下のコードの3行目のような指定を追加します．ここでは，0という値を乱数の種に設定していますが，これはなんでも好きな値を設定して良いです．
+
+# ```{note}
+# 何度か繰り返し実行しましょう．
+# ```
 
 # ```{note}
 # 普通，科学的な計算機実験をする際に乱数の種を固定せずに計算を開始することはあり得ません．乱数を使う場合は常に乱数の種を固定しておくことを習慣づける必要があります．
@@ -130,7 +127,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     tx = tf.constant([2, 4], dtype=tf.float32)
     print(tx)
@@ -159,7 +156,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     tx = tf.add([2, 4], [1, 3])
     print(tx)
@@ -177,7 +174,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
- 
+
 def main():
     na = np.array([[1, 2], [1, 3]])
     nb = np.array([[2, 3], [4, 5]])
@@ -197,7 +194,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
- 
+
 def main():
     na = np.array([[1, 2], [1, 3]], dtype=np.float32)
     nb = np.array([[2, 3], [5, 6]], dtype=np.float32)
@@ -223,7 +220,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
- 
+
 def main():
     na = np.array([[1, 2], [1, 3]], dtype=np.float32)
     nb = np.array([[2, 3], [5, 6]], dtype=np.float32)
@@ -242,7 +239,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
- 
+
 def main():
     na = np.array([[1, 2], [1, 3]], dtype=np.float32)
     print(tf.add(na, 1))
@@ -259,7 +256,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     ta = tf.constant([2, 4], dtype=tf.float32)
     tb = tf.constant([5, 6], dtype=tf.float32)
@@ -281,7 +278,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
- 
+
 def main():
     nx = np.array([1, 2, 3], dtype=np.float32)
     print(tf.square(nx))
@@ -301,7 +298,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     tx = tf.constant([[2, 4], [6, 8]], dtype=tf.float32)
     print(tx[:,0])
@@ -311,7 +308,7 @@ if __name__ == "__main__":
     main()
 
 
-# ```{hint}
+# ```{note}
 # これは2行2列の行列の1列目の値を取り出す操作です．
 # ```
 
@@ -322,7 +319,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     tx = tf.random.uniform([4, 5], dtype=tf.float32)
     print(tx)
@@ -407,7 +404,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     tx = tf.Variable(5, dtype=tf.float32)
     with tf.GradientTape() as tape:
@@ -529,7 +526,7 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import tensorflow as tf
- 
+
 def main():
     tx = tf.Variable(1.6, dtype=tf.float32) # これが変数．
     epoch, update_value, lr = 1, 5, 0.1 # 更新値はダミー変数．

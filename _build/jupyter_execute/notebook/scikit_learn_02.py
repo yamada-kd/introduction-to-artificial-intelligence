@@ -72,7 +72,7 @@ from sklearn.datasets import make_blobs
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 np.random.seed(1000)
- 
+
 def main():
     x, t = make_blobs(n_samples=150, centers=3)
     plt.scatter(x[:,0], x[:,1])
@@ -98,13 +98,13 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 np.random.seed(1000)
- 
+
 def main():
     x, t = make_blobs(n_samples=150, centers=3)
 
-    kmeans = KMeans(n_clusters=2).fit(x)
+    kmeans = KMeans(n_clusters=2, n_init="auto").fit(x)
     cluster = kmeans.labels_
-    
+
     colors = ["navy", "turquoise"]
     plt.figure()
     for color, i in zip(colors, [0, 1]):
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
 
 # ```{note}
-# 微妙な感じがします．
+# これは違う気がします．
 # ```
 
 # 次に3個のクラスタに分割します．以下のように書きます．
@@ -132,11 +132,11 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 np.random.seed(1000)
- 
+
 def main():
     x, t = make_blobs(n_samples=150, centers=3)
 
-    kmeans = KMeans(n_clusters=3).fit(x)
+    kmeans = KMeans(n_clusters=3, n_init="auto").fit(x)
     cluster = kmeans.labels_
 
     colors = ["navy", "turquoise", "darkorange"]
@@ -176,12 +176,12 @@ from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 np.random.seed(1000)
- 
+
 def main():
     x, t = make_blobs(n_samples=150, centers=3)
-    
+
     for k in range(2,8):
-        kmeans = KMeans(n_clusters=k).fit(x)
+        kmeans = KMeans(n_clusters=k, n_init="auto").fit(x)
         cluster = kmeans.labels_
         print(k, ": ", silhouette_score(x, cluster), sep="")
 
@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
 # ## 階層的クラスタリング法
 
-# 与えられたデータをクラスター化する階層的クラスタリング法の利用方法を紹介します．階層的クラスタリング法でクラスター化した各クラスターは階層構造を有します．
+# 与えられたデータをクラスタ化する階層的クラスタリング法の利用方法を紹介します．階層的クラスタリング法でクラスタ化した各クラスタは階層構造を有します．
 
 # ### 基本的な事柄
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 # 2.   計算した指標を最も良くするようにクラスタと別のクラスタを連結して新たなクラスタを生成します．
 # 3.   クラスタがひとつになるまで，上の 1，2 を繰り返します．
 # 
-# 例えば，ウォード法を利用するのであれば 1 番で計算する指標は，以下のクラスタ内平方和です．クラスタ $C_k$ のクラスタ内平方和 $I_k$ は以下のように計算します．
+# 例えば，ウォード法を利用するのであれば指標として，以下のクラスタ内平方和を計算します．クラスタ $C_k$ のクラスタ内平方和 $I_k$ は以下のように計算します．
 # 
 # $
 # \displaystyle I_k=\sum_{i=1}^{n_k}\|x_i-\mu_k\|_2^2
@@ -304,7 +304,7 @@ if __name__ == "__main__":
 
 # ### 基本的な事柄
 
-# 与えられたデータに対して主成分分析を行う理由は，人が目で見て理解するには複雑なデータを人が理解しやすい形式に整えたいためです．4 個以上の要素からなるベクトル形式のデータを 2 個または 3 個（または稀に 1 個）の要素からなるベクトル形式のデータに変換し 2 次元または 3 次元（または 1 次元）平面上にインスタンスをプロットし直すことでデータの関連性を把握することができます．
+# 与えられたデータに対して主成分分析を行う理由は，人が目で見て理解するには複雑なデータを人が理解しやすい形式に整えたいためです．4個以上の要素からなるベクトル形式のデータを2個または3個（または稀に1個）の要素からなるベクトル形式のデータに変換し2次元または3次元（または1次元）平面上にインスタンスをプロットし直すことでデータの関連性を把握することができます．
 
 # ```{note}
 # この変換を次元削減と言います．
@@ -328,7 +328,7 @@ if __name__ == "__main__":
 
 # ### 次元の削減
 
-# アヤメのデータセットに対して次元の削減を行います．以下のようにこのデータセットにおける各インスタンスは 4 個の要素からなるベクトル形式のデータです．よってこれを 4 次元平面上にプロットしたとしてもその関係性を人は理解できません．
+# アヤメのデータセットに対して次元の削減を行います．以下のようにこのデータセットにおける各インスタンスは4個の要素からなるベクトル形式のデータです．よってこれを4次元平面上にプロットしたとしてもその関係性を人は理解できません．
 
 # ```{note}
 # そもそも4次元平面なんて描画できませんね．
@@ -340,7 +340,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import sklearn
 from sklearn.datasets import load_iris
- 
+
 def main():
     diris = load_iris()
     print(diris.data[0])
@@ -349,7 +349,7 @@ if __name__ == "__main__":
     main()
 
 
-# 主成分分析は以下のように行います．主成分分析で得られた全インスタンス（150 個）の値を出力させます．
+# 主成分分析は以下のように行います．主成分分析を実施することで得られた全インスタンス（150個）の値を出力させます．
 
 # In[ ]:
 
@@ -357,7 +357,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
- 
+
 def main():
     diris = load_iris()
     x = diris.data
@@ -381,7 +381,7 @@ from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
- 
+
 def main():
     diris = load_iris()
     x = diris.data
@@ -400,7 +400,7 @@ if __name__ == "__main__":
     main()
 
 
-# 各種類のアヤメがそれぞれ集まっていることがわかります．2 次元平面上にプロットすることで各インスタンスの関係性を把握することができました．この主成分平面には横軸と縦軸がありますが，これらの軸が何を意味しているのかは解析者がデータの分布の様子を観察する等して決定しなければなりません．
+# 各種類のアヤメがそれぞれ集まっていることがわかります．2次元平面上にプロットすることで各インスタンスの関係性を把握することができました．この主成分平面には横軸と縦軸がありますが，これらの軸が何を意味しているのかは解析者がデータの分布の様子を観察する等して決定しなければなりません．
 
 # ```{note}
 # 軸の意味の解釈のヒントは主成分負荷量を散布図上にプロットすることである程度は得られます．主成分負荷量とは最終的に得られた固有ベクトル（線形結合の係数）にそれに対応する固有値の正の平方根を掛けた値のことです．
@@ -420,7 +420,7 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
- 
+
 def main():
     diris = load_iris()
     x = diris.data
@@ -472,15 +472,15 @@ if __name__ == "__main__":
 # ```
 
 # ```{note}
-# ハイパーパラメータの最適化は深層学習の分野で最も重要なトピックのひとつなので紹介してみました．
+# ハイパーパラメータの最適化は深層学習の分野で最も重要なトピックのひとつなので紹介しました．
 # ```
 
 # ### 元の確率分布の推定
 
 # ここでは，母数の異なるふたつの正規分布からいくつかのインスタンスをサンプリングして，そのサンプリングしたデータから元の正規分布ふたつからなる二峰性の確率分布を再現できるかということを試します．
 
-# ```{hint}
-# 正規分布の母数（パラメータ）は平均値と分散ですね．母数の値が決まればそれに対応する正規分布の形状は一意に決まるのですね．
+# ```{note}
+# 正規分布の母数（パラメータ）は平均値と分散ですね．母数の値が決まればそれに対応する正規分布の形状は一意に決まります．
 # ```
 
 # 以下のコードで $N(2, 1.5)$ と $N(-3, 2)$ の正規分布を描画します．
@@ -493,7 +493,7 @@ import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
- 
+
 def main():
     x = np.linspace(-8, 8, 100)
     y = (norm.pdf(x, loc=2, scale=1.5) + norm.pdf(x, loc=-3, scale=2)) / 2
@@ -514,7 +514,7 @@ from scipy.stats import norm
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 np.random.seed(0)
- 
+
 def main():
     x1 = norm.rvs(loc=2, scale=1.5, size=50)
     plt.hist(x1)
@@ -540,7 +540,7 @@ from scipy.stats import norm
 from sklearn.neighbors import KernelDensity
 import matplotlib.pyplot as plt
 np.random.seed(0)
- 
+
 def main():
     x1 = norm.rvs(loc=2, scale=1.5, size=1000)
     x2 = norm.rvs(loc=-3, scale=2, size=1000)
