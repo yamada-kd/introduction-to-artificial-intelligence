@@ -81,10 +81,26 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.random.uniform([4, 3], minval=-1, maxval=1, dtype=tf.float32)
+    tx = torch.rand(4, 3) * 2 - 1  # 0から1の乱数を生成して、-1から1の範囲に調整
+    print(tx)
+
+if __name__ == "__main__":
+    main()
+
+
+# 以下のようにしてもできます．
+
+# In[ ]:
+
+
+#!/usr/bin/env python3
+import torch
+
+def main():
+    tx = torch.FloatTensor(4, 3).uniform_(-1, 1)  # -1から1の範囲の一様分布から乱数を生成
     print(tx)
 
 if __name__ == "__main__":
@@ -97,94 +113,81 @@ if __name__ == "__main__":
 # 何度か繰り返し実行しましょう．
 # ```
 
+# In[ ]:
+
+
+#!/usr/bin/env python3
+import torch
+torch.manual_seed(0)  # 乱数の種を設定
+
+def main():
+    tx = torch.FloatTensor(4, 3).uniform_(-1, 1)  # -1から1の範囲の一様分布から乱数を生成
+    print(tx)
+
+if __name__ == "__main__":
+    main()
+
+
 # ```{note}
 # 普通，科学的な計算機実験をする際に乱数の種を固定せずに計算を開始することはあり得ません．乱数を使う場合は常に乱数の種を固定しておくことを習慣づける必要があります．
 # ```
 
-# In[ ]:
-
-
-#!/usr/bin/env python3
-import tensorflow as tf
-tf.random.set_seed(0)
-
-def main():
-    tx = tf.random.uniform([4, 3], minval=-1, maxval=1, dtype=tf.float32)
-    print(tx)
-    # 何度か繰り返して実行．
-    # 全く同じコマンドで別の変数を生成して出力．
-    # 何度か繰り返して実行．
-    # 乱数のタネを別の値に変更した後に何度か繰り返して実行．
-
-if __name__ == "__main__":
-    main()
-
-
-# Python 配列より変換することもできます．この `tf.constant()` は実際には使う機会は多くありません．
+# テンソルは Python 配列より変換することもできます．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.constant([2, 4], dtype=tf.float32)
+    tx = torch.tensor([2, 4], dtype=torch.float32)
     print(tx)
-    # 多次元 Python 配列をテンソルに変換．
 
 if __name__ == "__main__":
     main()
 
-
-# なぜなら，TensorFlow のテンソル（tf.Tensor）と NumPy の多次元配列（ndarray）の変換は以下のふたつのルールによる簡単な変換を TensorFlow が自動で行ってくれるからです．
-# 
-# 
-# 1.   TensorFlowの演算により NumPy の ndarray は自動的に tf.Tensor に変換される．
-# 2.   NumPy の演算により tf.Tensor は自動的に ndarray に変換される．
-# 
-# これに関しては以下の四則計算のところでその挙動を確認します．
-# 
-# 
 
 # ### 四則計算
 
-# テンソルの四則計算は以下のように行います．最初に足し算を行います．NumPy と同じようにやはり element-wise な計算です．実行結果は `tf.Tensor([3 7], shape=(2,), dtype=int32)` となっており，配列の計算の結果が tf.Tensor に変換されていることが確認できます．
+# テンソルの四則計算は以下のように行います．最初に足し算を行います．NumPy と同じようにやはり element-wise な計算です．実行結果は `tensor([3, 7])` となっており，テンソルが出力されていることがわかります．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.add([2, 4], [1, 3])
+    tx = torch.add(torch.tensor([2, 4]), torch.tensor([1, 3]))  # テンソル同士の加算
     print(tx)
-    # 別の計算を実行．
 
 if __name__ == "__main__":
     main()
 
 
-# 以下では，ふたつの NumPy 多次元配列を生成しそれらを足し合わせます．得られる結果は NumPy の多次元配列でなくて tf.Tensor であることが確認できます．
+# 以下では，ふたつの NumPy 多次元配列を生成しそれらを足し合わせる場合も同じようにテンソルに変換します．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
 import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
     na = np.array([[1, 2], [1, 3]])
     nb = np.array([[2, 3], [4, 5]])
-    tx = tf.add(na, nb)
+    tx = torch.tensor(na) + torch.tensor(nb)  # NumPy配列をテンソルに変換してから加算
     print(tx)
-    # 別の計算を実行．
 
 if __name__ == "__main__":
     main()
 
+
+# ```{note}
+# このような型変換の柔軟性は TensorFlow の方があります．柔軟だから良いわけではありません．
+# ```
 
 # その他の四則演算は以下のように行います．
 
@@ -193,39 +196,32 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
-    na = np.array([[1, 2], [1, 3]], dtype=np.float32)
-    nb = np.array([[2, 3], [5, 6]], dtype=np.float32)
-    print(tf.add(na, nb))
-    print(tf.subtract(nb, na))
-    print(tf.multiply(na, nb))
-    print(tf.divide(nb, na))
-    # 別の計算を実行．
+    ta = torch.tensor([[1, 2], [1, 3]])
+    tb = torch.tensor([[2, 3], [5, 6]])
+    print(torch.add(ta, tb))      # 加算
+    print(torch.subtract(tb, ta)) # 減算
+    print(torch.multiply(ta, tb)) # 乗算
+    print(torch.divide(tb, ta))   # 除算
 
 if __name__ == "__main__":
     main()
 
 
-# ```{note}
-# 上から足し算，引き算，掛け算，割り算です．
-# ```
-
-# 上の `tf.multiply()` はテンソルの要素ごとの積（アダマール積）を計算するための方法です．行列の積は以下のように `tf.matmul()` を利用します．
+# 上の `torch.multiply()` はテンソルの要素ごとの積（アダマール積）を計算するための方法です．行列の積は以下のように `torch.matmul()` を利用します．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
-    na = np.array([[1, 2], [1, 3]], dtype=np.float32)
-    nb = np.array([[2, 3], [5, 6]], dtype=np.float32)
-    print(tf.matmul(na, nb))
-    # tf.multiply() との違いを確認．
+    ta = torch.tensor([[1, 2], [1, 3]], dtype=torch.float32)
+    tb = torch.tensor([[2, 3], [5, 6]], dtype=torch.float32)
+    print(torch.matmul(ta, tb))
 
 if __name__ == "__main__":
     main()
@@ -237,13 +233,11 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
-    na = np.array([[1, 2], [1, 3]], dtype=np.float32)
-    print(tf.add(na, 1))
-    # 引き算を実行．
+    ta = torch.tensor([[1, 2], [1, 3]], dtype=torch.float32)
+    print(torch.add(ta, 1))
 
 if __name__ == "__main__":
     main()
@@ -255,16 +249,17 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    ta = tf.constant([2, 4], dtype=tf.float32)
-    tb = tf.constant([5, 6], dtype=tf.float32)
+    ta = torch.tensor([2, 4], dtype=torch.float32)
+    tb = torch.tensor([5, 6], dtype=torch.float32)
     print(ta + tb)
     print(tb - ta)
     print(ta * tb)
     print(tb / ta)
-    # "//" と "%" の挙動を確認．
+    print(tb // ta)
+    print(tb % ta)
 
 if __name__ == "__main__":
     main()
@@ -276,14 +271,12 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
-    nx = np.array([1, 2, 3], dtype=np.float32)
-    print(tf.square(nx))
-    print(tf.reduce_sum(nx))
-    # 多次元配列での挙動を確認．
+    nx = torch.tensor([1, 2, 3], dtype=torch.float32)
+    print(torch.square(nx))
+    print(torch.sum(nx))
 
 if __name__ == "__main__":
     main()
@@ -297,12 +290,12 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.constant([[2, 4], [6, 8]], dtype=tf.float32)
-    print(tx[:,0])
-    # 2行目の値を出力．
+    tx = torch.tensor([[2, 4], [6, 8]], dtype=torch.float32)
+    # 列のスライスを取得
+    print(tx[:, 0])
 
 if __name__ == "__main__":
     main()
@@ -318,62 +311,120 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.random.uniform([4, 5], dtype=tf.float32)
+    tx = torch.rand(4, 5, dtype=torch.float32)
     print(tx)
-    print(tf.reshape(tx, [20]))
-    print(tf.reshape(tx, [1, 20]))
-    print(tf.reshape(tx, [5, 4]))
-    print(tf.reshape(tx, [-1, 4]))
-    # tf.reshape(tx, [20, 1]) の形を確認．
+    print(torch.reshape(tx, [20]))
+    print(torch.reshape(tx, [1, 20]))
+    print(torch.reshape(tx, [5, 4]))
+    print(torch.reshape(tx, [-1, 4]))
 
 if __name__ == "__main__":
     main()
 
 
-# 以上のプログラムの6行目では4行5列の行列が生成されています．これを，20要素からなるベクトルに変換するのが7行目の記述です．また，8行目の記述では1行20列の行列を生成できます．また，9行目は5行4列の行列を生成するためのものです．同じく10行目も5行4列の行列を生成します．ここでは，`tf.reshape()` の shape を指定するオプションの最初の引数に `-1` が指定されていますが，これのように書くと自動でその値が推測されます．この場合，`5` であると推測されています．
+# 以上のプログラムの6行目では4行5列の行列が生成されています．これを，20要素からなるベクトルに変換するのが7行目の記述です．また，8行目の記述では1行20列の行列を生成できます．また，9行目は5行4列の行列を生成するためのものです．同じく10行目も5行4列の行列を生成します．ここでは，`torch.reshape()` の shape を指定するオプションの最初の引数に `-1` が指定されていますが，これのように書くと自動でその値が推測されます．この場合，`5` であると推測されています．
 
 # ### 変数の変換
 
-# これまでに，NumPyの 多次元配列を TensorFlow のテンソルに変換する方法は確認しました．テンソルを NumPy 配列に変換するには明示的に `numpy()` を指定する方法があります．6行目は NumPy 配列を生成します．8行目はその NumPy 配列をテンソルに変換します．さらに，NumPy 配列に戻すためには10行目のように `.numpy()` を利用します．
+# これまでに，NumPy の多次元配列を PyTorch のテンソルに変換する方法は確認しました．テンソルを NumPy 配列に変換するには明示的に `numpy()` を指定する方法があります．6行目は NumPy 配列を生成します．8行目はその NumPy 配列をテンソルに変換します．さらに，NumPy 配列に戻すためには10行目のように `.numpy()` を利用します．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
 import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
     na = np.ones(5)
     print("NumPy:", na)
-    ta = tf.constant(na, dtype=tf.float32)
+    ta = torch.tensor(na, dtype=torch.float32)
     print("Tensor:", ta)
     na = ta.numpy()
     print("NumPy:", na)
-    # さらに32ビット整数型のテンソルに変換．
 
 if __name__ == "__main__":
     main()
 
 
-# また，テンソルに対して NumPy の演算操作を行うと自動的にテンソルは NumPy 配列に変換されます．以下の8行目と9行目はどちらもベクトルの内積を計算していますが，8行目で得られる結果はテンソル，9行目で得られる結果は NumPy の値です．
+# PyTorch では NumPy 配列，テンソル，に加えて GPU 上のテンソルを扱う必要があります．この3つの変数のタイプを自由に変換することができます．ただし，NumPy 配列から直接 GPU 上のテンソルへの変換はできません．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
 import numpy as np
-import tensorflow as tf
+import torch
 
 def main():
-    ta = tf.constant([2, 4], dtype=tf.float32)
-    tb = tf.constant([5, 6], dtype=tf.float32)
-    print(tf.tensordot(ta, tb, axes=1))
-    print(np.dot(ta, tb))
-    # NumPy 配列とテンソルの内積をテンソルの演算方法で計算．
+    na = np.ones(5)
+    print("NumPy:", na)
+    ta = torch.tensor(na, dtype=torch.float32)
+    print("Torch:", ta)
+    na = ta.numpy()
+    print("NumPy:", na)
+    device = torch.device("cuda")
+    ca = ta.to(device)
+    print("CUDA:", ca)
+    ta = ca.to("cpu", dtype=torch.float32)
+    print("Torch:", ta)
+
+if __name__ == "__main__":
+    main()
+
+
+# 以上のプログラムにおいて，7行目は NumPy 配列を生成します．9行目はその NumPy 配列をテンソルに変換します．さらに，NumPy 配列に戻すためには11行目のように `.numpy()` を利用します．13行目では CUDA のデバイスを定義しています．この環境で GPU を利用するには上のメニューの「ランタイム」から「ランタイムのタイプを変更」と進み，「ハードウェアアクセラレータ」の「GPU」を選択します．定義したデバイスに変数を送るには `.to()` を利用します．14行目のように記述します．16行目は GPU 上の変数を CPU 上のテンソルへと戻す記述です．これは以下のように書くこともできます．
+
+# In[ ]:
+
+
+#!/usr/bin/env python3
+import numpy as np
+import torch
+
+def main():
+    na = np.ones(5)
+    print("NumPy:", na)
+    ta = torch.tensor(na, dtype=torch.float32)
+    print("Torch:", ta)
+    na = ta.numpy()
+    print("NumPy:", na)
+    ca = ta.cuda()
+    print("CUDA:", ca)
+    ta = ca.cpu()
+    print("Torch:", ta)
+
+if __name__ == "__main__":
+    main()
+
+
+# GPU を利用できない環境にてエラーを防ぐには以下のようにすると良いでしょう．
+
+# In[ ]:
+
+
+#!/usr/bin/env python3
+import numpy as np
+import torch
+
+def main():
+    na = np.ones(5)
+    print("NumPy:", na)
+    ta = torch.tensor(na, dtype=torch.float32)
+    print("Torch:", ta)
+    na = ta.numpy()
+    print("NumPy:", na)
+
+    if torch.cuda.is_available():
+        ca = ta.cuda()
+        print("CUDA:", ca)
+        ta = ca.cpu()
+        print("Torch:", ta)
+    else:
+        print("CUDA is not available.")
 
 if __name__ == "__main__":
     main()
@@ -385,7 +436,23 @@ if __name__ == "__main__":
 
 # ### 単一の変数に対する勾配
 
-# 深層学習法におけるアルゴリズムの中身を分解すると行列の掛け算と微分から構成されていることがわかります．TensorFlow はこの行列の掛け算と微分を行うライブラリです．自動微分機能を提供します．ここでは勾配の計算を紹介するため，以下の式を考えます．
+# 深層学習の最も基本的な構成要素は行列の掛け算と微分です．PyTorch はこれを行うライブラリです．自動微分機能を提供します．微分をしたい変数の生成は以下のように行います．テンソル型の変数を生成する際に，`requires_grad=True` を追加するだけです．
+
+# In[ ]:
+
+
+#!/usr/bin/env python3
+import torch
+
+def main():
+    tx = torch.tensor(5, dtype=torch.float32, requires_grad=True)
+    print(tx)
+
+if __name__ == "__main__":
+    main()
+
+
+# 深層学習法におけるアルゴリズムの中身を分解すると行列の掛け算と微分から構成されていることがわかります．PyTorch はこの行列の掛け算と微分を行うライブラリです．自動微分機能を提供します．ここでは勾配の計算を紹介するため，以下の式を考えます．
 # 
 # $y = x^2 + 2$
 # 
@@ -397,21 +464,20 @@ if __name__ == "__main__":
 # 
 # $\left.\dfrac{\partial y}{\partial x}\right|_{x=5}=10$
 # 
-# これを TensorFlow で実装すると以下のように書けます．微分は10行目のように `tape.gradient()` によって行います．
+# これを PyTorch で実装すると以下のように書けます．微分は10行目のように `tape.gradient()` によって行います．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.Variable(5, dtype=tf.float32)
-    with tf.GradientTape() as tape:
-        ty = tx**2 + 2 # ここに勾配を求める対象の計算式を書く．
-    grad = tape.gradient(ty, tx)
+    tx = torch.tensor(5, dtype=torch.float32, requires_grad=True)  # 勾配を追跡するためにrequires_grad=Trueを指定
+    ty = tx**2 + 2  # 勾配を求めたい計算式
+    ty.backward()  # 勾配を計算
+    grad = tx.grad  # 計算された勾配を取得
     print(grad)
-    # y=3x^2+x+1をxで偏微分したときの，x=1の値を計算．
 
 if __name__ == "__main__":
     main()
@@ -425,19 +491,18 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
     # Definition
-    ts = tf.constant([[2, 1]], dtype=tf.float32)
-    tt = tf.Variable([[2, 4], [6, 8]], dtype=tf.float32) # これが変数．
-    tu = tf.constant([[4], [1]], dtype=tf.float32)
+    ts = torch.tensor([[2, 1]], dtype=torch.float32)
+    tt = torch.tensor([[2, 4], [6, 8]], dtype=torch.float32, requires_grad=True)  # これが変数．勾配の追跡を有効化．
+    tu = torch.tensor([[4], [1]], dtype=torch.float32)
     # Calculation
-    with tf.GradientTape() as tape:
-        tz = tf.matmul(tf.matmul(ts, tt), tu)
-    grad = tape.gradient(tz,tt)
+    tz = torch.matmul(torch.matmul(ts, tt), tu)
+    tz.backward()  # 勾配を計算．
+    grad = tt.grad  # ttに関するtzの勾配を取得．
     print(grad)
-    # 2行2列の定数行列taを生成，ts*ta*tt*tuの行列の積を計算し，ttで偏微分．
 
 if __name__ == "__main__":
     main()
@@ -519,35 +584,40 @@ if __name__ == "__main__":
 
 # <img src="https://github.com/yamada-kd/binds-training/blob/main/image/gradientDescent.svg?raw=1" width="100%" />
 
-# これを TensorFlow を用いて実装すると以下のようになります．出力中，`Objective` は目的関数の値，`Solution` はその時点での解です．最終的に $x=-0.9912\simeq-1$ のとき，最適値 $y=1$ が出力されています．
+# これを PyTorch を用いて実装すると以下のようになります．出力中，`Objective` は目的関数の値，`Solution` はその時点での解です．最終的に $x=-0.9912\simeq-1$ のとき，最適値 $y=1$ が出力されています．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
 
 def main():
-    tx = tf.Variable(1.6, dtype=tf.float32) # これが変数．
-    epoch, update_value, lr = 1, 5, 0.1 # 更新値はダミー変数．
+    tx = torch.tensor(1.6, dtype=torch.float32, requires_grad=True)  # これが変数．勾配の追跡を有効化．
+    epoch, update_value, lr = 1, 5, 0.1  # 更新値はダミー変数．
     while abs(update_value) > 0.001:
-        with tf.GradientTape() as tape:
-            ty = (1/2) * (tx + 1)**2 + 1
-        grad = tape.gradient(ty, tx)
-        update_value = lr * grad.numpy()
-        tx.assign(tx - update_value)
-        print("Epoch {:4d}:\tObjective = {:5.3f}\tSolution = {:7.4f}".format(epoch, ty, tx.numpy()))
-        epoch = epoch + 1
-        # 下の新たなコードセルで計算．
+        ty = (1/2) * (tx + 1)**2 + 1
+        ty.backward()  # 勾配を計算．
+        with torch.no_grad():  # 勾配更新時には自動微分を無効化
+            update_value = lr * tx.grad.item() # item()メソッドを使うことでPythonの数値を取得できる．
+            tx -= update_value
+            tx.grad.zero_()  # 勾配を手動でゼロクリア
+        print("Epoch {:4d}:\tObjective = {:5.3f}\tSolution = {:7.4f}".format(epoch, ty, tx.detach().numpy()))
+        epoch += 1
 
 if __name__ == "__main__":
     main()
 
 
-# 5行目で最初のパラメータを発生させています．通常は乱数によってこの値を決めますが，ここでは上の図に合わせて1.6とします．次の6行目では，最初のエポック，更新値，学習率を定義します．エポックとは（ここでは）パラメータの更新回数のことを言います．7行目は終了条件です．以上のような凸関数においては勾配の値が0になる点が本当の最適値（正しくは停留点）ではありますが，計算機的にはパラメータを更新する値が大体0になったところで計算を打ち切ります．この場合，「大体0」を「0.001」としました．9行目は目的の関数，10行目で微分をしています．11行目は最急降下法で更新する値を計算しています．12行目の計算で `tx` をアップデートします．この12行目こそが上述の最急降下法の式です．
+# 5行目で最初のパラメータを発生させています．通常は乱数によってこの値を決めますが，ここでは上の図に合わせて1.6とします．次の6行目では，最初のエポック，更新値，学習率を定義します．エポックとは（ここでは）パラメータの更新回数のことを言います．7行目は終了条件です．以上のような凸関数においては勾配の値が0になる点が本当の最適値（正しくは停留点）ではありますが，計算機的にはパラメータを更新する値が大体0になったところで計算を打ち切ります．この場合，「大体0」を「0.001」としました．8
+# 行目は目的の関数，9行目で微分をしています．11行目は最急降下法で更新する値を計算しています．12行目の計算で `tx` をアップデートします．この12行目こそが上述の最急降下法の式です．
 
 # ```{note}
-# ここで最急降下法について説明しましたが，このような実装は TensorFlow を利用する際にする必要はありません．TensorFlow はこのような計算をしてくれる方法を提供してくれています．よって，ここの部分の意味が解らなかったとしても以降の部分は理解できます．
+# PyTorch はデフォルトで計算した勾配を蓄積する特徴を持っています．テンソルの `.grad` 属性に蓄積されます．つまり，`.backward()` を行った後にもう一度 `.backward()` を行うと最初に計算した勾配に次に計算した勾配の値が加算されるのです．この蓄積を失くすために `.zero_()` をする必要があります．
+# ```
+
+# ```{note}
+# ここで最急降下法について説明しましたが，このような実装は PyTorch を利用する際にする必要はありません．PyTorch はこのような計算をしてくれる方法を提供してくれています．よって，ここの部分の意味が解らなかったとしても以降の部分は理解できます．
 # ```
 
 # ```{note}
