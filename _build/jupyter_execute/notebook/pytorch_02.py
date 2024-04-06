@@ -9,29 +9,39 @@
 
 # ### MNIST について
 
-# MLP に処理させるデータセットとして，機械学習界隈で最も有名なデータセットである MNIST（Mixed National Institute of Standards and Technology database）を解析対象に用います．「エムニスト」と発音します．MNIST は縦横28ピクセル，合計784ピクセルよりなる画像データです．画像には手書きの一桁の数字（0から9）が含まれています．公式ウェブサイトでは，学習データセット6万個とテストデータセット1万個，全部で7万個の画像からなるデータセットが無償で提供されています．
+# MLP に処理させるデータセットとして，機械学習界隈で最も有名なデータセットである MNIST（Mixed National Institute of Standards and Technology database）を解析対象に用います．MNIST は縦横28ピクセル，合計784ピクセルよりなる画像データです．画像には手書きの一桁の数字（0から9）が含まれています．公式ウェブサイトでは，学習データセット6万個とテストデータセット1万個，全部で7万個の画像からなるデータセットが無償で提供されています．
+
+# ```{note}
+# MNIST はエムニストと読みます．
+# ```
 
 # ### ダウンロードと可視化
 
-# 公式サイトよりダウンロードしてきても良いのですが，TensorFlow がダウンロードするためのユーティリティを準備してくれているため，それを用います．以下の `tf.keras.datasets.mnist.load_data()` を用いることで可能です．MNIST は合計7万インスタンスからなるデータセットです．5行目でふたつのタプルにデータをダウンロードしていますが，最初のタプルは学習データセット，次のタプルはテストデータセットのためのものです．
+# 公式サイトよりダウンロードしてきても良いのですが，PyTorch がダウンロードするためのユーティリティを準備してくれているため，それを用います．MNIST は合計7万インスタンスからなるデータセットです．8行目は学習データセット，9行目はテストデータセットのための記述です．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
+from torchvision import datasets, transforms
 
 def main():
-    (lilearnx, lilearnt), (litestx, litestt) = tf.keras.datasets.mnist.load_data()
-    print("The number of instances in the learning dataset:", len(lilearnx), len(lilearnt))
-    print("The number of instances in the test dataset:", len(litestx), len(litestt))
-    print("The input vector of the first instance in the learning dataset:", lilearnx[0])
-    print("Its shape:", lilearnx[0].shape)
-    print("The target vector of the first instance in the learning datast:", lilearnt[0])
-    # 2番目のインスタンスのインプットデータとターゲットデータを確認．
+    # MNISTデータセットの読み込み．
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+    train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+
+    print("The number of instances in the learning dataset:", len(train_dataset))
+    print("The number of instances in the test dataset:", len(test_dataset))
+    # 最初のインスタンスの情報を取得．
+    first_train_image, first_train_target = train_dataset[0]
+    print("The input vector of the first instance in the learning dataset:", first_train_image)
+    print("Its shape:", first_train_image.shape)
+    print("The target vector of the first instance in the learning dataset:", first_train_target)
 
 if __name__ == "__main__":
-	main()
+    main()
 
 
 # データを可視化します．可視化のために matplotlib というライブラリをインポートします．
@@ -40,25 +50,33 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
 def main():
-    (lilearnx, lilearnt), (litestx, litestt) = tf.keras.datasets.mnist.load_data()
-    plt.imshow(lilearnx[0], cmap="gray")
-    plt.text(1, 2.5, int(lilearnt[0]), fontsize=20, color="white")
-    # 別のインプットデータを表示．
+    # MNISTデータセットの読み込み．
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+    train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+
+    # トレーニングデータセットから最初の画像を取得．
+    first_train_image, first_train_target = train_dataset[0]
+
+    # 画像を表示．
+    plt.imshow(first_train_image.squeeze(), cmap="gray")
+    plt.text(1, 2.5, int(first_train_target), fontsize=20, color="white")
+    plt.show()
 
 if __name__ == "__main__":
-	main()
+    main()
 
 
-# このデータセットがダウンロードされている場所は `~/.keras/datasets` です．以下のような BaSH のコマンドを打つことで確認することができます．
+# ちなみに，このデータセットがダウンロードされている場所は `/content/data` です．以下のような BaSH のコマンドを打つことで確認することができます．
 
 # In[ ]:
 
 
-get_ipython().system(' ls /root/.keras/datasets')
+get_ipython().system(' ls /content/data')
 
 
 # MNIST はこのような縦が28ピクセル，横が28ピクセルからなる手書き文字が書かれた（描かれた）画像です（0から9までの値）．それに対して，その手書き文字が0から9のどれなのかという正解データが紐づいています．この画像データを MLP に読み込ませ，それがどの数字なのかを当てるという課題に取り組みます．
@@ -83,189 +101,180 @@ get_ipython().system(' ls /root/.keras/datasets')
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import Model
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
-tf.random.set_seed(0)
+torch.manual_seed(0)
 np.random.seed(0)
 
 def main():
-    # データセットの生成
-    tx=[[1.1,2.2,3.0,4.0],[2.0,3.0,4.0,1.0],[2.0,2.0,3.0,4.0]]
-    tx=np.asarray(tx,dtype=np.float32)
-    tt=[0,1,2]
-    tt=tf.convert_to_tensor(tt)
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # ネットワークの定義
-    model=Network()
-    cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-    acc=tf.keras.metrics.SparseCategoricalAccuracy()
-    optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
-    
-    # 学習1回の記述
-    @tf.function
-    def inference(tx,tt):
-        with tf.GradientTape() as tape:
-            ty=model.call(tx)
-            costvalue=cce(tt,ty) #正解と出力の順番はこの通りにする必要がある．
-        gradient=tape.gradient(costvalue,model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-        accvalue=acc(tt,ty)
-        return costvalue,accvalue
-    
-    # 学習ループ
-    for epoch in range(1,3000+1): # 学習の回数の上限値
-        traincost,trainacc=inference(tx,tt)
-        if epoch%100==0:
+    # データセットの生成．
+    tx = torch.tensor([[1.1, 2.2, 3.0, 4.0], [2.0, 3.0, 4.0, 1.0], [2.0, 2.0, 3.0, 4.0]], dtype=torch.float32).to(device)
+    tt = torch.tensor([0, 1, 2], dtype=torch.long).to(device)
+
+    # ネットワークの定義．
+    model = Network().to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters())
+
+    # 学習ループ．
+    for epoch in range(1, 3001):
+        optimizer.zero_grad()
+        ty = model(tx)
+        traincost = criterion(ty, tt)
+        prediction = ty.argmax(dim=1) # Accuracyを計算するために予測値を計算．
+        trainacc = torch.tensor(torch.sum(prediction == tt).item() / len(tt)) # Accuracyを計算．
+        traincost.backward()
+        optimizer.step()
+        if epoch % 100 == 0:
             print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch,traincost,trainacc))
-    
-    # 学習が本当にうまくいったのか入力ベクトルのひとつを処理させてみる
-    tx1=np.asarray([[1.1,2.2,3.0,4.0]],dtype=np.float32)
-    ty1=model.call(tx1)
-    print(ty1)
 
-    # 未知のデータを読ませてみる
-    tu=np.asarray([[999,888,777,666]],dtype=np.float32)
-    tp=model.call(tu)
-    print(tp)
+    # 推論の例．
+    tx1 = torch.tensor([[1.1, 2.2, 3.0, 4.0]], dtype=torch.float32).to(device)
+    ty1 = model(tx1)
+    print(ty1.cpu().detach().numpy())  # 結果をCPUに戻してnumpy配列に変換
 
-    # Denseの最初の引数の値やエポックの値や変化させて，何が起こっているか把握する．
+    # 未知のデータに対する推論．
+    tu = torch.tensor([[999, 888, 777, 666]], dtype=torch.float32).to(device)
+    tp = model(tu)
+    print(tp.cpu().detach().numpy())  # 結果をCPUに戻してnumpy配列に変換
 
-class Network(Model):
+class Network(nn.Module):
     def __init__(self):
-        super(Network,self).__init__()
-        self.d1=Dense(10, activation="relu") # これは全結合層を生成するための記述．
-        self.d2=Dense(3, activation="softmax")
-    
-    def call(self,x):
-        y=self.d1(x)
-        y=self.d2(y)
-        return y
+        super(Network, self).__init__()
+        self.d1 = nn.Linear(4, 10)  # 全結合層
+        self.d2 = nn.Linear(10, 3)  # 出力層
+
+    def forward(self, x):
+        x = torch.relu(self.d1(x))
+        x = torch.softmax(self.d2(x), dim=1)
+        return x
 
 if __name__ == "__main__":
     main()
 
 
-# 上から説明を行います．以下のような記述があります．ここで，上述のデータを生成しています．`tx` は入力ベクトル3つです．`tt` はそれに対応するターゲットベクトル（スカラ）3つです．
+# 上から説明します．以下の記述は GPU を利用するためのものです．もし GPU が利用できない環境だと CPU が利用されます．
 # ```python
-#     tx=[[1.1,2.2,3.0,4.0],[2.0,3.0,4.0,1.0],[2.0,2.0,3.0,4.0]]
-#     tx=np.asarray(tx,dtype=np.float32)
-#     tt=[0,1,2]
-#     tt=tf.convert_to_tensor(tt)
+#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#     print("Using device:", device)
+# ```
+
+# 以下では，上述のデータを生成しています．`tx` は入力ベクトル3つです．`tt` はそれに対応するターゲットベクトル（スカラ）3つです．
+# ```python
+#     # データセットの生成．
+#     tx = torch.tensor([[1.1, 2.2, 3.0, 4.0], [2.0, 3.0, 4.0, 1.0], [2.0, 2.0, 3.0, 4.0]], dtype=torch.float32).to(device)
+#     tt = torch.tensor([0, 1, 2], dtype=torch.long).to(device)
 # ```
 
 # 次に，以下のような記述があります．この記述によって未学習の人工知能を生成します．生成した人工知能は `model` です．
 # ```python
-#     model=Network()
+#     model = Network().to(device)
 # ```
 # この未学習の人工知能を生成するための記述の本体はプログラムの最下層辺りにある以下の記述です．
 # ```python
-# class Network(Model):
+# class Network(nn.Module):
 #     def __init__(self):
-#         super(Network,self).__init__()
-#         self.d1=Dense(10, activation="relu")
-#         self.d2=Dense(3, activation="softmax")
-#     
-#     def call(self,x):
-#         y=self.d1(x)
-#         y=self.d2(y)
-#         return y
+#         super(Network, self).__init__()
+#         self.d1 = nn.Linear(4, 10)  # 全結合層
+#         self.d2 = nn.Linear(10, 3)  # 出力層
+# 
+#     def forward(self, x):
+#         x = torch.relu(self.d1(x))
+#         x = torch.softmax(self.d2(x), dim=1)
+#         return x
 # ```
-# ここに `Dense(10, activation="relu")` とありますが，これは10個のニューロンを持つ層を1個生成するための記述です．活性化関数に ReLU を使うようにしています．これによって生成される層の名前は `self.d1()` です．ここでは10個という値を設定していますが，これは100でも1万でも1兆でもなんでも良いです．解きたい課題にあわせて増やしたり減らしたりします．ここをうまく選ぶことでより良い人工知能を構築でき，腕の見せ所です．次に，`Dense(3, activation="softmax")` という記述で3個のニューロンを持つ層を1個生成します．この3個という値は意味を持っています．入力するデータのクラスが0，1または2の3分類（クラス）であるからです．また，活性化関数にはソフトマックス関数を指定しています．ソフトマックス関数の出力ベクトルの要素を合計すると1になります．各要素の最小値は0です．よって出力結果を確率として解釈できます．次の，`def call(self,x):` という記述はこれ（`class Network()`）によって生成した人工知能を呼び出したときにどのような計算をさせるかを定義するものです．入力として `x` というベクトルが与えられたら，それに対して最初の層を適用し，次に，その出力に対して次の層を適用し，その値を出力する，と定義しています．構築した人工知能 `model` に対して `model.call()` のような方法で呼び出すことができます．
+# ここに `nn.Linear(4, 10)` とありますが，これは10個のニューロンを持つ層を1個生成するための記述です．これによって生成される層の名前は `self.d1()` です．ここでは10個という値を設定していますが，これは100でも1万でも1兆でもなんでも良いです．解きたい課題にあわせて増やしたり減らしたりします．ここをうまく選ぶことでより良い人工知能を構築でき，腕の見せ所です．次に，`nn.Linear(10, 3)` という記述で3個のニューロンを持つ層を1個生成します．この3個という値は意味を持っています．入力するデータのクラスが0，1または2の3分類（クラス）であるからです．次の，`def forward(self,x):` という記述はこれ（`class Network()`）によって生成した人工知能を呼び出したときにどのような計算をさせるかを定義するものです．入力として `x` というベクトルが与えられたら，それに対して最初の層を適用し，次に，その出力に対して次の層を適用し，その値を出力する，と定義しています．構築した人工知能 `model` に対して `model.forward()` のような方法で呼び出すことができます．`torch.relu(self.d1(x))` という記述は活性化関数である ReLU を利用するためのものです．また，出力時の活性化関数にはソフトマックス関数，`torch.softmax()` を指定しています．ソフトマックス関数の出力ベクトルの要素を合計すると1になります．各要素の最小値は0です．よって出力結果を確率として解釈できます．
 # 
 
-# 次の以下の記述は，それぞれ，損失関数，正確度（ACC）を計算する関数，最急降下法の最適化法（パラメータの更新ルール）を定義するものです．これは，TensorFlow ではこのように書くのだと覚えるものです．
+# 次の以下の記述は，それぞれ，損失関数，正確度（ACC）を計算する関数，最急降下法の最適化法（パラメータの更新ルール）を定義するものです．これは，PyTorch ではこのように書くのだと覚えるものです．
 # ```python
-#     cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-#     acc=tf.keras.metrics.SparseCategoricalAccuracy()
-#     optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
+#     criterion = nn.CrossEntropyLoss()
+#     optimizer = optim.Adam(model.parameters())
 # ```
 
-# 次の以下の記述は損失を計算するためのものです．この `tf.GradientTapa()` は上でも出ました．最初に，`model.call()` に入力ベクトルのデータを処理させて出力ベクトル `ty` を得ます．この出力ベクトルとターゲットベクトルを損失関数の入力として損失 `traincost` を得ます．
-# ```python
-#         with tf.GradientTape() as tape:
-#             ty=model.call(tx)
-#             costvalue=cce(tt,ty) #正解と出力の順番はこの通りにする必要がある．
-# ```
-# この損失は人工知能が持つパラメータによって微分可能なので，以下の記述によって勾配を求めます．
-# ```python
-#         gradient=tape.gradient(costvalue,model.trainable_variables)
-# ```
-# 以下の記述はパラメータ更新のための最急降下法の定義と損失とは別の性能評価指標である正確度（accuracy（ACC））を計算するための定義です．
-# ```python
-#         optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-#         accvalue=acc(tt,ty)
-# ```
-# 最後の以下の記述はこの関数の戻り値を定義するものです．
-# ```python
-#         return costvalue,accvalue
+# ```{note}
+# 実は，最終層でソフトマックス関数を使う必要はありません．`nn.CrossEntropyLoss()` は内部でソフトマックスを計算するので，これを損失関数として利用する場合は加えない方が良いです．このコードでは初学者用にあえて加えたに過ぎません．実際の利用では最終層のソフトマックス関数は外しましょう．
 # ```
 
 # 次に記述されている以下の部分は，実際の学習のループに関するものです．このループでデータを何度も何度も予測器（人工知能）に読ませ，そのパラメータを成長させます．この場合，3000回データを学習させます．また，学習100回毎に学習の状況を出力させます．
 # ```python
-#     for epoch in range(1,3000+1):
-#         traincost,trainacc=inference(tx,tt)
-#         if epoch%100==0:
+#     # 学習ループ．
+#     for epoch in range(1, 3001):
+#         optimizer.zero_grad()
+#         ty = model(tx)
+#         traincost = criterion(ty, tt)
+#         prediction = ty.argmax(dim=1) # Accuracyを計算するために予測値を計算．
+#         trainacc = torch.tensor(torch.sum(prediction == tt).item() / len(tt)) # Accuracyを計算．
+#         traincost.backward()
+#         optimizer.step()
+#         if epoch % 100 == 0:
 #             print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch,traincost,trainacc))
 # ```
+# この学習ループでは，最初に勾配の値を `optimizer.zero_grad()` にてゼロにします．PyTroch の仕様上，勾配を `.grad` に蓄積してしまうという性質があるからです．次の行では出力値を計算します．この出力値 `ty` と教師データ `tt` を `criterion()` にて比較することでコスト関数値 `traincost` を計算します．引き続き正確度を計算します．次の `traincost.backward()` はコスト関数から勾配を計算するためのものです．次の `optimizer.step()` にてニューラルネットワークのパラメータを更新します．
 
 # 次の記述，以下の部分では学習がうまくいったのかを確認するために学習データのひとつを学習済みの人工知能に読ませて予測をさせています．この場合，最初のデータのターゲットベクトルは0なので0が出力されなければなりません．
 # ```python
-#     # 学習が本当にうまくいったのか入力ベクトルのひとつを処理させてみる
-#     tx1=np.asarray([[1.1,2.2,3.0,4.0]],dtype=np.float32)
-#     ty1=model.call(tx1)
-#     print(ty1)
+#     # 推論の例．
+#     tx1 = torch.tensor([[1.1, 2.2, 3.0, 4.0]], dtype=torch.float32).to(device)
+#     ty1 = model(tx1)
+#     print(ty1.cpu().detach().numpy())  # 結果をCPUに戻してnumpy配列に変換
 # ```
 # 出力結果は以下のようになっているはずです．出力はソフトマックス関数なので各クラスの確率が表示されています．これを確認すると，最初のクラス（0）である確率が99%以上であると出力されています．よって，やはり人工知能は意図した通り成長したことが確認できます．
 # ```
-# tf.Tensor([[9.932116e-01 7.842198e-06 6.780579e-03]], shape=(1, 3), dtype=float32)
+# [[9.9754351e-01 3.6117400e-04 2.0953205e-03]]
 # ```
 # 
 
 # 次に，全く新たなデータを入力しています．
 # ```python
-#     # 未知のデータを読ませてみる
-#     tu=np.asarray([[999,888,777,666]],dtype=np.float32)
-#     tp=model.call(tu)
-#     print(tp)
+#     # 未知のデータに対する推論．
+#     tu = torch.tensor([[999, 888, 777, 666]], dtype=torch.float32).to(device)
+#     tp = model(tu)
+#     print(tp.cpu().detach().numpy())  # 結果をCPUに戻してnumpy配列に変換
 # ```
 # `[999,888,777,666]` というベクトルを入力したときにどのような出力がされるかということですが，この場合，以下のような出力がされています．このベクトルを入力したときの予測値は2であるとこの人工知能は予測したということです．
 # ```
-# tf.Tensor([[0. 0. 1.]], shape=(1, 3), dtype=float32)
+# [[0. 0. 1.]]
 # ```
 # 
 
-# 以下では `Dense()` の挙動を確認してみます．`Dense()` はもちろんクラスの中でなければ使えない関数ではなく，`main()` の中でも呼び出して利用可能です．これで挙動を確認することでどのようにネットワークが構築されているか把握できるかもしれません．
+# ### モジュールの挙動確認
+
+# 以下では `nn.Linear()` の挙動を確認します．`nn.Linear()` はもちろんクラスの中でなければ使えない関数ではなく，`main()` の中でも呼び出して利用可能です．これで挙動を確認することでどのようにネットワークが構築されているか把握できるかもしれません．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Dense
+import torch
+import torch.nn as nn
 import numpy as np
-tf.random.set_seed(0)
+torch.manual_seed(0)
 np.random.seed(0)
 
 def main():
     # データセットの生成
-    tx=[[1.1,2.2,3.0,4.0],[2.0,3.0,4.0,1.0],[2.0,2.0,3.0,4.0]]
-    tx=np.asarray(tx,dtype=np.float32)
-    
+    tx = torch.tensor([[1.1, 2.2, 3.0, 4.0], [2.0, 3.0, 4.0, 1.0], [2.0, 2.0, 3.0, 4.0]], dtype=torch.float32)
+
     # 関数を定義
-    d1=Dense(10, activation="relu")
+    d1 = nn.Linear(4, 10)
+    relu = nn.ReLU()
 
     # データセットの最初の値を入力
     print("1-----------")
-    print(d1(tx[0:1]))
+    print(relu(d1(tx[0:1])))
 
     # データセットの全部の値を入力
     print("2-----------")
-    print(d1(tx))
+    print(relu(d1(tx)))
 
     # 活性化関数を変更した関数を定義
-    d1=Dense(10, activation="linear")
+    d1 = nn.Linear(4, 10)
 
     # データセットの最初の値を入力
     print("3-----------")
@@ -276,7 +285,7 @@ def main():
     print(d1(tx))
 
     # 最初の引数の値を変更した関数を定義
-    d1=Dense(4, activation="linear")
+    d1 = nn.Linear(4, 4)
 
     # データセットの最初の値を入力
     print("5-----------")
@@ -287,22 +296,27 @@ def main():
     print(d1(tx))
 
     # 別の関数を定義
-    d1=Dense(4, activation="linear")
-    d2=Dense(5, activation="relu")
+    d1 = nn.Linear(4, 4)
+    d2 = nn.Linear(4, 5)
+    relu = nn.ReLU()
 
     # データセットの最初の値を入力
     print("7-----------")
-    y=d1(tx[0:1])
-    print(d2(y))
+    y = relu(d2(d1(tx[0:1])))
+    print(y)
 
     # データセットの全部の値を入力
     print("8-----------")
-    y=d1(tx)
-    print(d2(y))
+    y = relu(d2(d1(tx)))
+    print(y)
 
 if __name__ == "__main__":
     main()
 
+
+# ```{note}
+# このようなコードを動かすことでニューラルネットワークの中身を理解することができます．
+# ```
 
 # ### MNIST を利用した学習
 
@@ -312,173 +326,171 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import Model
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
-tf.random.set_seed(0)
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+torch.manual_seed(0)
 np.random.seed(0)
 
 def main():
-    # ハイパーパラメータの設定
-    MAXEPOCH=50
-    MINIBATCHSIZE=500
-    UNITSIZE=500
-    TRAINSIZE=54000
-    MINIBATCHNUMBER=TRAINSIZE//MINIBATCHSIZE # ミニバッチのサイズとトレーニングデータのサイズから何個のミニバッチができるか計算
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # データの読み込み
-    (lilearnx,lilearnt),(litestx,litestt)=tf.keras.datasets.mnist.load_data()
-    outputsize=len(np.unique(lilearnt)) # MNISTにおいて出力ベクトルのサイズは0から9の10
-    
-    # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
-    litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
-    livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
-    
-    # 最大値を1にしておく
-    litrainx,livalidx,litestx=litrainx/255,livalidx/255,litestx/255
-    
-    # ネットワークの定義
-    model=Network(UNITSIZE,outputsize)
-    cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-    acc=tf.keras.metrics.SparseCategoricalAccuracy() # これはテストの際に利用するため学習では利用しないが次のコードのために一応定義しておく．
-    optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
-    
-    # 学習1回の記述
-    @tf.function
-    def inference(tx,tt,mode): # 「mode」という変数を新たに設定．これでパラメータ更新をするかしないかを制御する（バリデーションではパラメータ更新はしない）．
-        with tf.GradientTape() as tape:
-            model.trainable=mode
-            ty=model.call(tx)
-            costvalue=cce(tt,ty)
-        gradient=tape.gradient(costvalue,model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-        accvalue=acc(tt,ty)
-        return costvalue,accvalue
-    
-    # 学習ループ
-    for epoch in range(1,MAXEPOCH+1):
-        # トレーニング
-        index=np.random.permutation(TRAINSIZE)
-        traincost=0
-        for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-            somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-            eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-            subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-            traincost+=subtraincost
-        traincost=traincost/MINIBATCHNUMBER
-        # バリデーション
-        validcost,_=inference(livalidx,livalidt,False)
-        # 学習過程の出力
-        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+    # ハイパーパラメータの設定．
+    MAXEPOCH = 50
+    MINIBATCHSIZE = 500
+    UNITSIZE = 500
 
-    # ユニットサイズやミニバッチサイズを変更したり層を追加したりして挙動を把握する．
+    # データの読み込みと前処理．
+    transform = transforms.Compose([transforms.ToTensor()])
+    learn_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 
-class Network(Model):
-    def __init__(self,UNITSIZE,OUTPUTSIZE):
-        super(Network,self).__init__()
-        self.d0=Flatten(input_shape=(28,28)) # 行列をベクトルに変換
-        self.d1=Dense(UNITSIZE, activation="relu")
-        self.d2=Dense(OUTPUTSIZE, activation="softmax")
-    
-    def call(self,x):
-        y=self.d0(x)
-        y=self.d1(y)
-        y=self.d2(y)
-        return y
+    # トレーニングセットとバリデーションセットの分割．
+    train_dataset, valid_dataset = torch.utils.data.random_split(learn_dataset, [int(len(learn_dataset) * 0.9), int(len(learn_dataset) * 0.1)])
+
+    # データローダーの設定．
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=MINIBATCHSIZE, shuffle=True)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=len(valid_dataset), shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
+
+    # ネットワークの定義．
+    model = Network(UNITSIZE, len(learn_dataset.classes)).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters())
+
+    # 学習ループ．
+    for epoch in range(1, MAXEPOCH + 1):
+        # トレーニング．
+        model.train() # ドロップアウト等は動作するモード．
+        traincost = 0.0
+        for tx, tt in train_loader:
+            tx, tt = tx.to(device), tt.to(device)
+            optimizer.zero_grad()
+            ty = model(tx)
+            loss = criterion(ty, tt)
+            loss.backward()
+            optimizer.step()
+            traincost += loss.item()
+        traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+        # バリデーション．
+        model.eval() # ドロップアウト等は動作しないモード．
+        validcost = 0.0
+        with torch.no_grad():
+            for tx, tt in valid_loader:
+                tx, tt = tx.to(device), tt.to(device)
+                ty = model(tx)
+                loss = criterion(ty, tt)
+                validcost += loss.item()
+        validcost /= len(valid_loader)
+        # 学習過程の出力．
+        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
+
+class Network(nn.Module):
+    def __init__(self, UNITSIZE, OUTPUTSIZE):
+        super(Network, self).__init__()
+        self.flatten = nn.Flatten()
+        self.d1 = nn.Linear(28*28, UNITSIZE)
+        self.d2 = nn.Linear(UNITSIZE, OUTPUTSIZE)
+
+    def forward(self, x):
+        x = self.flatten(x)
+        x = torch.relu(self.d1(x))
+        x = self.d2(x)
+        return x
 
 if __name__ == "__main__":
     main()
 
 
-# プログラムの中身について上から順に説明します．以下の部分はハイパーパラメータを設定する記述です．`MAXEPOCH` は計算させる最大エポックです．このエポックに至るまで繰り返しの学習をさせるということです．`MINIBATCHSIZE` とはミニバッチ処理でサンプリングするデータのサイズです．これが大きいとき実計算時間は短縮されます．この値が `1` のとき，学習法はオンライン学習法であり，この値がトレーニングセットのサイズと等しいとき，学習法は一括更新法です．ミニバッチの大きさは持っているマシンのスペックと相談しつつ，色々な値を試してみて一番良い値をトライアンドエラーで探します．`UNITSIZE` は MLP の層のサイズ，つまり，ニューロンの数です．`TRAINSIZE` はトレーニングセットのインスタンスの大きさです．MNIST の学習セットは60000インスタンスからなるのでその90%をトレーニングセットとして利用することにしています．`MINIBATCHNUMBER` はミニバッチのサイズとデータのサイズから計算されるミニバッチの個数です．オンライン学習法の場合，1エポックでパラメータ更新は，この例の場合，54000回行われます．一括更新法の場合，1エポックでパラメータ更新は1回行われます．このミニバッチのサイズ（500）とデータサイズの場合，1エポックでパラメータ更新は108回行われます．
+# プログラムの中身について上から順に説明します．以下の部分はハイパーパラメータを設定する記述です．`MAXEPOCH` は計算させる最大エポックです．このエポックに至るまで繰り返しの学習をさせるということです．`MINIBATCHSIZE` とはミニバッチ処理でサンプリングするデータのサイズです．これが大きいとき実計算時間は短縮されます．この値が `1` のとき，学習法はオンライン学習法であり，この値がトレーニングセットのサイズと等しいとき，学習法は一括更新法です．ミニバッチの大きさは持っているマシンのスペックと相談しつつ，色々な値を試してみて一番良い値をトライアンドエラーで探します．`UNITSIZE` は MLP の層のサイズ，つまり，ニューロンの数です．
 # 
 # ```python
-#     # ハイパーパラメータの設定
-#     MAXEPOCH=50
-#     MINIBATCHSIZE=500
-#     UNITSIZE=500
-#     TRAINSIZE=54000
-#     MINIBATCHNUMBER=TRAINSIZE//MINIBATCHSIZE # ミニバッチのサイズとトレーニングデータのサイズから何個のミニバッチができるか計算
+#     # ハイパーパラメータの設定．
+#     MAXEPOCH = 50
+#     MINIBATCHSIZE = 500
+#     UNITSIZE = 500
 # ```
 
-# データの読み込みは上で説明したため省略し，以下の部分では読み込んだデータをトレーニングセットとバリデーションセットに分割しています．この `:` の利用方法は NumPy の使い方解説のところで行った通りです．
+# データの読み込みは上で説明したため省略し，以下の部分では読み込んだデータをトレーニングセットとバリデーションセットに分割しています．MNIST の学習セットは60000インスタンスからなりますが，その90%をトレーニングセットとして利用することにしています．
 # ```python
-#     # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
-#     litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
-#     livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
+#     # トレーニングセットとバリデーションセットの分割．
+#     train_dataset, valid_dataset = torch.utils.data.random_split(learn_dataset, [int(len(learn_dataset) * 0.9), int(len(learn_dataset) * 0.1)])
 # ```
 
-# 以下の記述では，MNIST に含まれる値を0以上1以下の値に変換しています（元々の MNIST は0から255の値で構成されています）．用いるオプティマイザの種類やそのパラメータ更新を大きさを決めるハイパーパラメータ（学習率）の設定によってはこのような操作が良い効果をもたらす場合があります．
+# 以下の記述は，データローダーを設定するための記述です．PyTroch ではこのデータローダーという機能を利用してデータを人工知能に読ませます．`batch_size` でしたサイズのデータが第一引数で指定したデータセットより抽出されます．
 # ```python
-#     # 最大値を1にしておく
-#     litrainx,livalidx,litestx=litrainx/255,livalidx/255,litestx/255
+#     # データローダーの設定．
+#     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=MINIBATCHSIZE, shuffle=True)
+#     valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=len(valid_dataset), shuffle=False)
+#     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
 # ```
 
 # ネットワークの定義は以下で行います．これは前述の例と同じです．
 # ```python
-#     # ネットワークの定義
-#     model=Network(UNITSIZE,outputsize)
-#     cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-#     acc=tf.keras.metrics.SparseCategoricalAccuracy() # これはテストの際に利用するため学習では利用しないが次のコードのために一応定義しておく．
-#     optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
+#     # ネットワークの定義．
+#     model = Network(UNITSIZE, len(learn_dataset.classes)).to(device)
+#     criterion = nn.CrossEntropyLoss()
+#     optimizer = optim.Adam(model.parameters())
 # ```
-# ネットワーク自体は以下の部分で定義されているのですが，前述の例と少し異なります．ここでは，28行28列の行列を784要素のベクトルに変換するための層 `self.d0` を定義しています．
+# ネットワーク自体は以下の部分で定義されているのですが，前述の例と少し異なります．ここでは，28行28列の行列を784要素のベクトルに変換するための層 `self.flatten()` を定義しています．これにより，行列をベクトルへと変換します．
 # ```python
-# class Network(Model):
-#     def __init__(self,UNITSIZE,OUTPUTSIZE):
-#         super(Network,self).__init__()
-#         self.d0=Flatten(input_shape=(28,28)) # 行列をベクトルに変換
-#         self.d1=Dense(UNITSIZE, activation="relu")
-#         self.d2=Dense(OUTPUTSIZE, activation="softmax")
+# class Network(nn.Module):
+#     def __init__(self, UNITSIZE, OUTPUTSIZE):
+#         super(Network, self).__init__()
+#         self.flatten = nn.Flatten()
+#         self.d1 = nn.Linear(28*28, UNITSIZE)
+#         self.d2 = nn.Linear(UNITSIZE, OUTPUTSIZE)
 #     
-#     def call(self,x):
-#         y=self.d0(x)
-#         y=self.d1(y)
-#         y=self.d2(y)
-#         return y
+#     def forward(self, x):
+#         x = self.flatten(x)
+#         x = torch.relu(self.d1(x))
+#         x = self.d2(x)
+#         return x
 # ```
 
-# 学習1回分の記述は前述の例と少し異なります．`mode` という変数を利用して，トレーニングの際にはパラメータ更新を行い，バリデーションの際にはパラメータ更新を行わないように制御します．その他は前述の例と同じです．
+# 学習ループは以下で占めす通りです．最初に，`mode.train()` を実行し，ドロップアウト等は動作するモードにモデルを設定します．その後，データローダーでデータを読み出し，それらを GPU メモリに送り，ニューラルネットワークのパラメータ更新の計算を行います．バリデーションでは，`model.eval()` にてモデルをドロップアウト等が動作しないモードに変更し，その性能を計測します．
 # ```python
-#     # 学習1回の記述
-#     @tf.function
-#     def inference(tx,tt,mode): # 「mode」という変数を新たに設定．これでパラメータ更新をするかしないかを制御する（バリデーションではパラメータ更新はしない）．
-#         with tf.GradientTape() as tape:
-#             model.trainable=mode
-#             ty=model.call(tx)
-#             costvalue=cce(tt,ty)
-#         gradient=tape.gradient(costvalue,model.trainable_variables)
-#         optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-#         accvalue=acc(tt,ty)
-#         return costvalue,accvalue
-# ```
-
-# 学習ループが開始された最初の `index=np.random.permutation(TRAINSIZE)` ではトレーニングセットのサイズに応じた（この場合，0から53999）整数からなる要素をランダムに並べた配列を生成します．これを利用して，ミニバッチのときにランダムにインスタンスを抽出します．`traincost=0` のところではトレーニングコストを計算するための変数を宣言しています．ミニバッチ処理をするので，トレーニングコストはミニバッチの個数分，この場合108個分計算されるのですが，これを平均するために利用する変数です．この変数にミニバッチ処理1回毎に出力されるコストを足し合わせて，最後にミニバッチ処理の回数で割り平均値を出します．その次の `for subepoch in range(MINIBATCHNUMBER):` がミニバッチの処理です．この場合，最初に `somb` に入る値は `0`，`eomb` に入る値は `500` です．1番目から500番目までのデータを抽出する作業のためです．`index[somb:eomb]` には500個のランダムに抽出された整数が入っていますが，それを `litrainx[index[somb:eomb]]` のように使うことで，トレーニングセットからランダムに500個のインスタンスを抽出します．`traincost+=subtraincost` は1回のミニバッチ処理で計算されたコストを上で準備した変数に足し合わせる記述です．ミニバッチ処理が終了した後は，`traincost=traincost/MINIBATCHNUMBER` によって平均トレーニングコストを計算し，また，`validcost,_=inference(livalidx,livalidt,False)` によってバリデーションコストを計算し，それらの値をエポック毎に出力する記述をしています．
-# ```python
-#     # 学習ループ
-#     for epoch in range(1,MAXEPOCH+1):
-#         # トレーニング
-#         index=np.random.permutation(TRAINSIZE)
-#         traincost=0
-#         for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-#             somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-#             eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-#             subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-#             traincost+=subtraincost
-#         traincost=traincost/MINIBATCHNUMBER
-#         # バリデーション
-#         validcost,_=inference(livalidx,livalidt,False)
-#         # 学習過程の出力
-#         print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+#     # 学習ループ．
+#     for epoch in range(1, MAXEPOCH + 1):
+#         # トレーニング．
+#         model.train() # ドロップアウト等は動作するモード．
+#         traincost = 0.0
+#         for tx, tt in train_loader:
+#             tx, tt = tx.to(device), tt.to(device)
+#             optimizer.zero_grad()
+#             ty = model(tx)
+#             loss = criterion(ty, tt)
+#             loss.backward()
+#             optimizer.step()
+#             traincost += loss.item()
+#         traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+#         # バリデーション．
+#         model.eval() # ドロップアウト等は動作しないモード．
+#         validcost = 0.0
+#         with torch.no_grad():
+#             for tx, tt in valid_loader:
+#                 tx, tt = tx.to(device), tt.to(device)
+#                 ty = model(tx)
+#                 loss = criterion(ty, tt)
+#                 validcost += loss.item()
+#         validcost /= len(valid_loader)
+#         # 学習過程の出力．
+#         print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
 # ```
 
 # 次に，出力結果について説明します．このプログラムを実行するとエポックとその時のトレーニングコストとバリデーションコストが出力されます．
 # ```
-# Epoch    1: Training cost=  0.4437 Validation cost=  0.1900
-# Epoch    2: Training cost=  0.1914 Validation cost=  0.1325
-# Epoch    3: Training cost=  0.1372 Validation cost=  0.1056
+# Epoch    1: Training cost=  0.5361 Validation cost=  0.2647
+# Epoch    2: Training cost=  0.2293 Validation cost=  0.1964
+# Epoch    3: Training cost=  0.1672 Validation cost=  0.1539
+# Epoch    4: Training cost=  0.1289 Validation cost=  0.1308
+# Epoch    5: Training cost=  0.1041 Validation cost=  0.1163
+# Epoch    6: Training cost=  0.0846 Validation cost=  0.1004
+# Epoch    7: Training cost=  0.0706 Validation cost=  0.0950
 # .
 # .
 # .
@@ -493,73 +505,75 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import Model
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-tf.random.set_seed(0)
+torch.manual_seed(0)
 np.random.seed(0)
 
 def main():
-    # ハイパーパラメータの設定
-    MAXEPOCH=50
-    MINIBATCHSIZE=500
-    UNITSIZE=500
-    TRAINSIZE=54000
-    MINIBATCHNUMBER=TRAINSIZE//MINIBATCHSIZE # ミニバッチのサイズとトレーニングデータのサイズから何個のミニバッチができるか計算
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # データの読み込み
-    (lilearnx,lilearnt),(litestx,litestt)=tf.keras.datasets.mnist.load_data()
-    outputsize=len(np.unique(lilearnt)) # MNISTにおいて出力ベクトルのサイズは0から9の10
-    
-    # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
-    litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
-    livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
-    
-    # 最大値を1にしておく
-    litrainx,livalidx,litestx=litrainx/255,livalidx/255,litestx/255
-    
-    # ネットワークの定義
-    model=Network(UNITSIZE,outputsize)
-    cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-    acc=tf.keras.metrics.SparseCategoricalAccuracy() # これはテストの際に利用するため学習では利用しないが次のコードのために一応定義しておく．
-    optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
-    
-    # 学習1回の記述
-    @tf.function
-    def inference(tx,tt,mode):
-        with tf.GradientTape() as tape:
-            model.trainable=mode
-            ty=model.call(tx)
-            costvalue=cce(tt,ty)
-        gradient=tape.gradient(costvalue,model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-        accvalue=acc(tt,ty)
-        return costvalue,accvalue
-    
-    # 学習ループ
-    liepoch,litraincost,livalidcost=[],[],[]
-    for epoch in range(1,MAXEPOCH+1):
-        # トレーニング
-        index=np.random.permutation(TRAINSIZE)
-        traincost=0
-        for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-            somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-            eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-            subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-            traincost+=subtraincost
-        traincost=traincost/MINIBATCHNUMBER
-        # バリデーション
-        validcost,_=inference(livalidx,livalidt,False)
-        # 学習過程の出力
-        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+    # ハイパーパラメータの設定．
+    MAXEPOCH = 50
+    MINIBATCHSIZE = 500
+    UNITSIZE = 500
+
+    # データの読み込みと前処理．
+    transform = transforms.Compose([transforms.ToTensor()])
+    learn_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+
+    # トレーニングセットとバリデーションセットの分割．
+    train_dataset, valid_dataset = torch.utils.data.random_split(learn_dataset, [int(len(learn_dataset) * 0.9), int(len(learn_dataset) * 0.1)])
+
+    # データローダーの設定．
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=MINIBATCHSIZE, shuffle=True)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=len(valid_dataset), shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
+
+    # ネットワークの定義．
+    model = Network(UNITSIZE, len(learn_dataset.classes)).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters())
+
+    # 学習ループ．
+    liepoch, litraincost, livalidcost = [], [], []
+    for epoch in range(1, MAXEPOCH + 1):
+        # トレーニング．
+        model.train() # ドロップアウト等は動作するモード．
+        traincost = 0.0
+        for tx, tt in train_loader:
+            tx, tt = tx.to(device), tt.to(device)
+            optimizer.zero_grad()
+            ty = model(tx)
+            loss = criterion(ty, tt)
+            loss.backward()
+            optimizer.step()
+            traincost += loss.item()
+        traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+        # バリデーション．
+        model.eval() # ドロップアウト等は動作しないモード．
+        validcost = 0.0
+        with torch.no_grad():
+            for tx, tt in valid_loader:
+                tx, tt = tx.to(device), tt.to(device)
+                ty = model(tx)
+                loss = criterion(ty, tt)
+                validcost += loss.item()
+        validcost /= len(valid_loader)
+        # 学習過程の出力．
+        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
         liepoch.append(epoch)
         litraincost.append(traincost)
         livalidcost.append(validcost)
 
-    # 学習曲線の描画    
+    # 学習曲線の描画
     plt.plot(liepoch,litraincost,label="Training")
     plt.plot(liepoch,livalidcost,label="Validation")
     plt.ylim(0,0.2)
@@ -568,20 +582,18 @@ def main():
     plt.legend()
     plt.show()
 
-    # 次に進む．
+class Network(nn.Module):
+    def __init__(self, UNITSIZE, OUTPUTSIZE):
+        super(Network, self).__init__()
+        self.flatten = nn.Flatten()
+        self.d1 = nn.Linear(28*28, UNITSIZE)
+        self.d2 = nn.Linear(UNITSIZE, OUTPUTSIZE)
 
-class Network(Model):
-    def __init__(self,UNITSIZE,OUTPUTSIZE):
-        super(Network,self).__init__()
-        self.d0=Flatten(input_shape=(28,28)) # 行列をベクトルに変換
-        self.d1=Dense(UNITSIZE, activation="relu")
-        self.d2=Dense(OUTPUTSIZE, activation="softmax")
-    
-    def call(self,x):
-        y=self.d0(x)
-        y=self.d1(y)
-        y=self.d2(y)
-        return y
+    def forward(self, x):
+        x = self.flatten(x)
+        x = torch.relu(self.d1(x))
+        x = self.d2(x)
+        return x
 
 if __name__ == "__main__":
     main()
@@ -594,22 +606,33 @@ if __name__ == "__main__":
 
 # 次に，学習ループの記述ですが，以下のように最初に `liepoch`，`litraincost`，`livalidcost` という3つの空の配列を用意しました．その後ループの最後で，これらの配列に，それぞれ，エポックの値，トレーニングのコストおよびバリデーションのコストをエポックを進めるたびに追加しています．
 # ```python
-#     # 学習ループ
-#     liepoch,litraincost,livalidcost=[],[],[]
-#     for epoch in range(1,MAXEPOCH+1):
-#         # トレーニング
-#         index=np.random.permutation(TRAINSIZE)
-#         traincost=0
-#         for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-#             somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-#             eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-#             subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-#             traincost+=subtraincost
-#         traincost=traincost/MINIBATCHNUMBER
-#         # バリデーション
-#         validcost,_=inference(livalidx,livalidt,False)
-#         # 学習過程の出力
-#         print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+#     # 学習ループ．
+#     liepoch, litraincost, livalidcost = [], [], []
+#     for epoch in range(1, MAXEPOCH + 1):
+#         # トレーニング．
+#         model.train() # ドロップアウト等は動作するモード．
+#         traincost = 0.0
+#         for tx, tt in train_loader:
+#             tx, tt = tx.to(device), tt.to(device)
+#             optimizer.zero_grad()
+#             ty = model(tx)
+#             loss = criterion(ty, tt)
+#             loss.backward()
+#             optimizer.step()
+#             traincost += loss.item()
+#         traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+#         # バリデーション．
+#         model.eval() # ドロップアウト等は動作しないモード．
+#         validcost = 0.0
+#         with torch.no_grad():
+#             for tx, tt in valid_loader:
+#                 tx, tt = tx.to(device), tt.to(device)
+#                 ty = model(tx)
+#                 loss = criterion(ty, tt)
+#                 validcost += loss.item()
+#         validcost /= len(valid_loader)
+#         # 学習過程の出力．
+#         print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
 #         liepoch.append(epoch)
 #         litraincost.append(traincost)
 #         livalidcost.append(validcost)
@@ -637,82 +660,84 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import Model
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-tf.random.set_seed(0)
+torch.manual_seed(0)
 np.random.seed(0)
 
 def main():
-    # ハイパーパラメータの設定
-    MAXEPOCH=50
-    MINIBATCHSIZE=500
-    UNITSIZE=500
-    TRAINSIZE=54000
-    MINIBATCHNUMBER=TRAINSIZE//MINIBATCHSIZE # ミニバッチのサイズとトレーニングデータのサイズから何個のミニバッチができるか計算
-    PATIENCE=5
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # データの読み込み
-    (lilearnx,lilearnt),(litestx,litestt)=tf.keras.datasets.mnist.load_data()
-    outputsize=len(np.unique(lilearnt)) # MNISTにおいて出力ベクトルのサイズは0から9の10
-    
-    # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
-    litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
-    livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
-    
-    # 最大値を1にしておく
-    litrainx,livalidx,litestx=litrainx/255,livalidx/255,litestx/255
-    
-    # ネットワークの定義
-    model=Network(UNITSIZE,outputsize)
-    cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-    acc=tf.keras.metrics.SparseCategoricalAccuracy() # これはテストの際に利用するため学習では利用しないが次のコードのために一応定義しておく．
-    optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
-    
-    # 学習1回の記述
-    @tf.function
-    def inference(tx,tt,mode):
-        with tf.GradientTape() as tape:
-            model.trainable=mode
-            ty=model.call(tx)
-            costvalue=cce(tt,ty)
-        gradient=tape.gradient(costvalue,model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-        accvalue=acc(tt,ty)
-        return costvalue,accvalue
-    
-    # 学習ループ
-    liepoch,litraincost,livalidcost=[],[],[]
-    patiencecounter,bestvalue=0,100000
-    for epoch in range(1,MAXEPOCH+1):
-        # トレーニング
-        index=np.random.permutation(TRAINSIZE)
-        traincost=0
-        for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-            somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-            eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-            subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-            traincost+=subtraincost
-        traincost=traincost/MINIBATCHNUMBER
-        # バリデーション
-        validcost,_=inference(livalidx,livalidt,False)
-        # 学習過程の出力
-        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+    # ハイパーパラメータの設定．
+    MAXEPOCH = 50
+    MINIBATCHSIZE = 500
+    UNITSIZE = 500
+    PATIENCE = 5
+
+    # データの読み込みと前処理．
+    transform = transforms.Compose([transforms.ToTensor()])
+    learn_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+
+    # トレーニングセットとバリデーションセットの分割．
+    train_dataset, valid_dataset = torch.utils.data.random_split(learn_dataset, [int(len(learn_dataset) * 0.9), int(len(learn_dataset) * 0.1)])
+
+    # データローダーの設定．
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=MINIBATCHSIZE, shuffle=True)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=len(valid_dataset), shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
+
+    # ネットワークの定義．
+    model = Network(UNITSIZE, len(learn_dataset.classes)).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters())
+
+    # 学習ループ．
+    liepoch, litraincost, livalidcost = [], [], []
+    patiencecounter, bestvalue = 0, 100000
+    for epoch in range(1, MAXEPOCH + 1):
+        # トレーニング．
+        model.train() # ドロップアウト等は動作するモード．
+        traincost = 0.0
+        for tx, tt in train_loader:
+            tx, tt = tx.to(device), tt.to(device)
+            optimizer.zero_grad()
+            ty = model(tx)
+            loss = criterion(ty, tt)
+            loss.backward()
+            optimizer.step()
+            traincost += loss.item()
+        traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+        # バリデーション．
+        model.eval() # ドロップアウト等は動作しないモード．
+        validcost = 0.0
+        with torch.no_grad():
+            for tx, tt in valid_loader:
+                tx, tt = tx.to(device), tt.to(device)
+                ty = model(tx)
+                loss = criterion(ty, tt)
+                validcost += loss.item()
+        validcost /= len(valid_loader)
+        # 学習過程の出力．
+        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
         liepoch.append(epoch)
         litraincost.append(traincost)
         livalidcost.append(validcost)
-        if validcost<bestvalue:
-            bestvalue=validcost
-            patiencecounter=0
+        if validcost < bestvalue:
+            bestvalue = validcost
+            patiencecounter = 0
         else:
-            patiencecounter+=1
-        if patiencecounter==PATIENCE:
+            patiencecounter += 1
+        if patiencecounter == PATIENCE:
             break
 
-    # 学習曲線の描画    
+    # 学習曲線の描画
     plt.plot(liepoch,litraincost,label="Training")
     plt.plot(liepoch,livalidcost,label="Validation")
     plt.ylim(0,0.2)
@@ -721,20 +746,18 @@ def main():
     plt.legend()
     plt.show()
 
-    # 次に進む．
+class Network(nn.Module):
+    def __init__(self, UNITSIZE, OUTPUTSIZE):
+        super(Network, self).__init__()
+        self.flatten = nn.Flatten()
+        self.d1 = nn.Linear(28*28, UNITSIZE)
+        self.d2 = nn.Linear(UNITSIZE, OUTPUTSIZE)
 
-class Network(Model):
-    def __init__(self,UNITSIZE,OUTPUTSIZE):
-        super(Network,self).__init__()
-        self.d0=Flatten(input_shape=(28,28)) # 行列をベクトルに変換
-        self.d1=Dense(UNITSIZE, activation="relu")
-        self.d2=Dense(OUTPUTSIZE, activation="softmax")
-    
-    def call(self,x):
-        y=self.d0(x)
-        y=self.d1(y)
-        y=self.d2(y)
-        return y
+    def forward(self, x):
+        x = self.flatten(x)
+        x = torch.relu(self.d1(x))
+        x = self.d2(x)
+        return x
 
 if __name__ == "__main__":
     main()
@@ -742,47 +765,58 @@ if __name__ == "__main__":
 
 # プログラムには以下の部分を追加しました．今回は4回までコストが改善しなくても許すが，5回目は許さないということです．
 # ```python
-#     PATIENCE=5
+#     PATIENCE = 5
 # ```
 
 # 学習ループを以下のようにコードを追加しました．`patiencecounter` はコストが更新されなかった回数を数えるカウンタです．`bestvalue` は最も良いコストの値を記録する変数です．
 # ```python
-#     # 学習ループ
-#     liepoch,litraincost,livalidcost=[],[],[]
-#     patiencecounter,bestvalue=0,100000
-#     for epoch in range(1,MAXEPOCH+1):
-#         # トレーニング
-#         index=np.random.permutation(TRAINSIZE)
-#         traincost=0
-#         for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-#             somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-#             eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-#             subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-#             traincost+=subtraincost
-#         traincost=traincost/MINIBATCHNUMBER
-#         # バリデーション
-#         validcost,_=inference(livalidx,livalidt,False)
-#         # 学習過程の出力
-#         print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+#     # 学習ループ．
+#     liepoch, litraincost, livalidcost = [], [], []
+#     patiencecounter, bestvalue = 0, 100000
+#     for epoch in range(1, MAXEPOCH + 1):
+#         # トレーニング．
+#         model.train() # ドロップアウト等は動作するモード．
+#         traincost = 0.0
+#         for tx, tt in train_loader:
+#             tx, tt = tx.to(device), tt.to(device)
+#             optimizer.zero_grad()
+#             ty = model(tx)
+#             loss = criterion(ty, tt)
+#             loss.backward()
+#             optimizer.step()
+#             traincost += loss.item()
+#         traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+#         # バリデーション．
+#         model.eval() # ドロップアウト等は動作しないモード．
+#         validcost = 0.0
+#         with torch.no_grad():
+#             for tx, tt in valid_loader:
+#                 tx, tt = tx.to(device), tt.to(device)
+#                 ty = model(tx)
+#                 loss = criterion(ty, tt)
+#                 validcost += loss.item()
+#         validcost /= len(valid_loader)
+#         # 学習過程の出力．
+#         print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
 #         liepoch.append(epoch)
 #         litraincost.append(traincost)
 #         livalidcost.append(validcost)
-#         if validcost<bestvalue:
-#             bestvalue=validcost
-#             patiencecounter=0
+#         if validcost < bestvalue:
+#             bestvalue = validcost
+#             patiencecounter = 0
 #         else:
-#             patiencecounter+=1
-#         if patiencecounter==PATIENCE:
+#             patiencecounter += 1
+#         if patiencecounter == PATIENCE:
 #             break
 # ```
 # 以下の部分で，もし最も良いコストよりさらに良いコストが得られたらベストなコストを更新し，また，ペイシェンスのカウンタを元に（`0`）戻す作業をし，それ以外の場合はペイシェンスのカウンタを1ずつ増やします．もし，カウンタの値があらかじめ設定したペイシェンスの値に達したら学習ループを停止します．
 # ```python
-#         if validcost<bestvalue:
-#             bestvalue=validcost
-#             patiencecounter=0
+#         if validcost < bestvalue:
+#             bestvalue = validcost
+#             patiencecounter = 0
 #         else:
-#             patiencecounter+=1
-#         if patiencecounter==PATIENCE:
+#             patiencecounter += 1
+#         if patiencecounter == PATIENCE:
 #             break
 # ```
 
@@ -796,85 +830,85 @@ if __name__ == "__main__":
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import Model
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-tf.random.set_seed(0)
+torch.manual_seed(0)
 np.random.seed(0)
 
 def main():
-    # ハイパーパラメータの設定
-    MAXEPOCH=50
-    MINIBATCHSIZE=500
-    UNITSIZE=500
-    TRAINSIZE=54000
-    MINIBATCHNUMBER=TRAINSIZE//MINIBATCHSIZE # ミニバッチのサイズとトレーニングデータのサイズから何個のミニバッチができるか計算
-    PATIENCE=5
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # データの読み込み
-    (lilearnx,lilearnt),(litestx,litestt)=tf.keras.datasets.mnist.load_data()
-    outputsize=len(np.unique(lilearnt)) # MNISTにおいて出力ベクトルのサイズは0から9の10
-    
-    # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
-    litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
-    livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
-    
-    # 最大値を1にしておく
-    litrainx,livalidx,litestx=litrainx/255,livalidx/255,litestx/255
-    
-    # ネットワークの定義
-    model=Network(UNITSIZE,outputsize)
-    cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-    acc=tf.keras.metrics.SparseCategoricalAccuracy() # これはテストの際に利用するため学習では利用しないが次のコードのために一応定義しておく．
-    optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
-    # モデルを保存するための記述
-    checkpoint=tf.train.Checkpoint(model=model)
-    
-    # 学習1回の記述
-    @tf.function
-    def inference(tx,tt,mode):
-        with tf.GradientTape() as tape:
-            model.trainable=mode
-            ty=model.call(tx)
-            costvalue=cce(tt,ty)
-        gradient=tape.gradient(costvalue,model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-        accvalue=acc(tt,ty)
-        return costvalue,accvalue
-    
-    # 学習ループ
-    liepoch,litraincost,livalidcost=[],[],[]
-    patiencecounter,bestvalue=0,100000
-    for epoch in range(1,MAXEPOCH+1):
-        # トレーニング
-        index=np.random.permutation(TRAINSIZE)
-        traincost=0
-        for subepoch in range(MINIBATCHNUMBER): # 「subepoch」は「epoch in epoch」と呼ばれるのを見たことがある．
-            somb=subepoch*MINIBATCHSIZE # 「start of minibatch」
-            eomb=somb+MINIBATCHSIZE # 「end of minibatch」
-            subtraincost,_=inference(litrainx[index[somb:eomb]],litraint[index[somb:eomb]],True)
-            traincost+=subtraincost
-        traincost=traincost/MINIBATCHNUMBER
-        # バリデーション
-        validcost,_=inference(livalidx,livalidt,False)
-        # 学習過程の出力
-        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch,traincost,validcost))
+    # ハイパーパラメータの設定．
+    MAXEPOCH = 50
+    MINIBATCHSIZE = 500
+    UNITSIZE = 500
+    PATIENCE = 5
+
+    # データの読み込みと前処理．
+    transform = transforms.Compose([transforms.ToTensor()])
+    learn_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+
+    # トレーニングセットとバリデーションセットの分割．
+    train_dataset, valid_dataset = torch.utils.data.random_split(learn_dataset, [int(len(learn_dataset) * 0.9), int(len(learn_dataset) * 0.1)])
+
+    # データローダーの設定．
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=MINIBATCHSIZE, shuffle=True)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=len(valid_dataset), shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
+
+    # ネットワークの定義．
+    model = Network(UNITSIZE, len(learn_dataset.classes)).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters())
+
+    # 学習ループ．
+    liepoch, litraincost, livalidcost = [], [], []
+    patiencecounter, bestvalue = 0, 100000
+    for epoch in range(1, MAXEPOCH + 1):
+        # トレーニング．
+        model.train() # ドロップアウト等は動作するモード．
+        traincost = 0.0
+        for tx, tt in train_loader:
+            tx, tt = tx.to(device), tt.to(device)
+            optimizer.zero_grad()
+            ty = model(tx)
+            loss = criterion(ty, tt)
+            loss.backward()
+            optimizer.step()
+            traincost += loss.item()
+        traincost /= len(train_loader) # このlen(train_loader)はミニバッチの個数．
+        # バリデーション．
+        model.eval() # ドロップアウト等は動作しないモード．
+        validcost = 0.0
+        with torch.no_grad():
+            for tx, tt in valid_loader:
+                tx, tt = tx.to(device), tt.to(device)
+                ty = model(tx)
+                loss = criterion(ty, tt)
+                validcost += loss.item()
+        validcost /= len(valid_loader)
+        # 学習過程の出力．
+        print("Epoch {:4d}: Training cost= {:7.4f} Validation cost= {:7.4f}".format(epoch, traincost, validcost))
         liepoch.append(epoch)
         litraincost.append(traincost)
         livalidcost.append(validcost)
-        if validcost<bestvalue:
-            bestvalue=validcost
-            patiencecounter=0
+        if validcost < bestvalue:
+            bestvalue = validcost
+            patiencecounter = 0
+            torch.save(model.state_dict(), "mlp-mnist-model.pt") # モデルを保存するための記述．
         else:
-            patiencecounter+=1
-        if patiencecounter==PATIENCE:
-            checkpoint.save("mlp-mnist/model")
+            patiencecounter += 1
+        if patiencecounter == PATIENCE:
             break
 
-    # 学習曲線の描画    
+    # 学習曲線の描画
     plt.plot(liepoch,litraincost,label="Training")
     plt.plot(liepoch,livalidcost,label="Validation")
     plt.ylim(0,0.2)
@@ -883,20 +917,18 @@ def main():
     plt.legend()
     plt.show()
 
-    # ユニットサイズや層の数やその他のハイパーパラメータを色々変更してより良いバリデーションコストを出力する予測器を作る．
+class Network(nn.Module):
+    def __init__(self, UNITSIZE, OUTPUTSIZE):
+        super(Network, self).__init__()
+        self.flatten = nn.Flatten()
+        self.d1 = nn.Linear(28*28, UNITSIZE)
+        self.d2 = nn.Linear(UNITSIZE, OUTPUTSIZE)
 
-class Network(Model):
-    def __init__(self,UNITSIZE,OUTPUTSIZE):
-        super(Network,self).__init__()
-        self.d0=Flatten(input_shape=(28,28)) # 行列をベクトルに変換
-        self.d1=Dense(UNITSIZE, activation="relu")
-        self.d2=Dense(OUTPUTSIZE, activation="softmax")
-    
-    def call(self,x):
-        y=self.d0(x)
-        y=self.d1(y)
-        y=self.d2(y)
-        return y
+    def forward(self, x):
+        x = self.flatten(x)
+        x = torch.relu(self.d1(x))
+        x = self.d2(x)
+        return x
 
 if __name__ == "__main__":
     main()
@@ -904,13 +936,7 @@ if __name__ == "__main__":
 
 # 以下の記述を追加しました．
 # ```python
-#     # モデルを保存するための記述
-#     checkpoint=tf.train.Checkpoint(model=model)
-# ```
-
-# また，学習ループの最後に以下のような記述を追加しました．`mlp-mnist` というディレクトリに `model` という名前で学習済みモデルを保存するように，という意味です．
-# ```python
-#             checkpoint.save("mlp-mnist/model")
+#             torch.save(model.state_dict(), "mlp-mnist-model.pt") # モデルを保存するための記述．
 # ```
 
 # 以下のシェルのコマンドを打つと，ディレクトリが新規に生成されていることを確認できます．
@@ -918,7 +944,7 @@ if __name__ == "__main__":
 # In[ ]:
 
 
-get_ipython().system(' ls mlp-mnist')
+get_ipython().system(' ls')
 
 
 # 最後に，以下のコードで保存したモデル（実体はパラメータ）を呼び出して，テストセットにてその性能を評価します．
@@ -927,77 +953,82 @@ get_ipython().system(' ls mlp-mnist')
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import Model
-import numpy as np
+import torch
+import torch.nn as nn
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import warnings
-warnings.filterwarnings("ignore")
+torch.manual_seed(0)
+np.random.seed(0)
 
 def main():
-    # ハイパーパラメータの設定
-    UNITSIZE=500
-    TRAINSIZE=54000
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # データの読み込み
-    (lilearnx,lilearnt),(litestx,litestt)=tf.keras.datasets.mnist.load_data()
-    outputsize=len(np.unique(lilearnt)) # MNISTにおいて出力ベクトルのサイズは0から9の10
-    
-    # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
-    litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
-    livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
-    
-    # 最大値を1にしておく
-    litrainx,livalidx,litestx=litrainx/255,livalidx/255,litestx/255
-    
-    # ネットワークの定義
-    model=Network(UNITSIZE,outputsize)
-    cce=tf.keras.losses.SparseCategoricalCrossentropy() #これでロス関数を生成する．
-    acc=tf.keras.metrics.SparseCategoricalAccuracy() # これはテストの際に利用する．
-    optimizer=tf.keras.optimizers.Adam() #これでオプティマイザを生成する．
+    # ハイパーパラメータの設定．
+    MAXEPOCH = 50
+    MINIBATCHSIZE = 500
+    UNITSIZE = 500
+    PATIENCE = 5
+
+    # データの読み込みと前処理．
+    transform = transforms.Compose([transforms.ToTensor()])
+    learn_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+
+    # データローダーの設定．
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
+
+    # ネットワークの定義．
+    model = Network(UNITSIZE, len(learn_dataset.classes)).to(device)
+
     # モデルの読み込み
-    checkpoint=tf.train.Checkpoint(model=model)
-    checkpoint.restore(tf.train.latest_checkpoint("mlp-mnist"))
-    
-    # 学習1回の記述
-    @tf.function
-    def inference(tx,tt,mode):
-        with tf.GradientTape() as tape:
-            model.trainable=mode
-            ty=model.call(tx)
-            costvalue=cce(tt,ty)
-        gradient=tape.gradient(costvalue,model.trainable_variables)
-        optimizer.apply_gradients(zip(gradient,model.trainable_variables))
-        accvalue=acc(tt,ty)
-        return costvalue,accvalue
-    
-    # テストセットでの性能評価
-    testcost,testacc=inference(litestx,litestt,False)
+    model.load_state_dict(torch.load("mlp-mnist-model.pt"))
+    model.eval()
+    criterion = nn.CrossEntropyLoss()
+
+    # テストデータセットでの推論．
+    testcost, testacc = 0, 0
+    total_samples = len(test_dataset)
+    with torch.no_grad():
+        for tx, tt in test_loader:
+            tx = tx.to(device)
+            ty = model(tx)
+            loss = criterion(ty, tt)
+            testcost += loss.item()
+            prediction = ty.argmax(dim=1) # Accuracyを計算するために予測値を計算．
+            testacc += (prediction == tt).sum().item() / total_samples # Accuracyを計算．
+    testcost /= len(test_loader)
     print("Test cost= {:7.4f} Test ACC= {:7.4f}".format(testcost,testacc))
 
-    # テストセットの最初の画像を入力してみる
-    plt.imshow(litestx[0], cmap="gray")
-    plt.text(1, 2.5, int(litestt[0]), fontsize=20, color="white")
-    ty=model.call(litestx[:1]) # 予測器にデータを入れて予測
-    print("Output vector:",ty.numpy()) # 出力ベクトルを表示
-    print("Argmax of the output vector:",np.argmax(ty.numpy())) # 出力ベクトルの要素の中で最も大きい値のインデックスを表示
+    # テストセットの最初の画像だけに対する推論．
+    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+    for tx, tt in test_loader:
+        tx, tt = tx.to(device), tt.to(device)
+        # テストセットの最初の画像を表示．
+        plt.imshow(tx[0].cpu().squeeze(), cmap="gray")
+        plt.text(1, 2.5, str(int(tt[0].item())), fontsize=20, color="white")
+        plt.show()
+        # 予測．
+        ty = model(tx)
+        output_vector = ty.cpu().detach().numpy()  # CPUに移動し、NumPy配列に変換
+        print("Output vector:", output_vector)
+        print("Argmax of the output vector:", np.argmax(output_vector))
+        # 最初の画像の処理のみを行いたいため、ループを抜ける．
+        break
 
-    # 上で構築したハイパーパラメータを変化させたより良い人工知能の性能評価をする．
+class Network(nn.Module):
+    def __init__(self, UNITSIZE, OUTPUTSIZE):
+        super(Network, self).__init__()
+        self.flatten = nn.Flatten()
+        self.d1 = nn.Linear(28*28, UNITSIZE)
+        self.d2 = nn.Linear(UNITSIZE, OUTPUTSIZE)
 
-class Network(Model):
-    def __init__(self,UNITSIZE,OUTPUTSIZE):
-        super(Network,self).__init__()
-        self.d0=Flatten(input_shape=(28,28)) # 行列をベクトルに変換
-        self.d1=Dense(UNITSIZE, activation="relu")
-        self.d2=Dense(OUTPUTSIZE, activation="softmax")
-    
-    def call(self,x):
-        y=self.d0(x)
-        y=self.d1(y)
-        y=self.d2(y)
-        return y
+    def forward(self, x):
+        x = self.flatten(x)
+        x = torch.relu(self.d1(x))
+        x = self.d2(x)
+        return x
 
 if __name__ == "__main__":
     main()
@@ -1006,25 +1037,29 @@ if __name__ == "__main__":
 # 学習済みモデルは以下のような記述で読み込みます．
 # ```python
 #     # モデルの読み込み
-#     checkpoint=tf.train.Checkpoint(model=model)
-#     checkpoint.restore(tf.train.latest_checkpoint("mlp-mnist"))
-# ```
-
-# テストセットでの性能評価のための記述です．
-# ```python
-#     # テストセットでの性能評価
-#     testcost,testacc=inference(litestx,litestt,False)
-#     print("Test cost= {:7.4f} Test ACC= {:7.4f}".format(testcost,testacc))
+#     model.load_state_dict(torch.load("mlp-mnist-model.pt"))
+#     model.eval()
+#     criterion = nn.CrossEntropyLoss()
+# 
 # ```
 
 # 最後に，テストセットの最初の画像を予測器に入れてその結果を確認してみます．以下のコードで行います．
 # ```python
-#     # テストセットの最初の画像を入力してみる
-#     plt.imshow(litestx[0], cmap="gray")
-#     plt.text(1, 2.5, int(litestt[0]), fontsize=20, color="white")
-#     ty=model.call(litestx[:1]) # 予測器にデータを入れて予測
-#     print("Output vector:",ty.numpy()) # 出力ベクトルを表示
-#     print("Argmax of the output vector:",np.argmax(ty.numpy())) # 出力ベクトルの要素の中で最も大きい値のインデックスを表示
+#     # テストセットの最初の画像だけに対する推論．
+#     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+#     for tx, tt in test_loader:
+#         tx, tt = tx.to(device), tt.to(device)
+#         # テストセットの最初の画像を表示．
+#         plt.imshow(tx[0].cpu().squeeze(), cmap="gray")
+#         plt.text(1, 2.5, str(int(tt[0].item())), fontsize=20, color="white")
+#         plt.show()
+#         # 予測．
+#         ty = model(tx)
+#         output_vector = ty.cpu().detach().numpy()  # CPUに移動し、NumPy配列に変換
+#         print("Output vector:", output_vector)
+#         print("Argmax of the output vector:", np.argmax(output_vector))
+#         # 最初の画像の処理のみを行いたいため、ループを抜ける．
+#         break
 # ```
 
 # 実行すると，テストセットでも高い性能を示すことが確認できました．また，7が答えである画像を入力に，`7` を出力できていることを確認しました．
