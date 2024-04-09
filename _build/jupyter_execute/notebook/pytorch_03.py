@@ -23,7 +23,14 @@
 # 
 # <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_03.svg?raw=1" width="100%" />
 # 
-# ほげ
+# これを画像全体に対して行うことで以下のような特徴マップを計算します．
+# 
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_04.svg?raw=1" width="100%" />
+# 
+# この場合，フィルタを1ピクセルごとに動かしているため，最終的に生成される特徴マップは3行3列です．フィルタを移動させる間隔のことをストライドと呼びますが，このストライドの値を2として計算すると以下のような特徴マップが得られます．
+# 
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_05.svg?raw=1" width="100%" />
+# 
 
 # ### プーリング
 
