@@ -392,12 +392,14 @@ const thebe_selector_output = ".output, .cell_output"
 <p>画像データを処理することが得意なニューラルネットワークである畳み込みニューラルネットワーク（convolutional neural network（CNN））とそれに関する基本的な事柄をまとめます．</p>
 <div class="section" id="cnn">
 <h3><span class="section-number">8.1.1. </span>CNN とは<a class="headerlink" href="#cnn" title="Permalink to this headline">¶</a></h3>
-<p>ほげ</p>
+<p>CNN とは画像を処理することが得意なニューラルネットワークです．畳み込み層という層を含みます．以前の章で紹介した MLP は以下のような構造をしていました．MLP における中間層は全結合層でした．</p>
 <a class="reference internal image-reference" href="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_01.svg?raw=1"><img alt="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_01.svg?raw=1" src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_01.svg?raw=1" style="width: 100%;" /></a>
+<p>これに対して，CNN は以下のような層によって構成されます．CNN では入力データにフィルタ処理を行い，生データでのピクセル単位でなく，フィルタによって抽出された特徴に基づいて出力を行います．</p>
+<a class="reference internal image-reference" href="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_02.svg?raw=1"><img alt="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_02.svg?raw=1" src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_02.svg?raw=1" style="width: 100%;" /></a>
 </div>
 <div class="section" id="id3">
 <h3><span class="section-number">8.1.2. </span>畳み込み<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p>ほげ</p>
+<p>CNN では画像データに対して畳み込みと呼ばれる操作を行うことで，特徴マップと呼ばれる情報を出力します．</p>
 </div>
 <div class="section" id="id4">
 <h3><span class="section-number">8.1.3. </span>プーリング<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>

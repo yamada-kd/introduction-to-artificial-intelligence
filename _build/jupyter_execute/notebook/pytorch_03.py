@@ -9,13 +9,17 @@
 
 # ### CNN とは
 
-# ほげ
+# CNN とは画像を処理することが得意なニューラルネットワークです．畳み込み層という層を含みます．以前の章で紹介した MLP は以下のような構造をしていました．MLP における中間層は全結合層でした．
 # 
 # <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_01.svg?raw=1" width="100%" />
+# 
+# これに対して，CNN は以下のような層によって構成されます．CNN では入力データにフィルタ処理を行い，生データでのピクセル単位でなく，フィルタによって抽出された特徴に基づいて出力を行います．
+# 
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_02.svg?raw=1" width="100%" />
 
 # ### 畳み込み
 
-# ほげ
+# CNN では画像データに対して畳み込みと呼ばれる操作を行うことで，特徴マップと呼ばれる情報を出力します．
 
 # ### プーリング
 
