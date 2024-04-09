@@ -10,6 +10,8 @@
 # ### CNN とは
 
 # ほげ
+# 
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cnn_01.svg?raw=1" width="100%" />
 
 # ### 畳み込み
 

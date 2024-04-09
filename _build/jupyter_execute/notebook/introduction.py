@@ -95,7 +95,7 @@
 # バリデーションデータセットは開発データセット（development dataset）とも言います．
 # ```
 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/dataset.svg?raw=1" width="100%" />
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/dataset.svg?raw=1" width="100%" />
 
 # 学習の際には学習データセットを利用して得られる結果だけを観察します．学習の際に一瞬でもテストセットにおける予測器の性能を観察するべきではありません．また，「独立であること」もしっかり定義すべきです．データが互いに独立であるとは，機械学習の文脈においては「学習データセットに含まれるデータとテストデータセットに含まれるデータが，互いに関連を持たないこと」です．例えば，画像に含まれている文字を予測する人工知能を様々な人が書いた文字を取り扱うために利用するのなら，手書き文字の画像を書いた人が学習データセットとテストデータセット間で異なっていなければなりません．
 
