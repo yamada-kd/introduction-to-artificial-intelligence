@@ -995,6 +995,7 @@ def main():
         for tx, tt in test_loader:
             tx = tx.to(device)
             ty = model(tx)
+            tt = tt.to(device)
             loss = criterion(ty, tt)
             testcost += loss.item()
             prediction = ty.argmax(dim=1) # Accuracyを計算するために予測値を計算．
