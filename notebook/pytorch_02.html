@@ -1399,6 +1399,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="k">for</span> <span class="n">tx</span><span class="p">,</span> <span class="n">tt</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
             <span class="n">tx</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">ty</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">ty</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span>
             <span class="n">testcost</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
             <span class="n">prediction</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Accuracyを計算するために予測値を計算．</span>
