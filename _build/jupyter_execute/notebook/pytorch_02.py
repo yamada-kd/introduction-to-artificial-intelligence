@@ -955,6 +955,7 @@ get_ipython().system(' ls')
 #!/usr/bin/env python3
 import torch
 import torch.nn as nn
+import numpy as np
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
