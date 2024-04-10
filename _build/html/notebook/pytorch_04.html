@@ -446,7 +446,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>世の中には配列データがたくさんあります．例えば，自然言語，生物学的文字列（核酸とかアミノ酸配列），音楽，人の動き，株価とかです．RNN を利用するとこのようなデータを上手に扱うことができます．</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>上手に扱うことができるのであって，配列処理に必要不可欠な構造ではないのですよね．</p>
+<p>上手に扱うことができるのであって，配列処理に必要不可欠な構造ではないです．</p>
 </div>
 <p>RNN を用いて何らかのデータを解析する際には，普通，超短期記憶（Long Short-term Memory（LSTM））とケート付き再帰型ユニット（Gated Recurrent Unit（GRU））を利用すれば十分でしょう．TensorFlow や PyTorch には標準的に実装されているので簡単に利用することができます．</p>
 <div class="admonition note">
@@ -457,18 +457,22 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># GPUの使用の設定．</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
     <span class="c1"># データセットの生成．</span>
     <span class="n">tx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">tx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
-    <span class="c1"># 関数を定義．</span>
-    <span class="n">rnn</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">return_sequences</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="c1"># RNNの計算．</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">rnn</span><span class="p">(</span><span class="n">tx</span><span class="p">))</span>
+    <span class="c1"># モデルの定義．</span>
+    <span class="n">rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">cell</span><span class="p">)</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
@@ -476,28 +480,40 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>この LSTM で行った計算を GRU に行わせるようにすることはとても簡単です．以下のように <code class="docutils literal notranslate"><span class="pre">LSTM</span></code> の部分を <code class="docutils literal notranslate"><span class="pre">GRU</span></code> に書き換えるだけです．</p>
+<p>以下の部分が LSTM を利用するための記述です．<code class="docutils literal notranslate"><span class="pre">batch_first=True</span></code> は、PyTorchにおいてRNNの層を使用する際に，入力データの形状が <code class="docutils literal notranslate"><span class="pre">[batch_size,</span> <span class="pre">seq_len,</span> <span class="pre">features]</span></code> の順序であることを指定するオプションです．このオプションが指定されていない場合（デフォルトは <code class="docutils literal notranslate"><span class="pre">batch_first=False</span></code>），入力データは <code class="docutils literal notranslate"><span class="pre">[seq_len,</span> <span class="pre">batch_size,</span> <span class="pre">features]</span></code> の形状を持つと期待されます．</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この LSTM で行った計算を GRU に行わせるようにすることはとても簡単です．以下のように <code class="docutils literal notranslate"><span class="pre">LSTM</span></code> の部分を <code class="docutils literal notranslate"><span class="pre">GRU</span></code> に書き換えて，出力を受け取る変数を変えるだけです．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># GPUの使用の設定．</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
     <span class="c1"># データセットの生成．</span>
     <span class="n">tx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">tx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
-    <span class="c1"># 関数を定義．</span>
-    <span class="n">rnn</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">return_sequences</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="c1"># RNNの計算．</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">rnn</span><span class="p">(</span><span class="n">tx</span><span class="p">))</span>
+    <span class="c1"># モデルの定義．</span>
+    <span class="n">rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">LSTM</span></code> と <code class="docutils literal notranslate"><span class="pre">GRU</span></code> の内部構造は少し異なります．<code class="docutils literal notranslate"><span class="pre">GRU</span></code> はセル状態を持たないので出力値は2個だけです．</p>
 </div>
 </div>
 <div class="section" id="id3">
@@ -509,10 +525,10 @@ const thebe_selector_output = ".output, .cell_output"
 </ul>
 <p>最初のひとつは学習全体を通して考えると人工知能のパラメータの方で解決できるし，ふたつ目も非線形な関数を近似できる人工知能を使えば解決できるため，回避できない問題とは思えませんが．</p>
 <p>これとは別のエンコード方法として，ワンホットエンコーディングがあります．ワンホットエンコーディングはワンホットベクトルに単語を対応させます．ワンホットベクトルとは，ベクトルのある要素が 1 で他の全要素が 0 であるベクトルです．以下のような感じです．</p>
-<a class="reference internal image-reference" href="https://github.com/yamada-kd/binds-training/blob/main/image/oneHotEmbedding.svg?raw=1"><img alt="https://github.com/yamada-kd/binds-training/blob/main/image/oneHotEmbedding.svg?raw=1" src="https://github.com/yamada-kd/binds-training/blob/main/image/oneHotEmbedding.svg?raw=1" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/oneHotEmbedding.svg?raw=1"><img alt="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/oneHotEmbedding.svg?raw=1" src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/oneHotEmbedding.svg?raw=1" style="width: 100%;" /></a>
 <p>この方法は非効率的です．ワンホットベクトルはとても疎です．ボキャブラリに 10000 個の単語がある場合，各ベクトルはその要素の 99.99% が 0 からなります．学習を効率よく進めるためには多くの重みパラメータを設定しなければならないことになるでしょう．また，入力ベクトルが場合によってはものすごく長くなるでしょう．</p>
 <p>現在のところ最も良い方法と考えられるのは単語埋め込み（word embedding）です．単語埋め込みを利用すると似たような単語が似たようなベクトルへとエンコードされます（学習の過程で）．埋め込みは浮動小数点数で行い，密なベクトルができます．以下のような感じです．</p>
-<a class="reference internal image-reference" href="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1"><img alt="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1" src="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/floatEmbedding.svg?raw=1"><img alt="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/floatEmbedding.svg?raw=1" src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/floatEmbedding.svg?raw=1" style="width: 100%;" /></a>
 </div>
 <div class="section" id="id4">
 <h3><span class="section-number">9.1.3. </span>入出力データ形式<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
@@ -704,13 +720,13 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">tx</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">pad_sequences</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">padding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="n">tt</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">tt</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
-    
+
     <span class="c1"># ネットワークの定義</span>
     <span class="n">model</span><span class="o">=</span><span class="n">Network</span><span class="p">()</span>
     <span class="n">cce</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">SparseCategoricalCrossentropy</span><span class="p">()</span>
     <span class="n">acc</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">SparseCategoricalAccuracy</span><span class="p">()</span>
     <span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">()</span>
-    
+
     <span class="c1"># 学習1回の記述</span>
     <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span>
     <span class="k">def</span> <span class="nf">inference</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">tt</span><span class="p">):</span>
@@ -721,7 +737,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="n">optimizer</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradient</span><span class="p">,</span><span class="n">model</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
         <span class="n">accvalue</span><span class="o">=</span><span class="n">acc</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span><span class="n">ty</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">costvalue</span><span class="p">,</span><span class="n">accvalue</span>
-    
+
     <span class="c1"># 学習前の人工知能がどのような出力をしているのかを確認</span>
     <span class="n">ty</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output vector:&quot;</span><span class="p">,</span><span class="n">ty</span><span class="p">)</span>
@@ -732,7 +748,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="n">traincost</span><span class="p">,</span><span class="n">trainacc</span><span class="o">=</span><span class="n">inference</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">tt</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">epoch</span><span class="o">%</span><span class="k">50</span>==0:
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">{:5d}</span><span class="s2">: Training cost= </span><span class="si">{:.4f}</span><span class="s2">, Training ACC= </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">traincost</span><span class="p">,</span><span class="n">trainacc</span><span class="p">))</span>
-    
+
     <span class="c1"># 学習後の人工知能がどのような出力をしているのかを確認</span>
     <span class="n">ty</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output vector:&quot;</span><span class="p">,</span><span class="n">ty</span><span class="p">)</span>
@@ -745,7 +761,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="nb">super</span><span class="p">(</span><span class="n">Network</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="o">=</span><span class="n">LSTM</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="o">=</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">activation</span><span class="o">=</span><span class="s2">&quot;softmax&quot;</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tx</span><span class="p">):</span>
         <span class="n">ty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
         <span class="n">ty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">ty</span><span class="p">)</span>
@@ -839,12 +855,12 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">tt</span><span class="o">=</span><span class="p">[[[</span><span class="mf">6.2</span><span class="p">,</span><span class="mf">1.1</span><span class="p">],[</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">2.1</span><span class="p">],[</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">1.1</span><span class="p">]],[[</span><span class="mf">4.5</span><span class="p">,</span><span class="mf">3.8</span><span class="p">],[</span><span class="mf">4.1</span><span class="p">,</span><span class="mf">4.9</span><span class="p">],[</span><span class="mf">3.4</span><span class="p">,</span><span class="mf">4.6</span><span class="p">],[</span><span class="mf">2.7</span><span class="p">,</span><span class="mf">1.7</span><span class="p">],[</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">2.5</span><span class="p">]],[[</span><span class="mf">1.2</span><span class="p">,</span><span class="mf">1.0</span><span class="p">],[</span><span class="mf">4.4</span><span class="p">,</span><span class="mf">3.3</span><span class="p">],[</span><span class="mf">3.1</span><span class="p">,</span><span class="mf">2.8</span><span class="p">],[</span><span class="mf">2.7</span><span class="p">,</span><span class="mf">1.6</span><span class="p">]]]</span>
     <span class="n">tx</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">pad_sequences</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">padding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">tt</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">pad_sequences</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span><span class="n">padding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span><span class="n">value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="c1"># ネットワークの定義</span>
     <span class="n">model</span><span class="o">=</span><span class="n">Network</span><span class="p">()</span>
     <span class="n">mse</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">MeanSquaredError</span><span class="p">()</span>
     <span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">()</span>
-    
+
     <span class="c1"># 学習1回の記述</span>
     <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span>
     <span class="k">def</span> <span class="nf">inference</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">tt</span><span class="p">):</span>
@@ -854,7 +870,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="n">gradient</span><span class="o">=</span><span class="n">tape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">costvalue</span><span class="p">,</span><span class="n">model</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">)</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradient</span><span class="p">,</span><span class="n">model</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">costvalue</span>
-    
+
     <span class="c1"># 学習前の人工知能がどのような出力をしているのかを確認</span>
     <span class="n">ty</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output vector:&quot;</span><span class="p">,</span><span class="n">ty</span><span class="p">)</span>
@@ -865,7 +881,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="n">traincost</span><span class="o">=</span><span class="n">inference</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">tt</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">epoch</span><span class="o">%</span><span class="k">50</span>==0:
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch=</span><span class="si">{0:5d}</span><span class="s2"> Cost=</span><span class="si">{1:7.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">traincost</span><span class="p">)))</span>
-    
+
     <span class="c1"># 学習後の人工知能がどのような出力をしているのかを確認</span>
     <span class="n">ty</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output vector:&quot;</span><span class="p">,</span><span class="n">ty</span><span class="p">)</span>
@@ -879,7 +895,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="o">=</span><span class="n">Embedding</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="mi">9</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">output_dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">mask_zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="o">=</span><span class="n">Bidirectional</span><span class="p">(</span><span class="n">LSTM</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">return_sequences</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="o">=</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tx</span><span class="p">):</span>
         <span class="n">ty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
         <span class="n">ty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">ty</span><span class="p">)</span>
@@ -1055,19 +1071,19 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">VALIDSIZE</span><span class="o">=</span><span class="mi">25000</span><span class="o">-</span><span class="n">TRAINSIZE</span>
     <span class="n">TRAINMINIBATCHNUMBER</span><span class="o">=</span><span class="n">TRAINSIZE</span><span class="o">//</span><span class="n">MINIBATCHSIZE</span>
     <span class="n">VALIDMINIBATCHNUMBER</span><span class="o">=</span><span class="n">VALIDSIZE</span><span class="o">//</span><span class="n">MINIBATCHSIZE</span>
-    
+
     <span class="c1"># データの読み込み</span>
     <span class="p">(</span><span class="n">lilearnx</span><span class="p">,</span><span class="n">lilearnt</span><span class="p">),(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">imdb</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
     <span class="n">outputsize</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">lilearnt</span><span class="p">))</span>
     <span class="n">lilearnx</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">pad_sequences</span><span class="p">(</span><span class="n">lilearnx</span><span class="p">,</span><span class="n">padding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    
+
     <span class="c1"># データセットに存在するボキャブラリのサイズを計算</span>
     <span class="n">vocabsize</span><span class="o">=</span><span class="mi">0</span>
     <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">lilearnx</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span><span class="o">&gt;</span><span class="n">vocabsize</span><span class="p">:</span>
             <span class="n">vocabsize</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
     <span class="n">vocabsize</span><span class="o">=</span><span class="n">vocabsize</span><span class="o">+</span><span class="mi">1</span>
-    
+
     <span class="c1"># 学習セットをトレーニングセットとバリデーションセットに分割（9:1）</span>
     <span class="n">litrainx</span><span class="p">,</span><span class="n">litraint</span><span class="o">=</span><span class="n">lilearnx</span><span class="p">[:</span><span class="n">TRAINSIZE</span><span class="p">],</span><span class="n">lilearnt</span><span class="p">[:</span><span class="n">TRAINSIZE</span><span class="p">]</span>
     <span class="n">livalidx</span><span class="p">,</span><span class="n">livalidt</span><span class="o">=</span><span class="n">lilearnx</span><span class="p">[</span><span class="n">TRAINSIZE</span><span class="p">:],</span><span class="n">lilearnt</span><span class="p">[</span><span class="n">TRAINSIZE</span><span class="p">:]</span>
@@ -1089,7 +1105,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="n">optimizer</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradient</span><span class="p">,</span><span class="n">model</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
         <span class="n">accvalue</span><span class="o">=</span><span class="n">acc</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span><span class="n">ty</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">costvalue</span><span class="p">,</span><span class="n">accvalue</span>
-    
+
     <span class="c1"># 学習ループ</span>
     <span class="n">liepoch</span><span class="p">,</span><span class="n">litraincost</span><span class="p">,</span><span class="n">livalidcost</span><span class="o">=</span><span class="p">[],[],[]</span>
     <span class="n">patiencecounter</span><span class="p">,</span><span class="n">bestvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">100000</span>
@@ -1124,7 +1140,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="k">if</span> <span class="n">patiencecounter</span><span class="o">==</span><span class="n">PATIENCE</span><span class="p">:</span>
             <span class="k">break</span>
 
-    <span class="c1"># 学習曲線の描画    </span>
+    <span class="c1"># 学習曲線の描画</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">liepoch</span><span class="p">,</span><span class="n">litraincost</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Training&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">liepoch</span><span class="p">,</span><span class="n">livalidcost</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Validation&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">)</span>
@@ -1141,7 +1157,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="bp">self</span><span class="o">.</span><span class="n">d0</span><span class="o">=</span><span class="n">Embedding</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="n">vocabsize</span><span class="p">,</span><span class="n">output_dim</span><span class="o">=</span><span class="n">EMBEDSIZE</span><span class="p">,</span><span class="n">mask_zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d1</span><span class="o">=</span><span class="n">LSTM</span><span class="p">(</span><span class="n">UNITSIZE</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d2</span><span class="o">=</span><span class="n">Dense</span><span class="p">(</span><span class="n">outputsize</span><span class="p">,</span><span class="n">activation</span><span class="o">=</span><span class="s2">&quot;softmax&quot;</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">d0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">d1</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>

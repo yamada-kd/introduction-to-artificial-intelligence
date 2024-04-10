@@ -18,7 +18,7 @@
 # 世の中には配列データがたくさんあります．例えば，自然言語，生物学的文字列（核酸とかアミノ酸配列），音楽，人の動き，株価とかです．RNN を利用するとこのようなデータを上手に扱うことができます．
 
 # ```{note}
-# 上手に扱うことができるのであって，配列処理に必要不可欠な構造ではないのですよね．
+# 上手に扱うことができるのであって，配列処理に必要不可欠な構造ではないです．
 # ```
 
 # RNN を用いて何らかのデータを解析する際には，普通，超短期記憶（Long Short-term Memory（LSTM））とケート付き再帰型ユニット（Gated Recurrent Unit（GRU））を利用すれば十分でしょう．TensorFlow や PyTorch には標準的に実装されているので簡単に利用することができます．
@@ -33,45 +33,62 @@
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
+import torch.nn as nn
 import numpy as np
-tf.random.set_seed(0)
+torch.manual_seed(0)
 
 def main():
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # データセットの生成．
     tx = np.asarray([[[7, 5, 8],[3, 9, 3]]], dtype=np.float32)
+    tx = torch.tensor(tx).to(device)
     print(tx)
-    # 関数を定義．
-    rnn = tf.keras.layers.LSTM(units=4, return_sequences=True)
-    # RNNの計算．
-    print(rnn(tx))
+    # モデルの定義．
+    rnn = nn.LSTM(input_size=3, hidden_size=4, batch_first=True).to(device)
+    output, (hidden, cell) = rnn(tx)
+    print(output)
 
 if __name__ == "__main__":
     main()
 
 
-# この LSTM で行った計算を GRU に行わせるようにすることはとても簡単です．以下のように `LSTM` の部分を `GRU` に書き換えるだけです．
+# 以下の部分が LSTM を利用するための記述です．`batch_first=True` は、PyTorchにおいてRNNの層を使用する際に，入力データの形状が `[batch_size, seq_len, features]` の順序であることを指定するオプションです．このオプションが指定されていない場合（デフォルトは `batch_first=False`），入力データは `[seq_len, batch_size, features]` の形状を持つと期待されます．
+# ```
+# rnn = nn.LSTM(input_size=3, hidden_size=4, batch_first=True).to(device)
+# ```
+
+# この LSTM で行った計算を GRU に行わせるようにすることはとても簡単です．以下のように `LSTM` の部分を `GRU` に書き換えて，出力を受け取る変数を変えるだけです．
 
 # In[ ]:
 
 
 #!/usr/bin/env python3
-import tensorflow as tf
+import torch
+import torch.nn as nn
 import numpy as np
-tf.random.set_seed(0)
+torch.manual_seed(0)
 
 def main():
+    # GPUの使用の設定．
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # データセットの生成．
     tx = np.asarray([[[7, 5, 8],[3, 9, 3]]], dtype=np.float32)
+    tx = torch.tensor(tx).to(device)
     print(tx)
-    # 関数を定義．
-    rnn = tf.keras.layers.GRU(units=4, return_sequences=True)
-    # RNNの計算．
-    print(rnn(tx))
+    # モデルの定義．
+    rnn = nn.GRU(input_size=3, hidden_size=4, batch_first=True).to(device)
+    output, hidden = rnn(tx)
+    print(output)
 
 if __name__ == "__main__":
     main()
 
+
+# ```{note}
+# `LSTM` と `GRU` の内部構造は少し異なります．`GRU` はセル状態を持たないので出力値は2個だけです．
+# ```
 
 # ### 文字エンコード
 
@@ -85,14 +102,14 @@ if __name__ == "__main__":
 # 
 # これとは別のエンコード方法として，ワンホットエンコーディングがあります．ワンホットエンコーディングはワンホットベクトルに単語を対応させます．ワンホットベクトルとは，ベクトルのある要素が 1 で他の全要素が 0 であるベクトルです．以下のような感じです．
 # 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/oneHotEmbedding.svg?raw=1" width="100%" />
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/oneHotEmbedding.svg?raw=1" width="100%" />
 # 
 # 
 # この方法は非効率的です．ワンホットベクトルはとても疎です．ボキャブラリに 10000 個の単語がある場合，各ベクトルはその要素の 99.99% が 0 からなります．学習を効率よく進めるためには多くの重みパラメータを設定しなければならないことになるでしょう．また，入力ベクトルが場合によってはものすごく長くなるでしょう．
 # 
 # 現在のところ最も良い方法と考えられるのは単語埋め込み（word embedding）です．単語埋め込みを利用すると似たような単語が似たようなベクトルへとエンコードされます（学習の過程で）．埋め込みは浮動小数点数で行い，密なベクトルができます．以下のような感じです．
 # 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/floatEmbedding.svg?raw=1" width="100%" />
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/floatEmbedding.svg?raw=1" width="100%" />
 # 
 
 # ### 入出力データ形式
@@ -200,13 +217,13 @@ def main():
     tx=tf.keras.preprocessing.sequence.pad_sequences(tx,padding="post",dtype=np.float32)
     tt=[1,2,0]
     tt=tf.convert_to_tensor(tt)
-    
+
     # ネットワークの定義
     model=Network()
     cce=tf.keras.losses.SparseCategoricalCrossentropy()
     acc=tf.keras.metrics.SparseCategoricalAccuracy()
     optimizer=tf.keras.optimizers.Adam()
-    
+
     # 学習1回の記述
     @tf.function
     def inference(tx,tt):
@@ -217,7 +234,7 @@ def main():
         optimizer.apply_gradients(zip(gradient,model.trainable_variables))
         accvalue=acc(tt,ty)
         return costvalue,accvalue
-    
+
     # 学習前の人工知能がどのような出力をしているのかを確認
     ty=model.call(tx)
     print("Output vector:",ty)
@@ -228,7 +245,7 @@ def main():
         traincost,trainacc=inference(tx,tt)
         if epoch%50==0:
             print("Epoch {:5d}: Training cost= {:.4f}, Training ACC= {:.4f}".format(epoch,traincost,trainacc))
-    
+
     # 学習後の人工知能がどのような出力をしているのかを確認
     ty=model.call(tx)
     print("Output vector:",ty)
@@ -241,7 +258,7 @@ class Network(Model):
         super(Network,self).__init__()
         self.lstm=LSTM(50)
         self.fc=Dense(3,activation="softmax")
-    
+
     def call(self,tx):
         ty=self.lstm(tx)
         ty=self.fc(ty)
@@ -315,12 +332,12 @@ def main():
     tt=[[[6.2,1.1],[3.5,2.1],[2.0,1.1]],[[4.5,3.8],[4.1,4.9],[3.4,4.6],[2.7,1.7],[2.1,2.5]],[[1.2,1.0],[4.4,3.3],[3.1,2.8],[2.7,1.6]]]
     tx=tf.keras.preprocessing.sequence.pad_sequences(tx,padding="post",dtype=np.int32,value=0)
     tt=tf.keras.preprocessing.sequence.pad_sequences(tt,padding="post",dtype=np.float32,value=-1)
-    
+
     # ネットワークの定義
     model=Network()
     mse=tf.keras.losses.MeanSquaredError()
     optimizer=tf.keras.optimizers.Adam()
-    
+
     # 学習1回の記述
     @tf.function
     def inference(tx,tt):
@@ -330,7 +347,7 @@ def main():
         gradient=tape.gradient(costvalue,model.trainable_variables)
         optimizer.apply_gradients(zip(gradient,model.trainable_variables))
         return costvalue
-    
+
     # 学習前の人工知能がどのような出力をしているのかを確認
     ty=model.call(tx)
     print("Output vector:",ty)
@@ -341,7 +358,7 @@ def main():
         traincost=inference(tx,tt)
         if epoch%50==0:
             print("Epoch={0:5d} Cost={1:7.4f}".format(epoch,float(traincost)))
-    
+
     # 学習後の人工知能がどのような出力をしているのかを確認
     ty=model.call(tx)
     print("Output vector:",ty)
@@ -355,7 +372,7 @@ class Network(Model):
         self.embed=Embedding(input_dim=9+1,output_dim=3,mask_zero=True)
         self.lstm=Bidirectional(LSTM(units=50,return_sequences=True))
         self.fc=Dense(units=2)
-    
+
     def call(self,tx):
         ty=self.embed(tx)
         ty=self.lstm(ty)
@@ -535,19 +552,19 @@ def main():
     VALIDSIZE=25000-TRAINSIZE
     TRAINMINIBATCHNUMBER=TRAINSIZE//MINIBATCHSIZE
     VALIDMINIBATCHNUMBER=VALIDSIZE//MINIBATCHSIZE
-    
+
     # データの読み込み
     (lilearnx,lilearnt),(_,_)=tf.keras.datasets.imdb.load_data()
     outputsize=len(np.unique(lilearnt))
     lilearnx=tf.keras.preprocessing.sequence.pad_sequences(lilearnx,padding="post",dtype=np.int32,value=0)
-    
+
     # データセットに存在するボキャブラリのサイズを計算
     vocabsize=0
     for instance in lilearnx:
         if max(instance)>vocabsize:
             vocabsize=max(instance)
     vocabsize=vocabsize+1
-    
+
     # 学習セットをトレーニングセットとバリデーションセットに分割（9:1）
     litrainx,litraint=lilearnx[:TRAINSIZE],lilearnt[:TRAINSIZE]
     livalidx,livalidt=lilearnx[TRAINSIZE:],lilearnt[TRAINSIZE:]
@@ -569,7 +586,7 @@ def main():
         optimizer.apply_gradients(zip(gradient,model.trainable_variables))
         accvalue=acc(tt,ty)
         return costvalue,accvalue
-    
+
     # 学習ループ
     liepoch,litraincost,livalidcost=[],[],[]
     patiencecounter,bestvalue=0,100000
@@ -604,7 +621,7 @@ def main():
         if patiencecounter==PATIENCE:
             break
 
-    # 学習曲線の描画    
+    # 学習曲線の描画
     plt.plot(liepoch,litraincost,label="Training")
     plt.plot(liepoch,livalidcost,label="Validation")
     plt.ylim(0,0.2)
@@ -621,7 +638,7 @@ class Network(Model):
         self.d0=Embedding(input_dim=vocabsize,output_dim=EMBEDSIZE,mask_zero=True)
         self.d1=LSTM(UNITSIZE)
         self.d2=Dense(outputsize,activation="softmax")
-    
+
     def call(self,x):
         y=self.d0(x)
         y=self.d1(y)
