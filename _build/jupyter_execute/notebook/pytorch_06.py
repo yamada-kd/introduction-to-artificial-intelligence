@@ -83,7 +83,7 @@
 # 5.   識別器の出力値を用いて計算したコスト関数 $Q$ の値に基づいて識別器のパラメータを更新．
 # 6.   識別器の評価指標が収束した場合，学習を終了．それ以外の場合，最初に戻る．
 # 
-# 実際の学習の際には適した最適化法を選ぶとか，生成器と識別器の学習回数を変えるとか，真とラベルを 1 ではなくて 0.8 から 1.2 の範囲に含まれる値にするとかのテクニックが存在しますが，そのようなものは以下の実装の部分で紹介します．
+# 実際の学習の際には適した最適化法を選ぶとか，生成器と識別器の学習回数を変えるとか，真のラベルを 1 ではなくて 0.8 から 1.2 の範囲に含まれる値にするとかのテクニックが存在します．
 
 # ### GAN の実装
 
@@ -210,7 +210,7 @@ class Generator(nn.Module):
         return self.model(x)
 
 def generate_noise(MiniBatchSize, NoiseSize):
-    return (2 * torch.rand(MiniBatchSize, NoiseSize) - 1) # 最小値-1，最大値1の一様分布．
+    return torch.rand(MiniBatchSize, NoiseSize).uniform_(-1, 1) # 最小値-1，最大値1の一様分布．
 
 if __name__ == "__main__":
     main()
@@ -307,7 +307,7 @@ if __name__ == "__main__":
 # 
 # ```Python
 # def generate_noise(MiniBatchSize, NoiseSize):
-#     return (2 * torch.rand(MiniBatchSize, NoiseSize) - 1) # 最小値-1，最大値1の一様分布．
+#     return torch.rand(MiniBatchSize, NoiseSize).uniform_(-1, 1) # 最小値-1，最大値1の一様分布．
 # ```
 
 # 以下の部分は識別器を成長させるための記述です．識別器に本物データと偽物データをそれぞれ入力することで予測値を出力させます．それらに対してコスト値を計算します．識別器は本物のデータが入力されたら本物と識別するように，また，偽物のデータが入力されたら偽物と識別するように成長させられます．識別器への入力値には `fake_images` という生成器からの出力値が含まれます．つまり，生成器と識別器が連結した大きなネットワークと見做すことができます．これらのパラメータの更新を一括で行ってしまうことはできますが，それはしたくありません．この記述では識別器だけを学習させたいのです．そのため，`.detach()` を利用して生成器に関わる部分の計算グラフを切り離します．そうすることで，以降の `.backward()` の計算に生成器の情報が含まれなくなります．
@@ -352,7 +352,7 @@ if __name__ == "__main__":
 # 
 # その他の GAN の問題点としては，上のプログラムを実行した結果から確認できたと思いますが，生成したいデータの条件を指定できないことです．例えば，MNIST のような数字が含まれた画像の中でも2が含まれる画像のみを生成したい場合，上のプログラムではかなり蕪雑な方法を使わないとできません．これを解決しようとした方法 CGAN を以下で紹介します．
 
-# ## WGAN-gp の実装
+# ## WGAN-gp
 
 # 基本的な GAN の改良版である WGAN-gp の実装方法を紹介します．
 
@@ -391,6 +391,129 @@ if __name__ == "__main__":
 # WGAN-gp を実装します．このプログラムでも MNIST の学習データセットを読み込んで，類似した数字画像を出力する人工知能を構築します．以下のように書きます．
 
 # In[ ]:
+
+
+#!/usr/bin/env python3
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+import numpy as np
+import matplotlib.pyplot as plt
+torch.manual_seed(0)
+np.random.seed(0)
+
+def calculate_gradient_penalty(critic, real_data, fake_data):
+    alpha = torch.rand(real_data.size(0), 1)
+    alpha = alpha.expand(real_data.size()).to(real_data.device)
+    interpolated = alpha * real_data + (1 - alpha) * fake_data
+    interpolated.requires_grad_(True)
+    prob_interpolated = critic(interpolated)
+    gradients = torch.autograd.grad(outputs=prob_interpolated, inputs=interpolated,
+                                    grad_outputs=torch.ones(prob_interpolated.size()).to(real_data.device),
+                                    create_graph=True, retain_graph=True)[0]
+    gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * 10
+    return gradient_penalty
+
+def generate_noise(batch_size, noise_size):
+    return torch.rand(batch_size, noise_size).uniform_(-1, 1)
+
+def main():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    #
+    MiniBatchSize = 300
+    NoiseSize = 100
+    MaxEpoch = 300
+    CriticLearningNumber = 5
+    GradientPenaltyCoefficient = 10
+
+    #
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+    dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    dataloader = DataLoader(dataset, batch_size=MiniBatchSize, shuffle=True)
+
+    #
+    generator = Generator().to(device)
+    critic = Critic().to(device)
+    optimizerGenerator = optim.Adam(generator.parameters(), lr=0.0001, betas=(0, 0.9))
+    optimizerCritic = optim.Adam(critic.parameters(), lr=0.0001, betas=(0, 0.9))
+
+    for epoch in range(1, MaxEpoch+1):
+        for i, (real_images, _) in enumerate(dataloader):
+            real_images = real_images.view(-1, 784).to(device)
+            noise = generate_noise(MiniBatchSize, NoiseSize).to(device)
+            fake_images = generator(noise)
+
+            for _ in range(CriticLearningNumber):
+                optimizerCritic.zero_grad()
+                critic_real = critic(real_images).mean()
+                critic_fake = critic(fake_images.detach()).mean()
+                gp = calculate_gradient_penalty(critic, real_images.data, fake_images.data)
+                critic_loss = critic_fake - critic_real + gp
+                critic_loss.backward()
+                optimizerCritic.step()
+
+            optimizerGenerator.zero_grad()
+            generator_loss = -critic(fake_images).mean()
+            generator_loss.backward()
+            optimizerGenerator.step()
+
+        if epoch % 10 == 0:
+            print(f"Epoch {epoch}, Critic Loss: {critic_loss.item()}, Generator Loss: {generator_loss.item()}")
+            with torch.no_grad():
+                generator.eval()
+                validation_noise = generate_noise(1, NoiseSize).to(device)
+                validation_image = generator(validation_noise).view(28, 28).cpu().numpy()
+                plt.imshow(validation_image, cmap="gray")
+                plt.pause(1)
+                generator.train()
+
+class Critic(nn.Module):
+    def __init__(self):
+        super(Critic, self).__init__()
+        self.model = nn.Sequential(
+            nn.Linear(784, 128),
+            nn.LeakyReLU(0.3),
+            nn.Dropout(0.5),
+            nn.Linear(128, 128),
+            nn.LeakyReLU(0.3),
+            nn.Dropout(0.5),
+            nn.Linear(128, 128),
+            nn.LeakyReLU(0.3),
+            nn.Dropout(0.5),
+            nn.Linear(128, 1)
+        )
+
+    def forward(self, x):
+        return self.model(x)
+
+class Generator(nn.Module):
+    def __init__(self):
+        super(Generator, self).__init__()
+        self.model = nn.Sequential(
+            nn.Linear(100, 128),
+            nn.LeakyReLU(0.3),
+            nn.BatchNorm1d(128),
+            nn.Linear(128, 128),
+            nn.LeakyReLU(0.3),
+            nn.BatchNorm1d(128),
+            nn.Linear(128, 128),
+            nn.LeakyReLU(0.3),
+            nn.BatchNorm1d(128),
+            nn.Linear(128, 784),
+            nn.Tanh()
+        )
+
+    def forward(self, x):
+        return self.model(x)
+
+if __name__ == "__main__":
+    main()
+
+
+# In[2]:
 
 
 #!/usr/bin/env python3
@@ -623,7 +746,7 @@ if __name__ == "__main__":
 #             plt.pause(1)
 # ```
 
-# ## CGAN の実装
+# ## CGAN
 
 # この節では条件を指定することで条件に合ったデータを生成することができる GAN の改良版である CGAN の実装方法を紹介します．
 
