@@ -461,7 +461,7 @@ def main():
             optimizerGenerator.step()
 
         if epoch % 10 == 0:
-            print(f"Epoch {epoch}, Critic Loss: {critic_loss.item()}, Generator Loss: {generator_loss.item()}")
+            print(f"Epoch {epoch} Critic Loss: {critic_loss.item()}, Generator Loss: {generator_loss.item()}")
             with torch.no_grad():
                 generator.eval()
                 validation_noise = generate_noise(1, NoiseSize).to(device)
@@ -513,7 +513,7 @@ if __name__ == "__main__":
     main()
 
 
-# In[2]:
+# In[ ]:
 
 
 #!/usr/bin/env python3
