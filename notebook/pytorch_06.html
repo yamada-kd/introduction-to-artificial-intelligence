@@ -866,7 +866,7 @@ const thebe_selector_output = ".output, .cell_output"
             <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, Critic Loss: </span><span class="si">{</span><span class="n">critic_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">, Generator Loss: </span><span class="si">{</span><span class="n">generator_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2"> Critic Loss: </span><span class="si">{</span><span class="n">critic_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">, Generator Loss: </span><span class="si">{</span><span class="n">generator_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                 <span class="n">generator</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
                 <span class="n">validation_noise</span> <span class="o">=</span> <span class="n">generate_noise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -918,48 +918,6 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 10, Critic Loss: -2.2575135231018066, Generator Loss: 20.32186508178711
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_1.png" src="../_images/pytorch_06_32_1.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 20, Critic Loss: -0.5380182862281799, Generator Loss: 1.4139845371246338
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_3.png" src="../_images/pytorch_06_32_3.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 30, Critic Loss: -0.6661345362663269, Generator Loss: -0.9224522709846497
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_5.png" src="../_images/pytorch_06_32_5.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 40, Critic Loss: 0.2050597071647644, Generator Loss: -2.037776231765747
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_7.png" src="../_images/pytorch_06_32_7.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 50, Critic Loss: -0.7068277597427368, Generator Loss: -2.11684250831604
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_9.png" src="../_images/pytorch_06_32_9.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 60, Critic Loss: -0.8753162622451782, Generator Loss: -2.0120584964752197
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_11.png" src="../_images/pytorch_06_32_11.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 70, Critic Loss: -0.498803973197937, Generator Loss: -1.7515109777450562
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_13.png" src="../_images/pytorch_06_32_13.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 80, Critic Loss: -0.87310791015625, Generator Loss: -0.9209244847297668
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_15.png" src="../_images/pytorch_06_32_15.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 90, Critic Loss: 0.015294969081878662, Generator Loss: -1.0653326511383057
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_17.png" src="../_images/pytorch_06_32_17.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 100, Critic Loss: -0.3914181590080261, Generator Loss: -2.5836169719696045
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_32_19.png" src="../_images/pytorch_06_32_19.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -1108,130 +1066,6 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz
-11490434/11490434 [==============================] - 0s 0us/step
-Epoch         10 D-cost -3.7952 G-cost -2.0991
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_1.png" src="../_images/pytorch_06_33_1.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         20 D-cost -5.0577 G-cost 7.0692
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_3.png" src="../_images/pytorch_06_33_3.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         30 D-cost -4.2893 G-cost 4.6005
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_5.png" src="../_images/pytorch_06_33_5.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         40 D-cost -3.5278 G-cost 2.0132
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_7.png" src="../_images/pytorch_06_33_7.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         50 D-cost -3.1768 G-cost 1.9226
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_9.png" src="../_images/pytorch_06_33_9.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         60 D-cost -2.9886 G-cost 1.9873
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_11.png" src="../_images/pytorch_06_33_11.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         70 D-cost -2.8164 G-cost 1.9255
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_13.png" src="../_images/pytorch_06_33_13.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         80 D-cost -2.6701 G-cost 1.8375
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_15.png" src="../_images/pytorch_06_33_15.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch         90 D-cost -2.5358 G-cost 1.7123
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_17.png" src="../_images/pytorch_06_33_17.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        100 D-cost -2.4193 G-cost 1.5796
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_19.png" src="../_images/pytorch_06_33_19.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        110 D-cost -2.3229 G-cost 1.6387
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_21.png" src="../_images/pytorch_06_33_21.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        120 D-cost -2.2407 G-cost 1.7898
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_23.png" src="../_images/pytorch_06_33_23.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        130 D-cost -2.1732 G-cost 1.9698
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_25.png" src="../_images/pytorch_06_33_25.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        140 D-cost -2.1128 G-cost 2.0057
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_27.png" src="../_images/pytorch_06_33_27.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        150 D-cost -2.0533 G-cost 2.1303
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_29.png" src="../_images/pytorch_06_33_29.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        160 D-cost -2.0143 G-cost 2.3226
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_31.png" src="../_images/pytorch_06_33_31.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        170 D-cost -1.9826 G-cost 2.3462
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_33.png" src="../_images/pytorch_06_33_33.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        180 D-cost -1.9481 G-cost 2.3309
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_35.png" src="../_images/pytorch_06_33_35.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        190 D-cost -1.9138 G-cost 2.3865
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_37.png" src="../_images/pytorch_06_33_37.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        200 D-cost -1.8777 G-cost 2.3763
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_39.png" src="../_images/pytorch_06_33_39.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        210 D-cost -1.8461 G-cost 2.4254
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_41.png" src="../_images/pytorch_06_33_41.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        220 D-cost -1.8182 G-cost 2.3314
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_43.png" src="../_images/pytorch_06_33_43.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        230 D-cost -1.7872 G-cost 2.3346
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_45.png" src="../_images/pytorch_06_33_45.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        240 D-cost -1.7652 G-cost 2.2728
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_47.png" src="../_images/pytorch_06_33_47.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        250 D-cost -1.7384 G-cost 2.1084
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_49.png" src="../_images/pytorch_06_33_49.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        260 D-cost -1.7132 G-cost 2.1712
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_51.png" src="../_images/pytorch_06_33_51.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        270 D-cost -1.6823 G-cost 2.0801
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_53.png" src="../_images/pytorch_06_33_53.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        280 D-cost -1.6654 G-cost 2.3210
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_55.png" src="../_images/pytorch_06_33_55.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        290 D-cost -1.6454 G-cost 2.3634
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_57.png" src="../_images/pytorch_06_33_57.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch        300 D-cost -1.6256 G-cost 2.4816
-</pre></div>
-</div>
-<img alt="../_images/pytorch_06_33_59.png" src="../_images/pytorch_06_33_59.png" />
 </div>
 </div>
 <p>このプログラムを実行すると，上の基本的な GAN を用いたときよりも奇麗な画像が出力されたのではないかと思います．また，生成器が綺麗な画像を出力しだす実時間も基本的な GAN を用いた場合よりも早かったのではないでしょうか．</p>
