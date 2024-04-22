@@ -366,7 +366,7 @@ if __name__ == "__main__":
 # \displaystyle P(\boldsymbol{\theta})=-\frac{1}{N}\sum_{i=1}^{N}D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))
 # $
 # 
-# また，WGAN-gp において識別器は真か偽の二値を識別して出力するものではなくて，実数を出力するものへと変わるため，これを識別器と呼ばず，クリティックと呼ぶ場合があるため，ここでもそのように呼びます．クリティックのコスト関数は以下の式で表されます．
+# また，WGAN-gp において識別器は真か偽の二値を識別して出力するものではなくて，実数を出力するものへと変わるため，これを識別器と呼ばず，クリティックと呼ぶため，ここでもそのように呼びます．クリティックのコスト関数は以下の式で表されます．
 # 
 # $
 # \displaystyle Q(\boldsymbol{\phi})=\frac{1}{N}\sum_{i=1}^{N}(D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))-D(\boldsymbol{\phi},\boldsymbol{x}_i)+\lambda(\|\boldsymbol{g}(\boldsymbol{\phi},\boldsymbol{\hat{x}}_i)\|_2-1)^2)
@@ -390,7 +390,7 @@ if __name__ == "__main__":
 
 # WGAN-gp を実装します．このプログラムでも MNIST の学習データセットを読み込んで，類似した数字画像を出力する人工知能を構築します．以下のように書きます．
 
-# In[ ]:
+# In[1]:
 
 
 #!/usr/bin/env python3
@@ -404,64 +404,50 @@ import matplotlib.pyplot as plt
 torch.manual_seed(0)
 np.random.seed(0)
 
-def calculate_gradient_penalty(critic, real_data, fake_data):
-    alpha = torch.rand(real_data.size(0), 1)
-    alpha = alpha.expand(real_data.size()).to(real_data.device)
-    interpolated = alpha * real_data + (1 - alpha) * fake_data
-    interpolated.requires_grad_(True)
-    prob_interpolated = critic(interpolated)
-    gradients = torch.autograd.grad(outputs=prob_interpolated, inputs=interpolated,
-                                    grad_outputs=torch.ones(prob_interpolated.size()).to(real_data.device),
-                                    create_graph=True, retain_graph=True)[0]
-    gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * 10
-    return gradient_penalty
-
-def generate_noise(batch_size, noise_size):
-    return torch.rand(batch_size, noise_size).uniform_(-1, 1)
-
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    #
+    # ハイパーパラメータの設定．
     MiniBatchSize = 300
     NoiseSize = 100
     MaxEpoch = 300
     CriticLearningNumber = 5
     GradientPenaltyCoefficient = 10
 
-    #
+    # データセットの読み込み．
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
-    dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    dataset = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
     dataloader = DataLoader(dataset, batch_size=MiniBatchSize, shuffle=True)
 
-    #
+    # モデルの構築．
     generator = Generator().to(device)
     critic = Critic().to(device)
     optimizerGenerator = optim.Adam(generator.parameters(), lr=0.0001, betas=(0, 0.9))
     optimizerCritic = optim.Adam(critic.parameters(), lr=0.0001, betas=(0, 0.9))
 
+    # 学習ループ．
     for epoch in range(1, MaxEpoch+1):
-        for i, (real_images, _) in enumerate(dataloader):
+        for real_images, _ in dataloader:
             real_images = real_images.view(-1, 784).to(device)
             noise = generate_noise(MiniBatchSize, NoiseSize).to(device)
             fake_images = generator(noise)
 
             for _ in range(CriticLearningNumber):
                 optimizerCritic.zero_grad()
-                critic_real = critic(real_images).mean()
-                critic_fake = critic(fake_images.detach()).mean()
-                gp = calculate_gradient_penalty(critic, real_images.data, fake_images.data)
+                critic_real = critic(real_images).mean() # 実際の画像に対するクリティックの平均出力．
+                critic_fake = critic(fake_images.detach()).mean() # 生成された偽画像に対するクリティックの平均出力．
+                gp = calculate_gradient_penalty(critic, real_images.data, fake_images.data, GradientPenaltyCoefficient) # .dataは勾配計算からの除外を意味し，勾配ペナルティ計算時にテンソルの値のみを使用することを意味する．
                 critic_loss = critic_fake - critic_real + gp
                 critic_loss.backward()
                 optimizerCritic.step()
 
             optimizerGenerator.zero_grad()
-            generator_loss = -critic(fake_images).mean()
+            generator_loss = -critic(fake_images).mean() # 生成された画像に対するクリティックの出力の負の平均．
             generator_loss.backward()
             optimizerGenerator.step()
 
         if epoch % 10 == 0:
-            print(f"Epoch {epoch} Critic Loss: {critic_loss.item()}, Generator Loss: {generator_loss.item()}")
+            print(f"Epoch {epoch}, Critic Loss: {critic_loss.item()}, Generator Loss: {generator_loss.item()}")
             with torch.no_grad():
                 generator.eval()
                 validation_noise = generate_noise(1, NoiseSize).to(device)
@@ -509,152 +495,18 @@ class Generator(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-if __name__ == "__main__":
-    main()
+def calculate_gradient_penalty(critic, real_data, fake_data, GradientPenaltyCoefficient):
+    epsilon = torch.rand(real_data.size(0), 1)
+    epsilon = epsilon.expand(real_data.size()).to(real_data.device) # # expandはepsilonをreal_dataの形状に拡張するため．
+    x_hat = epsilon * real_data + (1 - epsilon) * fake_data # x_hatは実データと偽データの間の補間点．
+    x_hat.requires_grad_(True) # requires_grad_(True)はx_hatに対する勾配を追跡するために付加．
+    critic_x_hat = critic(x_hat)
+    gradients = torch.autograd.grad(outputs=critic_x_hat, inputs=x_hat, grad_outputs=torch.ones(critic_x_hat.size()).to(real_data.device), create_graph=True, retain_graph=True)[0] # x_hatに対するcritic_x_hatの勾配を計算．
+    gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * GradientPenaltyCoefficient
+    return gradient_penalty
 
-
-# In[ ]:
-
-
-#!/usr/bin/env python3
-import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
-tf.random.set_seed(0)
-np.random.seed(0)
-
-def main():
-    # ハイパーパラメータの設定
-    MiniBatchSize = 300
-    NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
-    MaxEpoch = 300
-    CriticLearningNumber = 5
-    GradientPenaltyCoefficient = 10
-
-    # データセットの読み込み
-    (learnX, learnT), (_, _) = tf.keras.datasets.mnist.load_data()
-    learnX = np.asarray(learnX.reshape([60000, 784]), dtype="float32")
-    learnX = (learnX - 127.5) / 127.5
-
-    # 生成器と識別器の構築
-    generator = Generator() # 下のクラスを参照．
-    critic = Critic() # 下のクラスを参照．
-
-    # オプティマイザは生成器と識別器で同じで良い．が，ハイパーパラメータを変えたくなるかもしれないからふたつ用意．
-    optimizerGenerator = tf.keras.optimizers.Adam(learning_rate=0.0001,beta_1=0,beta_2=0.9)
-    optimizerCritic = tf.keras.optimizers.Adam(learning_rate=0.0001,beta_1=0,beta_2=0.9)
-
-    @tf.function()
-    def runCritic(generator, critic, noiseVector, realInputVector):
-        with tf.GradientTape() as criticTape:
-            generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
-            criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
-            criticOutputFromReal = critic(realInputVector) # 本物データを識別器に入れる．
-            epsilon = tf.random.uniform(generatedInputVector.shape, minval=0, maxval=1)
-            intermediateVector = generatedInputVector + epsilon * (realInputVector - generatedInputVector)
-            # 勾配ペナルティ
-            with tf.GradientTape() as gradientPenaltyTape:
-                gradientPenaltyTape.watch(intermediateVector)
-                criticOutputFromIntermediate = critic(intermediateVector)
-                gradientVector = gradientPenaltyTape.gradient(criticOutputFromIntermediate, intermediateVector)
-                gradientNorm = tf.norm(gradientVector, ord="euclidean", axis=1) # gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．
-                gradientPenalty = GradientPenaltyCoefficient * (gradientNorm - 1)**2
-            # 識別器の成長
-            criticCost = tf.reduce_mean(criticOutputFromGenerated - criticOutputFromReal + gradientPenalty) # 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．
-            gradientCritic = criticTape.gradient(criticCost, critic.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
-            optimizerCritic.apply_gradients(zip(gradientCritic, critic.trainable_variables))
-            return criticCost
-
-    @tf.function()
-    def runGenerator(generator, critic, noiseVector):
-        with tf.GradientTape() as generatorTape:
-            generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
-            criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
-            # 生成器の成長
-            generatorCost = -tf.reduce_mean(criticOutputFromGenerated) # 生成器を成長させるためのコストを計算．
-            gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
-            optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
-            return generatorCost
-
-    # ミニバッチセットの生成
-    learnX = tf.data.Dataset.from_tensor_slices(learnX) # このような方法を使うと簡単にミニバッチを実装することが可能．
-    learnT = tf.data.Dataset.from_tensor_slices(learnT)
-    learnA = tf.data.Dataset.zip((learnX, learnT)).shuffle(60000).batch(MiniBatchSize) # 今回はインプットデータしか使わないけど後にターゲットデータを使う場合があるため．
-    miniBatchNumber = len(list(learnA.as_numpy_iterator()))
-    # 学習ループ
-    for epoch in range(1,MaxEpoch+1):
-        criticCost, generatorCost = 0, 0
-        for learnx, _ in learnA:
-            # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
-            for _ in range(CriticLearningNumber):
-                noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
-                criticCostPiece = runCritic(generator, critic, noiseVector, learnx)
-                criticCost += criticCostPiece / (CriticLearningNumber * miniBatchNumber)
-            # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
-            for _ in range(1):
-                noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
-                generatorCostPiece = runGenerator(generator, critic, noiseVector)
-                generatorCost += generatorCostPiece / miniBatchNumber
-        # 疑似的なテスト
-        if epoch%10 == 0:
-            print("Epoch {:10d} D-cost {:6.4f} G-cost {:6.4f}".format(epoch,float(criticCost),float(generatorCost)))
-            validationNoiseVector = generateNoise(1, NoiseSize)
-            validationOutput = generator(validationNoiseVector)
-            validationOutput = np.asarray(validationOutput).reshape([1, 28, 28])
-            plt.imshow(validationOutput[0], cmap = "gray")
-            plt.pause(1)
-
-# 入力されたデータを評価するネットワーク
-class Critic(tf.keras.Model):
-    def __init__(self):
-        super(Critic,self).__init__()
-        self.d1 = tf.keras.layers.Dense(units=128)
-        self.d2 = tf.keras.layers.Dense(units=128)
-        self.d3 = tf.keras.layers.Dense(units=128)
-        self.d4 = tf.keras.layers.Dense(units=1)
-        self.a = tf.keras.layers.LeakyReLU()
-        self.dropout = tf.keras.layers.Dropout(0.5)
-    def call(self,x):
-        y = self.d1(x)
-        y = self.a(y)
-        y = self.dropout(y)
-        y = self.d2(y)
-        y = self.a(y)
-        y = self.dropout(y)
-        y = self.d3(y)
-        y = self.a(y)
-        y = self.dropout(y)
-        y = self.d4(y)
-        return y
-
-# 入力されたベクトルから別のベクトルを生成するネットワーク
-class Generator(tf.keras.Model):
-    def __init__(self):
-        super(Generator,self).__init__()
-        self.d1=tf.keras.layers.Dense(units=128)
-        self.d2=tf.keras.layers.Dense(units=128)
-        self.d3=tf.keras.layers.Dense(units=128)
-        self.d4=tf.keras.layers.Dense(units=784)
-        self.a=tf.keras.layers.LeakyReLU()
-        self.b1=tf.keras.layers.BatchNormalization()
-        self.b2=tf.keras.layers.BatchNormalization()
-        self.b3=tf.keras.layers.BatchNormalization()
-    def call(self,x):
-        y = self.d1(x)
-        y = self.a(y)
-        y = self.b1(y)
-        y = self.d2(y)
-        y = self.a(y)
-        y = self.b2(y)
-        y = self.d3(y)
-        y = self.a(y)
-        y = self.b3(y)
-        y = self.d4(y)
-        y = tf.keras.activations.tanh(y)
-        return y
-
-def generateNoise(miniBatchSize, randomNoiseSize):
-    return np.random.uniform(-1, 1, size=(miniBatchSize,randomNoiseSize)).astype("float32")
+def generate_noise(batch_size, noise_size):
+    return torch.rand(batch_size, noise_size).uniform_(-1, 1)
 
 if __name__ == "__main__":
     main()
@@ -669,40 +521,54 @@ if __name__ == "__main__":
 # 以下の部分はハイパーパラメータの設定部分ですが，基本的な GAN と比べて，`CriticLearningNumber` が新たに加わっています．これは，生成器のパラメータ更新 1 回に対してクリティックのパラメータ更新をさせる回数です．基本的な GAN の学習をうまく進めるために生成器の学習回数を増やすことがあるのですが，WGAN-gp ではクリティックの方の学習回数を増やします．また，`GradientPenaltyCoefficient` は勾配ペナルティに欠ける係数です．これはハイパーパラメータなのですが，元の論文では 10 に設定されていたため，ここでも 10 にしました．
 # 
 # ```python
-#     # ハイパーパラメータの設定
+#     # ハイパーパラメータの設定．
 #     MiniBatchSize = 300
-#     NoiseSize = 100 # GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．
+#     NoiseSize = 100
 #     MaxEpoch = 300
 #     CriticLearningNumber = 5
 #     GradientPenaltyCoefficient = 10
 # ```
 
-# WGAN-gp では生成器とクリティックの学習回数を変えるため，パラメータ更新のための関数は別々に用意する必要があります．以下はクリティックのパラメータ更新を行うための記述です．
+# 以下のような学習ループを書きます．WGAN-gp では生成器とクリティックの学習回数を変えます．
 # 
 # ```python
-#     @tf.function()
-#     def runCritic(generator, critic, noiseVector, realInputVector):
-#         with tf.GradientTape() as criticTape:
-#             generatedInputVector = generator(noiseVector) # 生成器によるデータの生成．
-#             criticOutputFromGenerated = critic(generatedInputVector) # その生成データを識別器に入れる．
-#             criticOutputFromReal = critic(realInputVector) # 本物データを識別器に入れる．
-#             epsilon = tf.random.uniform(generatedInputVector.shape, minval=0, maxval=1)
-#             intermediateVector = generatedInputVector + epsilon * (realInputVector - generatedInputVector)
-#             # 勾配ペナルティ
-#             with tf.GradientTape() as gradientPenaltyTape:
-#                 gradientPenaltyTape.watch(intermediateVector)
-#                 criticOutputFromIntermediate = critic(intermediateVector)
-#                 gradientVector = gradientPenaltyTape.gradient(criticOutputFromIntermediate, intermediateVector)
-#                 gradientNorm = tf.norm(gradientVector, ord="euclidean", axis=1) # gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．
-#                 gradientPenalty = GradientPenaltyCoefficient * (gradientNorm - 1)**2
-#             # 識別器の成長
-#             criticCost = tf.reduce_mean(criticOutputFromGenerated - criticOutputFromReal + gradientPenalty) # 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．
-#             gradientCritic = criticTape.gradient(criticCost, critic.trainable_variables) # 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．
-#             optimizerCritic.apply_gradients(zip(gradientCritic, critic.trainable_variables))
-#             return criticCost
+#     # 学習ループ．
+#     for epoch in range(1, MaxEpoch+1):
+#         for real_images, _ in dataloader:
+#             real_images = real_images.view(-1, 784).to(device)
+#             noise = generate_noise(MiniBatchSize, NoiseSize).to(device)
+#             fake_images = generator(noise)
+#             
+#             for _ in range(CriticLearningNumber):
+#                 optimizerCritic.zero_grad()
+#                 critic_real = critic(real_images).mean() # 実際の画像に対するクリティックの平均出力．
+#                 critic_fake = critic(fake_images.detach()).mean() # 生成された偽画像に対するクリティックの平均出力．
+#                 gp = calculate_gradient_penalty(critic, real_images.data, fake_images.data, GradientPenaltyCoefficient) # .dataは勾配計算からの除外を意味し，勾配ペナルティ計算時にテンソルの値のみを使用することを意味する．
+#                 critic_loss = critic_fake - critic_real + gp
+#                 critic_loss.backward()
+#                 optimizerCritic.step()
+#             
+#             optimizerGenerator.zero_grad()
+#             generator_loss = -critic(fake_images).mean() # 生成された画像に対するクリティックの出力の負の平均．
+#             generator_loss.backward()
+#             optimizerGenerator.step()
 # ```
 # 
-# 上で紹介したクリティックのコストを計算するための記述が含まれています．上の式の $\epsilon$ は `epsilon` からはじまる行で生成されます．単に一様分布からのサンプリングです．`intermediateVector` は $\hat{x}$ です．さらに，クリティックの出力に対してこの $\hat{x}$ に対する勾配を計算する必要がありますが，それを行っているのが `gradientVector` の行の記述です．引き続き `gradientPenalty` を行っています．その下の `criticCost` からはじまる行はクリティックのコストを求める上の式そのものです．
+# ここで普通の GAN と大きく異なる部分として勾配ペナルティの計算部分が挙げられます．勾配ペナルティは `calculate_gradient_penalty()` にて計算します．
+# 
+# ```Python
+# def calculate_gradient_penalty(critic, real_data, fake_data, GradientPenaltyCoefficient):
+#     epsilon = torch.rand(real_data.size(0), 1)
+#     epsilon = epsilon.expand(real_data.size()).to(real_data.device) # # expandはepsilonをreal_dataの形状に拡張するため．
+#     x_hat = epsilon * real_data + (1 - epsilon) * fake_data # x_hatは実データと偽データの間の補間点．
+#     x_hat.requires_grad_(True) # requires_grad_(True)はx_hatに対する勾配を追跡するために付加．
+#     critic_x_hat = critic(x_hat)
+#     gradients = torch.autograd.grad(outputs=critic_x_hat, inputs=x_hat, grad_outputs=torch.ones(critic_x_hat.size()).to(real_data.device), create_graph=True, retain_graph=True)[0] # x_hatに対するcritic_x_hatの勾配を計算．
+#     gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * GradientPenaltyCoefficient
+#     return gradient_penalty
+# ```
+# 
+# 上の式の $\epsilon$ は `epsilon` からはじまる行で生成されます．単に一様分布からのサンプリングです．`x_hat` は $\hat{x}$ です．さらに，クリティックの出力に対してこの $\hat{x}$ に対する勾配を計算する必要がありますが，それを行っているのが `gradients` の行の記述です．この行の `torch.autograd.grad()` は指定した出力（`outputs`）に関する指定した入力（`inputs`）の勾配を直接計算し，それを返します．`backward()` でも勾配を計算できるのですが，途中の特定のテンソルに関する勾配を直接取得することはできません．勾配ペナルティの計算のように，パラメータの更新ではなく，中間の勾配値自体に関心がある場合には `torch.autograd.grad()` が適しています．
 
 # 以下の記述は生成器のコストを求めるためのものです．`generatorCost` からはじまる行が生成器を求めるための上の式そのものなので理解しやすいのではないでしょうか．
 # 
@@ -717,33 +583,6 @@ if __name__ == "__main__":
 #             gradientGenerator = generatorTape.gradient(generatorCost,generator.trainable_variables) # 生成器のパラメータで勾配を計算．
 #             optimizerGenerator.apply_gradients(zip(gradientGenerator,generator.trainable_variables))
 #             return generatorCost
-# ```
-
-# 学習ループの部分は基本的な GAN のものとほぼ同じなのですが，識別器のパラメータ更新の回数を生成器のそれと変えるため，`for _ in range(CriticLearningNumber):` の部分でハイパーパラメータとして設定した分だけパラメータ更新のループを設定しています．
-# 
-# ```python
-#     # 学習ループ
-#     for epoch in range(1,MaxEpoch+1):
-#         criticCost, generatorCost = 0, 0
-#         for learnx, _ in learnA:
-#             # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
-#             for _ in range(CriticLearningNumber):
-#                 noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
-#                 criticCostPiece = runCritic(generator, critic, noiseVector, learnx)
-#                 criticCost += criticCostPiece / (CriticLearningNumber * miniBatchNumber)
-#             # WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．
-#             for _ in range(1):
-#                 noiseVector = generateNoise(MiniBatchSize, NoiseSize) # ミニバッチサイズで100個の要素からなるノイズベクトルを生成．
-#                 generatorCostPiece = runGenerator(generator, critic, noiseVector)
-#                 generatorCost += generatorCostPiece / miniBatchNumber
-#         # 疑似的なテスト
-#         if epoch%10 == 0:
-#             print("Epoch {:10d} D-cost {:6.4f} G-cost {:6.4f}".format(epoch,float(criticCost),float(generatorCost)))
-#             validationNoiseVector = generateNoise(1, NoiseSize)
-#             validationOutput = generator(validationNoiseVector)
-#             validationOutput = np.asarray(validationOutput).reshape([1, 28, 28])
-#             plt.imshow(validationOutput[0], cmap = "gray")
-#             plt.pause(1)
 # ```
 
 # ## CGAN

@@ -779,7 +779,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p><span class="math notranslate nohighlight">\(
 \displaystyle P(\boldsymbol{\theta})=-\frac{1}{N}\sum_{i=1}^{N}D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))
 \)</span></p>
-<p>また，WGAN-gp において識別器は真か偽の二値を識別して出力するものではなくて，実数を出力するものへと変わるため，これを識別器と呼ばず，クリティックと呼ぶ場合があるため，ここでもそのように呼びます．クリティックのコスト関数は以下の式で表されます．</p>
+<p>また，WGAN-gp において識別器は真か偽の二値を識別して出力するものではなくて，実数を出力するものへと変わるため，これを識別器と呼ばず，クリティックと呼ぶため，ここでもそのように呼びます．クリティックのコスト関数は以下の式で表されます．</p>
 <p><span class="math notranslate nohighlight">\(
 \displaystyle Q(\boldsymbol{\phi})=\frac{1}{N}\sum_{i=1}^{N}(D(\boldsymbol{\phi},G(\boldsymbol{\theta},\boldsymbol{z}_i))-D(\boldsymbol{\phi},\boldsymbol{x}_i)+\lambda(\|\boldsymbol{g}(\boldsymbol{\phi},\boldsymbol{\hat{x}}_i)\|_2-1)^2)
 \)</span></p>
@@ -809,64 +809,50 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">calculate_gradient_penalty</span><span class="p">(</span><span class="n">critic</span><span class="p">,</span> <span class="n">real_data</span><span class="p">,</span> <span class="n">fake_data</span><span class="p">):</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">interpolated</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">real_data</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">fake_data</span>
-    <span class="n">interpolated</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">prob_interpolated</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">interpolated</span><span class="p">)</span>
-    <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">outputs</span><span class="o">=</span><span class="n">prob_interpolated</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">interpolated</span><span class="p">,</span>
-                                    <span class="n">grad_outputs</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">prob_interpolated</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-                                    <span class="n">create_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">gradient_penalty</span> <span class="o">=</span> <span class="p">((</span><span class="n">gradients</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span>
-    <span class="k">return</span> <span class="n">gradient_penalty</span>
-
-<span class="k">def</span> <span class="nf">generate_noise</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">noise_size</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">noise_size</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
-    <span class="c1">#</span>
+    <span class="c1"># ハイパーパラメータの設定．</span>
     <span class="n">MiniBatchSize</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="n">NoiseSize</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">MaxEpoch</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="n">CriticLearningNumber</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">GradientPenaltyCoefficient</span> <span class="o">=</span> <span class="mi">10</span>
 
-    <span class="c1">#</span>
+    <span class="c1"># データセットの読み込み．</span>
     <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
     <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1">#</span>
+    <span class="c1"># モデルの構築．</span>
     <span class="n">generator</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
     <span class="n">critic</span> <span class="o">=</span> <span class="n">Critic</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
     <span class="n">optimizerGenerator</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">generator</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">))</span>
     <span class="n">optimizerCritic</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">critic</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">))</span>
 
+    <span class="c1"># 学習ループ．</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">MaxEpoch</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">real_images</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">real_images</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
             <span class="n">real_images</span> <span class="o">=</span> <span class="n">real_images</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">784</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">noise</span> <span class="o">=</span> <span class="n">generate_noise</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">fake_images</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CriticLearningNumber</span><span class="p">):</span>
                 <span class="n">optimizerCritic</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-                <span class="n">critic_real</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">real_images</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="n">critic_fake</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">fake_images</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="n">gp</span> <span class="o">=</span> <span class="n">calculate_gradient_penalty</span><span class="p">(</span><span class="n">critic</span><span class="p">,</span> <span class="n">real_images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">fake_images</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">critic_real</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">real_images</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c1"># 実際の画像に対するクリティックの平均出力．</span>
+                <span class="n">critic_fake</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">fake_images</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c1"># 生成された偽画像に対するクリティックの平均出力．</span>
+                <span class="n">gp</span> <span class="o">=</span> <span class="n">calculate_gradient_penalty</span><span class="p">(</span><span class="n">critic</span><span class="p">,</span> <span class="n">real_images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">fake_images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">GradientPenaltyCoefficient</span><span class="p">)</span> <span class="c1"># .dataは勾配計算からの除外を意味し，勾配ペナルティ計算時にテンソルの値のみを使用することを意味する．</span>
                 <span class="n">critic_loss</span> <span class="o">=</span> <span class="n">critic_fake</span> <span class="o">-</span> <span class="n">critic_real</span> <span class="o">+</span> <span class="n">gp</span>
                 <span class="n">critic_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
                 <span class="n">optimizerCritic</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
             <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-            <span class="n">generator_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">critic</span><span class="p">(</span><span class="n">fake_images</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="n">generator_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">critic</span><span class="p">(</span><span class="n">fake_images</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c1"># 生成された画像に対するクリティックの出力の負の平均．</span>
             <span class="n">generator_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
             <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2"> Critic Loss: </span><span class="si">{</span><span class="n">critic_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">, Generator Loss: </span><span class="si">{</span><span class="n">generator_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, Critic Loss: </span><span class="si">{</span><span class="n">critic_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">, Generator Loss: </span><span class="si">{</span><span class="n">generator_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                 <span class="n">generator</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
                 <span class="n">validation_noise</span> <span class="o">=</span> <span class="n">generate_noise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -914,158 +900,185 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">calculate_gradient_penalty</span><span class="p">(</span><span class="n">critic</span><span class="p">,</span> <span class="n">real_data</span><span class="p">,</span> <span class="n">fake_data</span><span class="p">,</span> <span class="n">GradientPenaltyCoefficient</span><span class="p">):</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="c1"># # expandはepsilonをreal_dataの形状に拡張するため．</span>
+    <span class="n">x_hat</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">real_data</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">*</span> <span class="n">fake_data</span> <span class="c1"># x_hatは実データと偽データの間の補間点．</span>
+    <span class="n">x_hat</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># requires_grad_(True)はx_hatに対する勾配を追跡するために付加．</span>
+    <span class="n">critic_x_hat</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">x_hat</span><span class="p">)</span>
+    <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">outputs</span><span class="o">=</span><span class="n">critic_x_hat</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">grad_outputs</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">critic_x_hat</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">create_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># x_hatに対するcritic_x_hatの勾配を計算．</span>
+    <span class="n">gradient_penalty</span> <span class="o">=</span> <span class="p">((</span><span class="n">gradients</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">GradientPenaltyCoefficient</span>
+    <span class="k">return</span> <span class="n">gradient_penalty</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="c1"># ハイパーパラメータの設定</span>
-    <span class="n">MiniBatchSize</span> <span class="o">=</span> <span class="mi">300</span>
-    <span class="n">NoiseSize</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．</span>
-    <span class="n">MaxEpoch</span> <span class="o">=</span> <span class="mi">300</span>
-    <span class="n">CriticLearningNumber</span> <span class="o">=</span> <span class="mi">5</span>
-    <span class="n">GradientPenaltyCoefficient</span> <span class="o">=</span> <span class="mi">10</span>
-
-    <span class="c1"># データセットの読み込み</span>
-    <span class="p">(</span><span class="n">learnX</span><span class="p">,</span> <span class="n">learnT</span><span class="p">),</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
-    <span class="n">learnX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">learnX</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">60000</span><span class="p">,</span> <span class="mi">784</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
-    <span class="n">learnX</span> <span class="o">=</span> <span class="p">(</span><span class="n">learnX</span> <span class="o">-</span> <span class="mf">127.5</span><span class="p">)</span> <span class="o">/</span> <span class="mf">127.5</span>
-
-    <span class="c1"># 生成器と識別器の構築</span>
-    <span class="n">generator</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span> <span class="c1"># 下のクラスを参照．</span>
-    <span class="n">critic</span> <span class="o">=</span> <span class="n">Critic</span><span class="p">()</span> <span class="c1"># 下のクラスを参照．</span>
-
-    <span class="c1"># オプティマイザは生成器と識別器で同じで良い．が，ハイパーパラメータを変えたくなるかもしれないからふたつ用意．</span>
-    <span class="n">optimizerGenerator</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span><span class="n">beta_1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">beta_2</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-    <span class="n">optimizerCritic</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span><span class="n">beta_1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">beta_2</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-
-    <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">runCritic</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">,</span> <span class="n">realInputVector</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">criticTape</span><span class="p">:</span>
-            <span class="n">generatedInputVector</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">noiseVector</span><span class="p">)</span> <span class="c1"># 生成器によるデータの生成．</span>
-            <span class="n">criticOutputFromGenerated</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">generatedInputVector</span><span class="p">)</span> <span class="c1"># その生成データを識別器に入れる．</span>
-            <span class="n">criticOutputFromReal</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">realInputVector</span><span class="p">)</span> <span class="c1"># 本物データを識別器に入れる．</span>
-            <span class="n">epsilon</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">generatedInputVector</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">intermediateVector</span> <span class="o">=</span> <span class="n">generatedInputVector</span> <span class="o">+</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="p">(</span><span class="n">realInputVector</span> <span class="o">-</span> <span class="n">generatedInputVector</span><span class="p">)</span>
-            <span class="c1"># 勾配ペナルティ</span>
-            <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">gradientPenaltyTape</span><span class="p">:</span>
-                <span class="n">gradientPenaltyTape</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">intermediateVector</span><span class="p">)</span>
-                <span class="n">criticOutputFromIntermediate</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">intermediateVector</span><span class="p">)</span>
-                <span class="n">gradientVector</span> <span class="o">=</span> <span class="n">gradientPenaltyTape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">criticOutputFromIntermediate</span><span class="p">,</span> <span class="n">intermediateVector</span><span class="p">)</span>
-                <span class="n">gradientNorm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gradientVector</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．</span>
-                <span class="n">gradientPenalty</span> <span class="o">=</span> <span class="n">GradientPenaltyCoefficient</span> <span class="o">*</span> <span class="p">(</span><span class="n">gradientNorm</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-            <span class="c1"># 識別器の成長</span>
-            <span class="n">criticCost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">criticOutputFromGenerated</span> <span class="o">-</span> <span class="n">criticOutputFromReal</span> <span class="o">+</span> <span class="n">gradientPenalty</span><span class="p">)</span> <span class="c1"># 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．</span>
-            <span class="n">gradientCritic</span> <span class="o">=</span> <span class="n">criticTape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">criticCost</span><span class="p">,</span> <span class="n">critic</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">)</span> <span class="c1"># 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．</span>
-            <span class="n">optimizerCritic</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradientCritic</span><span class="p">,</span> <span class="n">critic</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">criticCost</span>
-
-    <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">runGenerator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">generatorTape</span><span class="p">:</span>
-            <span class="n">generatedInputVector</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">noiseVector</span><span class="p">)</span> <span class="c1"># 生成器によるデータの生成．</span>
-            <span class="n">criticOutputFromGenerated</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">generatedInputVector</span><span class="p">)</span> <span class="c1"># その生成データを識別器に入れる．</span>
-            <span class="c1"># 生成器の成長</span>
-            <span class="n">generatorCost</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">criticOutputFromGenerated</span><span class="p">)</span> <span class="c1"># 生成器を成長させるためのコストを計算．</span>
-            <span class="n">gradientGenerator</span> <span class="o">=</span> <span class="n">generatorTape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">generatorCost</span><span class="p">,</span><span class="n">generator</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">)</span> <span class="c1"># 生成器のパラメータで勾配を計算．</span>
-            <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradientGenerator</span><span class="p">,</span><span class="n">generator</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">generatorCost</span>
-
-    <span class="c1"># ミニバッチセットの生成</span>
-    <span class="n">learnX</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(</span><span class="n">learnX</span><span class="p">)</span> <span class="c1"># このような方法を使うと簡単にミニバッチを実装することが可能．</span>
-    <span class="n">learnT</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(</span><span class="n">learnT</span><span class="p">)</span>
-    <span class="n">learnA</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">zip</span><span class="p">((</span><span class="n">learnX</span><span class="p">,</span> <span class="n">learnT</span><span class="p">))</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="mi">60000</span><span class="p">)</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">)</span> <span class="c1"># 今回はインプットデータしか使わないけど後にターゲットデータを使う場合があるため．</span>
-    <span class="n">miniBatchNumber</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">learnA</span><span class="o">.</span><span class="n">as_numpy_iterator</span><span class="p">()))</span>
-    <span class="c1"># 学習ループ</span>
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">MaxEpoch</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">criticCost</span><span class="p">,</span> <span class="n">generatorCost</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">learnx</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">learnA</span><span class="p">:</span>
-            <span class="c1"># WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CriticLearningNumber</span><span class="p">):</span>
-                <span class="n">noiseVector</span> <span class="o">=</span> <span class="n">generateNoise</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span> <span class="c1"># ミニバッチサイズで100個の要素からなるノイズベクトルを生成．</span>
-                <span class="n">criticCostPiece</span> <span class="o">=</span> <span class="n">runCritic</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">,</span> <span class="n">learnx</span><span class="p">)</span>
-                <span class="n">criticCost</span> <span class="o">+=</span> <span class="n">criticCostPiece</span> <span class="o">/</span> <span class="p">(</span><span class="n">CriticLearningNumber</span> <span class="o">*</span> <span class="n">miniBatchNumber</span><span class="p">)</span>
-            <span class="c1"># WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
-                <span class="n">noiseVector</span> <span class="o">=</span> <span class="n">generateNoise</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span> <span class="c1"># ミニバッチサイズで100個の要素からなるノイズベクトルを生成．</span>
-                <span class="n">generatorCostPiece</span> <span class="o">=</span> <span class="n">runGenerator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">)</span>
-                <span class="n">generatorCost</span> <span class="o">+=</span> <span class="n">generatorCostPiece</span> <span class="o">/</span> <span class="n">miniBatchNumber</span>
-        <span class="c1"># 疑似的なテスト</span>
-        <span class="k">if</span> <span class="n">epoch</span><span class="o">%</span><span class="k">10</span> == 0:
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">{:10d}</span><span class="s2"> D-cost </span><span class="si">{:6.4f}</span><span class="s2"> G-cost </span><span class="si">{:6.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">criticCost</span><span class="p">),</span><span class="nb">float</span><span class="p">(</span><span class="n">generatorCost</span><span class="p">)))</span>
-            <span class="n">validationNoiseVector</span> <span class="o">=</span> <span class="n">generateNoise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span>
-            <span class="n">validationOutput</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">validationNoiseVector</span><span class="p">)</span>
-            <span class="n">validationOutput</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">validationOutput</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">])</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">validationOutput</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="c1"># 入力されたデータを評価するネットワーク</span>
-<span class="k">class</span> <span class="nc">Critic</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Critic</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d3</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d4</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d2</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d3</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d4</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">y</span>
-
-<span class="c1"># 入力されたベクトルから別のベクトルを生成するネットワーク</span>
-<span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Generator</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d1</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d2</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d3</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d4</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">784</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">BatchNormalization</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">b2</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">BatchNormalization</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">b3</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">BatchNormalization</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d2</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d3</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b3</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d4</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">activations</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">y</span>
-
-<span class="k">def</span> <span class="nf">generateNoise</span><span class="p">(</span><span class="n">miniBatchSize</span><span class="p">,</span> <span class="n">randomNoiseSize</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">miniBatchSize</span><span class="p">,</span><span class="n">randomNoiseSize</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">generate_noise</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">noise_size</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">noise_size</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to ./data/MNIST/raw/train-images-idx3-ubyte.gz
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 9912422/9912422 [00:00&lt;00:00, 136478476.47it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting ./data/MNIST/raw/train-images-idx3-ubyte.gz to ./data/MNIST/raw
+
+Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to ./data/MNIST/raw/train-labels-idx1-ubyte.gz
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 28881/28881 [00:00&lt;00:00, 5881801.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting ./data/MNIST/raw/train-labels-idx1-ubyte.gz to ./data/MNIST/raw
+
+Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to ./data/MNIST/raw/t10k-images-idx3-ubyte.gz
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 1648877/1648877 [00:00&lt;00:00, 39559390.91it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting ./data/MNIST/raw/t10k-images-idx3-ubyte.gz to ./data/MNIST/raw
+
+Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to ./data/MNIST/raw/t10k-labels-idx1-ubyte.gz
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4542/4542 [00:00&lt;00:00, 14377757.56it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting ./data/MNIST/raw/t10k-labels-idx1-ubyte.gz to ./data/MNIST/raw
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 10, Critic Loss: -1.9940966367721558, Generator Loss: 20.64943504333496
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_11.png" src="../_images/pytorch_06_32_11.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 20, Critic Loss: -0.583886981010437, Generator Loss: 2.0302982330322266
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_13.png" src="../_images/pytorch_06_32_13.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 30, Critic Loss: -0.6589583158493042, Generator Loss: -1.6379354000091553
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_15.png" src="../_images/pytorch_06_32_15.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 40, Critic Loss: 0.011945217847824097, Generator Loss: -1.1564278602600098
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_17.png" src="../_images/pytorch_06_32_17.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 50, Critic Loss: -0.603103756904602, Generator Loss: -1.7278341054916382
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_19.png" src="../_images/pytorch_06_32_19.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 60, Critic Loss: -0.590256929397583, Generator Loss: -1.9534894227981567
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_21.png" src="../_images/pytorch_06_32_21.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 70, Critic Loss: -0.45454156398773193, Generator Loss: -2.1244874000549316
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_23.png" src="../_images/pytorch_06_32_23.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 80, Critic Loss: -0.9408407807350159, Generator Loss: -0.9475545287132263
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_25.png" src="../_images/pytorch_06_32_25.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 90, Critic Loss: 0.0461171418428421, Generator Loss: -0.7600011229515076
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_27.png" src="../_images/pytorch_06_32_27.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 100, Critic Loss: -0.2741048336029053, Generator Loss: -2.3561019897460938
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_29.png" src="../_images/pytorch_06_32_29.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 110, Critic Loss: -0.31326887011528015, Generator Loss: -1.7521822452545166
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_31.png" src="../_images/pytorch_06_32_31.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 120, Critic Loss: -0.22187454998493195, Generator Loss: -1.958808183670044
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_33.png" src="../_images/pytorch_06_32_33.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 130, Critic Loss: -0.1853249967098236, Generator Loss: -1.3306275606155396
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_35.png" src="../_images/pytorch_06_32_35.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 140, Critic Loss: -0.13288724422454834, Generator Loss: -2.683096408843994
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_37.png" src="../_images/pytorch_06_32_37.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 150, Critic Loss: -0.4680153727531433, Generator Loss: -2.392824411392212
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_39.png" src="../_images/pytorch_06_32_39.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 160, Critic Loss: -0.15517854690551758, Generator Loss: -3.3973352909088135
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_41.png" src="../_images/pytorch_06_32_41.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 170, Critic Loss: -0.5659467577934265, Generator Loss: -2.1569793224334717
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_43.png" src="../_images/pytorch_06_32_43.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 180, Critic Loss: -0.16363222897052765, Generator Loss: -1.0898158550262451
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_45.png" src="../_images/pytorch_06_32_45.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 190, Critic Loss: -0.22193998098373413, Generator Loss: -2.288491725921631
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_47.png" src="../_images/pytorch_06_32_47.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 200, Critic Loss: -0.12799209356307983, Generator Loss: -2.451430559158325
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_49.png" src="../_images/pytorch_06_32_49.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 210, Critic Loss: -0.4488948583602905, Generator Loss: -2.912799119949341
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_51.png" src="../_images/pytorch_06_32_51.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 220, Critic Loss: -0.20942074060440063, Generator Loss: -1.304951786994934
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_53.png" src="../_images/pytorch_06_32_53.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 230, Critic Loss: -0.06551165878772736, Generator Loss: -1.6173681020736694
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_55.png" src="../_images/pytorch_06_32_55.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 240, Critic Loss: -0.269016295671463, Generator Loss: -1.9656668901443481
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_57.png" src="../_images/pytorch_06_32_57.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 250, Critic Loss: -0.03428737819194794, Generator Loss: -1.9234592914581299
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_59.png" src="../_images/pytorch_06_32_59.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 260, Critic Loss: 0.05799926817417145, Generator Loss: -1.405828833580017
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_61.png" src="../_images/pytorch_06_32_61.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 270, Critic Loss: -0.300316721200943, Generator Loss: -2.0629777908325195
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_63.png" src="../_images/pytorch_06_32_63.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 280, Critic Loss: 0.1303752362728119, Generator Loss: -1.240586757659912
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_65.png" src="../_images/pytorch_06_32_65.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 290, Critic Loss: -0.030131295323371887, Generator Loss: -1.2877315282821655
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_67.png" src="../_images/pytorch_06_32_67.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 300, Critic Loss: 0.1307559609413147, Generator Loss: -2.6135411262512207
+</pre></div>
+</div>
+<img alt="../_images/pytorch_06_32_69.png" src="../_images/pytorch_06_32_69.png" />
 </div>
 </div>
 <p>このプログラムを実行すると，上の基本的な GAN を用いたときよりも奇麗な画像が出力されたのではないかと思います．また，生成器が綺麗な画像を出力しだす実時間も基本的な GAN を用いた場合よりも早かったのではないでしょうか．</p>
@@ -1074,38 +1087,50 @@ const thebe_selector_output = ".output, .cell_output"
 <p>WGAN-gp が優れた方法であることがわかりますね．</p>
 </div>
 <p>以下の部分はハイパーパラメータの設定部分ですが，基本的な GAN と比べて，<code class="docutils literal notranslate"><span class="pre">CriticLearningNumber</span></code> が新たに加わっています．これは，生成器のパラメータ更新 1 回に対してクリティックのパラメータ更新をさせる回数です．基本的な GAN の学習をうまく進めるために生成器の学習回数を増やすことがあるのですが，WGAN-gp ではクリティックの方の学習回数を増やします．また，<code class="docutils literal notranslate"><span class="pre">GradientPenaltyCoefficient</span></code> は勾配ペナルティに欠ける係数です．これはハイパーパラメータなのですが，元の論文では 10 に設定されていたため，ここでも 10 にしました．</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># ハイパーパラメータの設定</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># ハイパーパラメータの設定．</span>
     <span class="n">MiniBatchSize</span> <span class="o">=</span> <span class="mi">300</span>
-    <span class="n">NoiseSize</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># GANはランダムなノイズベクトルから何かを生成する方法なので，そのノイズベクトルのサイズを設定する．</span>
+    <span class="n">NoiseSize</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">MaxEpoch</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="n">CriticLearningNumber</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">GradientPenaltyCoefficient</span> <span class="o">=</span> <span class="mi">10</span>
 </pre></div>
 </div>
-<p>WGAN-gp では生成器とクリティックの学習回数を変えるため，パラメータ更新のための関数は別々に用意する必要があります．以下はクリティックのパラメータ更新を行うための記述です．</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">runCritic</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">,</span> <span class="n">realInputVector</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">criticTape</span><span class="p">:</span>
-            <span class="n">generatedInputVector</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">noiseVector</span><span class="p">)</span> <span class="c1"># 生成器によるデータの生成．</span>
-            <span class="n">criticOutputFromGenerated</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">generatedInputVector</span><span class="p">)</span> <span class="c1"># その生成データを識別器に入れる．</span>
-            <span class="n">criticOutputFromReal</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">realInputVector</span><span class="p">)</span> <span class="c1"># 本物データを識別器に入れる．</span>
-            <span class="n">epsilon</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">generatedInputVector</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">intermediateVector</span> <span class="o">=</span> <span class="n">generatedInputVector</span> <span class="o">+</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="p">(</span><span class="n">realInputVector</span> <span class="o">-</span> <span class="n">generatedInputVector</span><span class="p">)</span>
-            <span class="c1"># 勾配ペナルティ</span>
-            <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">gradientPenaltyTape</span><span class="p">:</span>
-                <span class="n">gradientPenaltyTape</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">intermediateVector</span><span class="p">)</span>
-                <span class="n">criticOutputFromIntermediate</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">intermediateVector</span><span class="p">)</span>
-                <span class="n">gradientVector</span> <span class="o">=</span> <span class="n">gradientPenaltyTape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">criticOutputFromIntermediate</span><span class="p">,</span> <span class="n">intermediateVector</span><span class="p">)</span>
-                <span class="n">gradientNorm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gradientVector</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># gradientNorm = tf.sqrt(tf.reduce_sum(tf.square(gradientVector), axis=1)) と書いても良い．</span>
-                <span class="n">gradientPenalty</span> <span class="o">=</span> <span class="n">GradientPenaltyCoefficient</span> <span class="o">*</span> <span class="p">(</span><span class="n">gradientNorm</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-            <span class="c1"># 識別器の成長</span>
-            <span class="n">criticCost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">criticOutputFromGenerated</span> <span class="o">-</span> <span class="n">criticOutputFromReal</span> <span class="o">+</span> <span class="n">gradientPenalty</span><span class="p">)</span> <span class="c1"># 識別器を成長させるためのコストを計算．WGANの元論文の式そのまま．</span>
-            <span class="n">gradientCritic</span> <span class="o">=</span> <span class="n">criticTape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">criticCost</span><span class="p">,</span> <span class="n">critic</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">)</span> <span class="c1"># 識別器のパラメータだけで勾配を計算．つまり生成器のパラメータは行わない．</span>
-            <span class="n">optimizerCritic</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradientCritic</span><span class="p">,</span> <span class="n">critic</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">criticCost</span>
+<p>以下のような学習ループを書きます．WGAN-gp では生成器とクリティックの学習回数を変えます．</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># 学習ループ．</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">MaxEpoch</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">real_images</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+            <span class="n">real_images</span> <span class="o">=</span> <span class="n">real_images</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">784</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">generate_noise</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">fake_images</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CriticLearningNumber</span><span class="p">):</span>
+                <span class="n">optimizerCritic</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="n">critic_real</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">real_images</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c1"># 実際の画像に対するクリティックの平均出力．</span>
+                <span class="n">critic_fake</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">fake_images</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c1"># 生成された偽画像に対するクリティックの平均出力．</span>
+                <span class="n">gp</span> <span class="o">=</span> <span class="n">calculate_gradient_penalty</span><span class="p">(</span><span class="n">critic</span><span class="p">,</span> <span class="n">real_images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">fake_images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">GradientPenaltyCoefficient</span><span class="p">)</span> <span class="c1"># .dataは勾配計算からの除外を意味し，勾配ペナルティ計算時にテンソルの値のみを使用することを意味する．</span>
+                <span class="n">critic_loss</span> <span class="o">=</span> <span class="n">critic_fake</span> <span class="o">-</span> <span class="n">critic_real</span> <span class="o">+</span> <span class="n">gp</span>
+                <span class="n">critic_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optimizerCritic</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            
+            <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">generator_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">critic</span><span class="p">(</span><span class="n">fake_images</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c1"># 生成された画像に対するクリティックの出力の負の平均．</span>
+            <span class="n">generator_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>上で紹介したクリティックのコストを計算するための記述が含まれています．上の式の <span class="math notranslate nohighlight">\(\epsilon\)</span> は <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> からはじまる行で生成されます．単に一様分布からのサンプリングです．<code class="docutils literal notranslate"><span class="pre">intermediateVector</span></code> は <span class="math notranslate nohighlight">\(\hat{x}\)</span> です．さらに，クリティックの出力に対してこの <span class="math notranslate nohighlight">\(\hat{x}\)</span> に対する勾配を計算する必要がありますが，それを行っているのが <code class="docutils literal notranslate"><span class="pre">gradientVector</span></code> の行の記述です．引き続き <code class="docutils literal notranslate"><span class="pre">gradientPenalty</span></code> を行っています．その下の <code class="docutils literal notranslate"><span class="pre">criticCost</span></code> からはじまる行はクリティックのコストを求める上の式そのものです．</p>
+<p>ここで普通の GAN と大きく異なる部分として勾配ペナルティの計算部分が挙げられます．勾配ペナルティは <code class="docutils literal notranslate"><span class="pre">calculate_gradient_penalty()</span></code> にて計算します．</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calculate_gradient_penalty</span><span class="p">(</span><span class="n">critic</span><span class="p">,</span> <span class="n">real_data</span><span class="p">,</span> <span class="n">fake_data</span><span class="p">,</span> <span class="n">GradientPenaltyCoefficient</span><span class="p">):</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="c1"># # expandはepsilonをreal_dataの形状に拡張するため．</span>
+    <span class="n">x_hat</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">real_data</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">*</span> <span class="n">fake_data</span> <span class="c1"># x_hatは実データと偽データの間の補間点．</span>
+    <span class="n">x_hat</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># requires_grad_(True)はx_hatに対する勾配を追跡するために付加．</span>
+    <span class="n">critic_x_hat</span> <span class="o">=</span> <span class="n">critic</span><span class="p">(</span><span class="n">x_hat</span><span class="p">)</span>
+    <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">outputs</span><span class="o">=</span><span class="n">critic_x_hat</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">grad_outputs</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">critic_x_hat</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">real_data</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">create_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># x_hatに対するcritic_x_hatの勾配を計算．</span>
+    <span class="n">gradient_penalty</span> <span class="o">=</span> <span class="p">((</span><span class="n">gradients</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">GradientPenaltyCoefficient</span>
+    <span class="k">return</span> <span class="n">gradient_penalty</span>
+</pre></div>
+</div>
+<p>上の式の <span class="math notranslate nohighlight">\(\epsilon\)</span> は <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> からはじまる行で生成されます．単に一様分布からのサンプリングです．<code class="docutils literal notranslate"><span class="pre">x_hat</span></code> は <span class="math notranslate nohighlight">\(\hat{x}\)</span> です．さらに，クリティックの出力に対してこの <span class="math notranslate nohighlight">\(\hat{x}\)</span> に対する勾配を計算する必要がありますが，それを行っているのが <code class="docutils literal notranslate"><span class="pre">gradients</span></code> の行の記述です．この行の <code class="docutils literal notranslate"><span class="pre">torch.autograd.grad()</span></code> は指定した出力（<code class="docutils literal notranslate"><span class="pre">outputs</span></code>）に関する指定した入力（<code class="docutils literal notranslate"><span class="pre">inputs</span></code>）の勾配を直接計算し，それを返します．<code class="docutils literal notranslate"><span class="pre">backward()</span></code> でも勾配を計算できるのですが，途中の特定のテンソルに関する勾配を直接取得することはできません．勾配ペナルティの計算のように，パラメータの更新ではなく，中間の勾配値自体に関心がある場合には <code class="docutils literal notranslate"><span class="pre">torch.autograd.grad()</span></code> が適しています．</p>
 <p>以下の記述は生成器のコストを求めるためのものです．<code class="docutils literal notranslate"><span class="pre">generatorCost</span></code> からはじまる行が生成器を求めるための上の式そのものなので理解しやすいのではないでしょうか．</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">runGenerator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">):</span>
@@ -1117,31 +1142,6 @@ const thebe_selector_output = ".output, .cell_output"
             <span class="n">gradientGenerator</span> <span class="o">=</span> <span class="n">generatorTape</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">generatorCost</span><span class="p">,</span><span class="n">generator</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">)</span> <span class="c1"># 生成器のパラメータで勾配を計算．</span>
             <span class="n">optimizerGenerator</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradientGenerator</span><span class="p">,</span><span class="n">generator</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">generatorCost</span>
-</pre></div>
-</div>
-<p>学習ループの部分は基本的な GAN のものとほぼ同じなのですが，識別器のパラメータ更新の回数を生成器のそれと変えるため，<code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">_</span> <span class="pre">in</span> <span class="pre">range(CriticLearningNumber):</span></code> の部分でハイパーパラメータとして設定した分だけパラメータ更新のループを設定しています．</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># 学習ループ</span>
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">MaxEpoch</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">criticCost</span><span class="p">,</span> <span class="n">generatorCost</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">learnx</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">learnA</span><span class="p">:</span>
-            <span class="c1"># WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CriticLearningNumber</span><span class="p">):</span>
-                <span class="n">noiseVector</span> <span class="o">=</span> <span class="n">generateNoise</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span> <span class="c1"># ミニバッチサイズで100個の要素からなるノイズベクトルを生成．</span>
-                <span class="n">criticCostPiece</span> <span class="o">=</span> <span class="n">runCritic</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">,</span> <span class="n">learnx</span><span class="p">)</span>
-                <span class="n">criticCost</span> <span class="o">+=</span> <span class="n">criticCostPiece</span> <span class="o">/</span> <span class="p">(</span><span class="n">CriticLearningNumber</span> <span class="o">*</span> <span class="n">miniBatchNumber</span><span class="p">)</span>
-            <span class="c1"># WGAN-gpでは識別器1回に対して生成器を複数回学習させるのでそのためのループ．</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
-                <span class="n">noiseVector</span> <span class="o">=</span> <span class="n">generateNoise</span><span class="p">(</span><span class="n">MiniBatchSize</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span> <span class="c1"># ミニバッチサイズで100個の要素からなるノイズベクトルを生成．</span>
-                <span class="n">generatorCostPiece</span> <span class="o">=</span> <span class="n">runGenerator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">critic</span><span class="p">,</span> <span class="n">noiseVector</span><span class="p">)</span>
-                <span class="n">generatorCost</span> <span class="o">+=</span> <span class="n">generatorCostPiece</span> <span class="o">/</span> <span class="n">miniBatchNumber</span>
-        <span class="c1"># 疑似的なテスト</span>
-        <span class="k">if</span> <span class="n">epoch</span><span class="o">%</span><span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">{:10d}</span><span class="s2"> D-cost </span><span class="si">{:6.4f}</span><span class="s2"> G-cost </span><span class="si">{:6.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">criticCost</span><span class="p">),</span><span class="nb">float</span><span class="p">(</span><span class="n">generatorCost</span><span class="p">)))</span>
-            <span class="n">validationNoiseVector</span> <span class="o">=</span> <span class="n">generateNoise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NoiseSize</span><span class="p">)</span>
-            <span class="n">validationOutput</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">validationNoiseVector</span><span class="p">)</span>
-            <span class="n">validationOutput</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">validationOutput</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">])</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">validationOutput</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
