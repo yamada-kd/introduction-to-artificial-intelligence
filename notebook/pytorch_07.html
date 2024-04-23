@@ -1359,6 +1359,9 @@ V_t=r_{t+1}+\gamma V_{t+1}
 <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="o">-</span><span class="mf">0.271</span> <span class="o">-</span><span class="mf">0.100</span>  <span class="mf">0.041</span>  <span class="mf">0.000</span>
 </pre></div>
 </div>
+<p>以上のようにグリッドワールドに関する問題を解くエージェントを構築できました．しかし，このエージェントはこのマップでしか答えを導き出せないでしょう．障害物の場所が少し変わるだけで機能しません．このマップに過学習しているということです．これに汎化性能を与えるためには様々な方法が考えられます．</p>
+<p>例えば，観測値を増やすことです．エージェントの左右上下のマップも情報も観測値として保有する方法が考えられます．そうすると，操作オブジェクトの上のマスに障害物がある場合はその方向には進まなくなるでしょう．</p>
+<p>また，その上でデータ（この場合はマップ）をたくさん生成して異なる種類の障害物や広さを繰り返し学習させることでエージェントは様々なシナリオに対応する能力を養うことができると考えられます．</p>
 </div>
 </div>
 <div class="section" id="openai-gym">
@@ -9559,7 +9562,7 @@ SUVORK5CYII=\
     }, 0);
   })()
 </script>
-</div><img alt="../_images/pytorch_07_79_2.png" src="../_images/pytorch_07_79_2.png" />
+</div><img alt="../_images/pytorch_07_80_2.png" src="../_images/pytorch_07_80_2.png" />
 </div>
 </div>
 <p>表示された動画を確認するとわかるように，このゲームは車の上に棒が設置されているもので，その棒が倒れないように車をうまく動かすというものです．次に，もう 1 個の描画方法を紹介します．以下のように書きます．</p>
@@ -46871,7 +46874,7 @@ QmCC\
     }, 0);
   })()
 </script>
-</div><img alt="../_images/pytorch_07_81_1.png" src="../_images/pytorch_07_81_1.png" />
+</div><img alt="../_images/pytorch_07_82_1.png" src="../_images/pytorch_07_82_1.png" />
 </div>
 </div>
 </div>
@@ -46922,7 +46925,7 @@ QmCC\
   deprecation(
 </pre></div>
 </div>
-<img alt="../_images/pytorch_07_84_1.png" src="../_images/pytorch_07_84_1.png" />
+<img alt="../_images/pytorch_07_85_1.png" src="../_images/pytorch_07_85_1.png" />
 </div>
 </div>
 <p>もう 1 個の画像の生成方法です．以下のようなプログラムを実行します．</p>
