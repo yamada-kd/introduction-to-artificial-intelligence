@@ -11,7 +11,7 @@
 
 # ### 強化学習法とは
 
-# 機械学習法は大きく分けて，教師あり学習法，教師なし学習法，強化学習法の 3 個に分類されます．教師あり学習法は入力データとそれに紐づいた教師データからなるデータを利用して，入力データに対して教師データに応じた出力をするように人工知能（機械学習モデル）を成長させるものです．強化学習法で成長させるものはエージェントと呼ばれる人工知能です．強化学習法をする際の登場人物は環境とエージェントのふたつです．エージェントが何らかの根拠に基づいて環境に作用します．例えば，ゲームで言うところの環境とはマップであったり空間であったり，そこに存在するキャラクターであったりしますが，それに作用するとは，プレイヤーの分身であるキャラクターを空間上で動かすこと等に相当します．このエージェントによる行動決定の根拠を方策と言います．強化学習法ではエージェントを成長させますが，これに与えるものは入力データと教師データの組み合わせではありません．エージェントは行動を選択した際のその行動の良さの指標である報酬という値を獲得します．エージェントは自身の行動に基づいてこの報酬を得ますが，環境の遷移が終わったとき（ゲームをクリアしたときや対戦の決着がついたとき）の報酬を最大化するように成長させられます．
+# 機械学習法は大きく分けて，教師あり学習法，教師なし学習法，強化学習法の 3 個に分類されます．教師あり学習法は入力データとそれに紐づいた教師データからなるデータを利用して，入力データに対して教師データに応じた出力をするように人工知能（機械学習モデル）を成長させるものです．強化学習法で成長させる人工知能は特にはエージェントと呼びます．強化学習法をする際の登場人物は環境とエージェントのふたつです．エージェントが何らかの根拠に基づいて環境に作用します．例えば，ゲームで言うところの環境とはマップであったり空間であったり，そこに存在するキャラクターであったりしますが，それに作用するとは，プレイヤーの分身であるキャラクターを空間上で動かすこと等に相当します．このエージェントによる行動決定の根拠を方策と言います．強化学習法ではエージェントを成長させますが，これに与えるものは入力データと教師データの組み合わせではありません．エージェントは行動を選択した際のその行動の良さの指標である報酬という値を獲得します．エージェントは自身の行動に基づいてこの報酬を得ますが，環境の遷移が終わったとき（ゲームをクリアしたときや対戦の決着がついたとき）の報酬を最大化するように成長させられます．
 # 
 # 
 # 
@@ -22,21 +22,23 @@
 
 # ### 用語の整理
 
-# 強化学習法ではこれまでの機械学習法では用いなかった用語を利用するため，それについての整理を行います．
+# 強化学習法では教師あり学習法や教師なし学習法では用いない用語を利用するため，それについての整理を行います．
 # 
-# **エージェント**とは強化学習法で成長させられる対象です．以下で紹介する Q 学習において成長させられるものは Q テーブルというものであるため厳密には違うのですが，エージェントはそれを参照して行動を決定するため，このように書きました．
+# **エージェント**とは強化学習法で成長させられる人工知能です．以下で紹介する Q 学習において成長させられるものは Q テーブルというものであるため厳密には違うのですが，エージェントはそれを参照して行動を決定するため，このように書きました．
 # 
 # **環境**とはエージェントが作用を及ぼす対象です．囲碁でいうところの盤面と碁が環境です．任天堂のマリオを動かすゲームでいうところのフィールドやマリオ等が環境です．この環境はエージェントが選択した行動によって遷移をします．
 # 
-# **報酬**とはエージェントを成長させるために与える得点です．何かの行動を選択した際に，その行動が良かったなら報酬をエージェントに与えます．エージェントは獲得できる報酬を最大化するように成長します．ただし，この行動に対して得られた報酬を即時的に処理してエージェントが成長するわけではありません．以下の価値関数のところで記述しますが，この報酬を長期的に獲得し続けた結果の価値という値を指標にしてエージェントは成長させられます．
+# **報酬**とはエージェントを成長させるために与える得点です．何かの行動を選択した際に，その行動が良かったなら報酬をエージェントに与えます．エージェントは獲得できる報酬の和を最大化するように成長します．ただし，この行動に対して得られた報酬を即時的に処理してエージェントが成長するわけではありません．以下の価値関数のところで記述しますが，この報酬を長期的に獲得し続けた結果の価値という値を指標にしてエージェントは成長させられます．
 # 
-# **価値関数**とはその他の機械学習法でいうところの評価関数です．価値関数はさらに状態価値関数と行動価値関数というものに細分化されます．状態価値関数とはある方策のもとにおいて，ある状態であった場合に将来的にもらえる報酬の和を出力する関数です．一方で，行動価値関数とは，ある方策のもとである状態であった場合にある行動を選択したときにもらえる報酬の和を出力する関数です．これは以下の節で紹介する Q 学習において Q 値と呼ばれる値です．報酬と価値は似て非なるものです．報酬はエージェントが何らかの行動を選択したときに即時的に得られる値ですが，価値は得られる報酬の期待値です．ここで報酬の和と表現した値です．
+# **価値**とはエージェントが獲得する報酬の和です．報酬と価値は似て非なるものです．報酬はエージェントが何らかの行動を選択したときに即時的に得られる値ですが，価値は得られる報酬の期待値です．
+# 
+# **価値関数**とはその他の機械学習法でいうところの評価関数です．価値関数はさらに状態価値関数と行動価値関数というものに細分化されます．状態価値関数とはある方策のもとにおいて，ある状態であった場合に将来的にもらえる価値（報酬の和）を出力する関数です．一方で，行動価値関数とは，ある方策のもとである状態であった場合にある行動を選択したときにもらえる価値を出力する関数です．これは以下の節で紹介する Q 学習において Q 値と呼ばれる値です．
 # 
 # **方策**とはエージェントが行動を選択するために利用するルールです．意思決定則です．これに基づいてエージェントは行動を決定します．以下の項で紹介する方策ベース法では方策関数というものを利用しますが，これは現在の環境の状態を入力として行動（または行動の確率）を出力する関数です．
 # 
-# **エピソード**とはエージェントが環境に作用し環境の遷移が何らかの停止条件に到達し終了するまでの時間の単位です．エピソードの中において環境が遷移する時間の単位はステップとかサイクルと言います．全ステップが 1 エピソードということです．
+# **エピソード**とはエージェントが環境に作用し環境の遷移が何らかの停止条件に到達し終了するまでの時間の単位です．エピソードの中において環境が遷移する時間の単位はステップとかサイクルと言います．全ステップが1エピソードということです．
 # 
-# **割引率**とは $\gamma$ で表される値です．エピソードの最初から最後までの報酬の和を価値と言いますが，現在の状態から未来の報酬を計算する場合，不確定要素が入ってくることを避けれません．それを吸収するために未来の報酬に 0 から 1 の間の値である $\gamma$ を掛けたもので和を計算します．この場合の報酬を割引報酬と言い，これを合計することで価値を計算します．割引報酬を利用した場合の時刻 $t$ における価値 $V_t$ は時刻 $t+1$ における報酬 $r_{t+1}$ を用いて以下のように表されます．
+# **割引率**とは $\gamma$ で表される値です．エピソードの最初から最後までの報酬の和を価値と呼ぶことは上述の通りですが，現在の状態から未来の報酬を計算する場合，不確定要素が入ってくることを避けれません．それを吸収するために未来の報酬に0から1の間の値である $\gamma$ を掛けたもので和を計算します．この場合の報酬を割引報酬と言い，これを合計することで価値を計算します．割引報酬を利用した場合の時刻 $t$ における価値 $V_t$ は時刻 $t+1$ における報酬 $r_{t+1}$ を用いて以下のように表されます．
 # 
 # $
 # V_t=r_{t+1}+\gamma V_{t+1}
@@ -44,7 +46,7 @@
 # 
 # 未来の報酬の重要度が下がるということになります．この値を調節することで未来の報酬をどれだけ重要視するかということを決めることができます．
 # 
-# **グリーディ**（greedy）な方法とは長期的に考えればより良い解が見つかることを考慮せずに，短期的に最も良いと考えられる解を見つけようとする方法のことです．貪欲法と言います．これは強化学習の分野における専門的な言葉ではありません．この教材でははじめて出したような気がしたのでここで一応まとめてみました．
+# **グリーディ**（greedy）な方法とは長期的に考えればより良い解が見つかることを考慮せずに，短期的に最も良いと考えられる解を見つけようとする方法のことです．貪欲法と言います．これは強化学習の分野における専門的な言葉ではありません．
 # 
 
 # ### 強化学習法の種類
@@ -68,7 +70,7 @@
 # 方策ベース法とは，エージェントが何らかの方策（ニューラルネットワークによって記述されるルールとか）を持っており，その方法を改善する方法です．価値ベース法とは，行動から価値を得て（価値関数の値を推定して），その価値を高める方策を選択する方法です．エージェントの詳細な制御方法がわからなくてもエピソードが成功裏に終わらせたという価値をもとにエージェントの成長をさせる方法です．
 # ```
 
-# ```{hint}
+# ```{note}
 # より詳しく学びたい人は Bellman 方程式について調べてみてください．
 # ```
 
@@ -84,9 +86,9 @@
 
 # 以下のような 5 行 4 列の行列を考えます．これはフィールドです．このフィールド上で何らかのオブジェクト（人でも犬でも何でも良いです）を動かしてゴール（G）を目指すこととします．オブジェクトはフィールド上のグリッド線で囲まれたどこかの位置に存在できることとします．このグリッド線で囲まれた位置のことをこれ以降マスと呼びます．オブジェクトは上下左右に動かせるものとします．ただし，フィールドは壁に囲まれているとします．つまり，オブジェクトはこの 5 行 4 列のフィールドの外には出られません．また，フィールドには障害物（X）があり，障害物が存在する位置にオブジェクトは行けないこととします．オブジェクトは最初ゴールでも障害物でもないオブジェクトが移動可能な普通のマス（S），座標にして `(4, 0)` に位置しているものとします．このオブジェクトをうまく移動させてゴールまで導くエージェントを作ることをここでの問題とします．
 # 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/field.svg?raw=1" width="100%" />
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/field.svg?raw=1" width="100%" />
 
-# ```{hint}
+# ```{note}
 # 左上のマスを `(0, 0)` として右下のマスを `(4, 3)` とします．つまり行列の要素の呼び方と同じですね．
 # ```
 
@@ -100,7 +102,7 @@
 # 
 # このような状況において，Q 学習では報酬を最大化するために参照する Q テーブルなるものを構築します．学習の過程でこの Q テーブルは更新されます．エージェントは良い Q テーブルを参照することによってより良い性能でオブジェクトを的確に動かせるようになります．つまり，Q 学習で成長させられるものは Q テーブルです．Q テーブルには Q 値が格納されます．というよりは Q 値の集合が Q テーブルです．Q 値は環境がある状態 $s$ にあるときに $a$ というアクションをエージェントがとることの良さを示す値です．$Q(s,a)$ と表します．
 
-# ```{hint}
+# ```{note}
 # 例えば，あるマス「`(4, 0)`」という「状態」でエージェントがオブジェクトを「上に移動させる」という「アクション」をとったときの良さを表すものが Q 値です．
 # ```
 
@@ -118,7 +120,7 @@
 # 
 # この式において，$\max Q(s',a')$ は現在の行動によって遷移した状態において取り得るすべての行動（この場合上下左右の 4 個）に対する Q 値の中で最も大きな値のことです．
 
-# ```{hint}
+# ```{note}
 # TD 誤差の部分を確認していただければわかるように，Q 値の更新式はある状態から次の状態に遷移したとき，最初の状態の Q 値を次の状態の最も大きな Q 値と報酬の和に近づけることを意味しています．例えば，ゴール直前の状態とそのひとつ前の状態を考えたとき，ひとつ前の状態の Q 値はゴール直前の状態に遷移しようとするように値が大きくなります．
 # ```
 
@@ -149,7 +151,7 @@ def main():
     env = Environment()
     observation = env.reset()
     agent = Agent(alpha=0.1, epsilon=0.3, gamma=0.9, actions=np.arange(4), observation=observation)
-    
+
     for episode in range(1, 50+1):
         rewards = []
         observation = env.reset() # 環境の初期化．
@@ -172,7 +174,7 @@ class Environment:
         self.done = False
         self.reward = None
         self.iteration = None
-    
+
     # 以下は環境を初期化する関数．
     def reset(self):
         self.objectPosition = 4, 0
@@ -180,7 +182,7 @@ class Environment:
         self.reward = None
         self.iteration = 0
         return self.objectPosition
-    
+
     # 以下は環境を進める関数．
     def step(self, action):
         self.iteration += 1
@@ -204,7 +206,7 @@ class Environment:
                 self.reward = 100
             self.objectPosition = y, x
             return self.objectPosition, self.reward, self.done
-    
+
     # 以下は移動が可能かどうかを判定する関数．
     def checkMovable(self, x, y, action):
         if action == self.actions["up"]:
@@ -233,7 +235,7 @@ class Agent:
         self.observation = str(observation)
         self.qValues = {} # Qテーブル
         self.qValues[self.observation] = np.repeat(0.0, len(self.actions))
-    
+
     # 以下の関数は行動を選択する関数．
     def act(self, observation):
         self.observation = str(observation)
@@ -242,7 +244,7 @@ class Agent:
         else:
             action = np.argmax(self.qValues[self.observation]) # 最もQ値が高い行動を選択．
         return action
-    
+
     # 以下はQテーブルを更新する関数．
     def update(self, objectNewPosition, action, reward):
         objectNewPosition = str(objectNewPosition)
@@ -518,7 +520,7 @@ def main():
     env = Environment()
     observation = env.reset()
     agent = Agent(alpha=0.1, epsilon=0.3, gamma=0.9, actions=np.arange(4), observation=observation)
-    
+
     for episode in range(1, 50+1):
         rewards = []
         observation = env.reset() # 環境の初期化．
@@ -543,7 +545,7 @@ class Environment:
         self.done = False
         self.reward = None
         self.iteration = None
-    
+
     # 以下は環境を初期化する関数．
     def reset(self):
         self.objectPosition = 4, 0
@@ -551,7 +553,7 @@ class Environment:
         self.reward = None
         self.iteration = 0
         return self.objectPosition
-    
+
     # 以下は環境を進める関数．
     def step(self, action):
         self.iteration += 1
@@ -575,7 +577,7 @@ class Environment:
                 self.reward = 100
             self.objectPosition = y, x
             return self.objectPosition, self.reward, self.done
-    
+
     # 以下は移動が可能かどうかを判定する関数．
     def checkMovable(self, x, y, action):
         if action == self.actions["up"]:
@@ -594,7 +596,7 @@ class Environment:
             return False
         else:
             return True
-    
+
     # 以下はフィールドとオブジェクト（8）の様子を可視化する関数．
     def render(self):
         y, x = self.objectPosition
@@ -619,7 +621,7 @@ class Agent:
         self.observation = str(observation)
         self.qValues = {} # Qテーブル
         self.qValues[self.observation] = np.repeat(0.0, len(self.actions))
-    
+
     # 以下の関数は行動を選択する関数．
     def act(self, observation):
         self.observation = str(observation)
@@ -628,7 +630,7 @@ class Agent:
         else:
             action = np.argmax(self.qValues[self.observation]) # 最もQ値が高い行動を選択．
         return action
-    
+
     # 以下はQテーブルを更新する関数．
     def update(self, objectNewPosition, action, reward):
         objectNewPosition = str(objectNewPosition)
@@ -701,7 +703,7 @@ def main():
     env = Environment()
     observation = env.reset()
     agent = Agent(alpha=0.1, epsilon=0.3, gamma=0.9, actions=np.arange(4), observation=observation)
-    
+
     for episode in range(1, 50+1):
         rewards = []
         observation = env.reset() # 環境の初期化．
@@ -727,7 +729,7 @@ class Environment:
         self.done = False
         self.reward = None
         self.iteration = None
-    
+
     # 以下は環境を初期化する関数．
     def reset(self):
         self.objectPosition = 4, 0
@@ -735,7 +737,7 @@ class Environment:
         self.reward = None
         self.iteration = 0
         return self.objectPosition
-    
+
     # 以下は環境を進める関数．
     def step(self, action):
         self.iteration += 1
@@ -759,7 +761,7 @@ class Environment:
                 self.reward = 100
             self.objectPosition = y, x
             return self.objectPosition, self.reward, self.done
-    
+
     # 以下は移動が可能かどうかを判定する関数．
     def checkMovable(self, x, y, action):
         if action == self.actions["up"]:
@@ -778,7 +780,7 @@ class Environment:
             return False
         else:
             return True
-    
+
     # 以下はフィールドとオブジェクト（8）の様子を可視化する関数．
     def render(self):
         y, x = self.objectPosition
@@ -803,7 +805,7 @@ class Agent:
         self.observation = str(observation)
         self.qValues = {} # Qテーブル
         self.qValues[self.observation] = np.repeat(0.0, len(self.actions))
-    
+
     # 以下の関数は行動を選択する関数．
     def act(self, observation):
         self.observation = str(observation)
@@ -812,7 +814,7 @@ class Agent:
         else:
             action = np.argmax(self.qValues[self.observation]) # 最もQ値が高い行動を選択．
         return action
-    
+
     # 以下はQテーブルを更新する関数．
     def update(self, objectNewPosition, action, reward):
         objectNewPosition = str(objectNewPosition)
@@ -821,7 +823,7 @@ class Agent:
         q = self.qValues[self.observation][action]  # Q(s,a)の計算．
         maxQ = max(self.qValues[objectNewPosition])  # max(Q(s',a'))の計算．
         self.qValues[self.observation][action] = q + (self.alpha * (reward + (self.gamma * maxQ) - q)) # Q'(s, a) = Q(s, a) + alpha * (reward + gamma * maxQ(s',a') - Q(s, a))の計算．
-    
+
     # 以下はQテーブルを出力する関数．
     def outputQTable(self):
         print("Q-table:    Up   Down   Left  Right")
@@ -873,7 +875,7 @@ if __name__ == "__main__":
 
 # OpenAI Gym を利用すると様々なゲームを Python からコントロールできるようになります．スーパーマリオブラザーズ等の有名なゲームも Python コード上で構築したエージェントが動かすことができるようになります．たくさんの Atari のゲームも動かすことができます．
 
-# ```{hint}
+# ```{note}
 # ただし，現在の OpenAI Gym には ROM ファイルは同梱されていません．著作権の問題なのかもしれませんが，詳しい事情は知りません．よって，マリオのゲームや Atari のゲームを利用したい場合はどこかからか ROM ファイルを入手する必要があります．
 # ```
 
@@ -1008,7 +1010,7 @@ if __name__ == "__main__":
     main()
 
 
-# ```{hint}
+# ```{note}
 # 描画をする前にこのコマンドを打たなければなりません．これを打つ前に以下にあるプログラムを実行するとエラーが出ます．気をつけてください．やってしまった場合はグーグルコラボラトリーのランタイムを削除して再起動してやり直してください．
 # ```
 
@@ -1275,21 +1277,21 @@ def main():
     minibatchSize = 32
     middleUnitSize = 128
     dropoutRate = 0.2
-    
+
     # 環境の生成．
     env = gym.make("CartPole-v1")
     env.seed(0) # 再現性確保のため乱数の種は絶対に指定する．
-    
+
     # 環境情報の取得．
     actionShape = env.action_space.n # ニューラルネットワークの出力サイズを指定するため取得．
     observationShape = env.observation_space.shape # ニューラルネットワークの入力サイズを指定するため取得．
-    
+
     # リプレイバッファの生成．
     experiences = deque(maxlen=replaySize) # 記憶を溜めるためのリスト．
-    
+
     # エージェントの生成．
     agent = Agent(epsilon, epsilonDecayRate, minimumEpsilon, gamma, actionShape, observationShape, middleUnitSize, minibatchSize, dropoutRate)
-      
+
     for episode in range(1, 200+1):
         observation = env.reset()
         rewards, costs = [], [] # エピソード毎に報酬とニューラルネットワークの学習コストを溜めるリスト．
@@ -1306,7 +1308,7 @@ def main():
         if len(experiences) >= minibatchSize:
             agent.update() # エピソードの最後にターゲットネットワーク（targetModel）の更新．
         print("Episode: {:3d}, Number of steps: {:3d}, Mean reward: {:3.1f}, Cost: {:5.3f}".format(episode, len(rewards), np.mean(rewards), np.mean(costs)))
-        
+
     # 以下はテスト結果を可視化するため．
     observation = env.reset()
     done = False
@@ -1334,7 +1336,7 @@ class Agent:
         self.minibatchSize = minibatchSize
         self.mseComputer = tf.keras.losses.MeanSquaredError() # Q値は右に動かすか左に動かすかの値なのでそれと同じになるように二乗誤差をコストとする．元の論文だとフーバーロスを利用．
         self.optimizer = tf.keras.optimizers.Adam()
-    
+
     # 以下の関数はイプシロングリーディ法を利用して行動を選択する関数．
     def act(self, observation):
         if np.random.uniform() < self.epsilon:
@@ -1343,13 +1345,13 @@ class Agent:
             action = np.argmax(self.targetModel(observation.reshape(1,-1), False)[0].numpy()) # 最もQ値が高い行動を選択．予測はターゲットネットワークで行う．
         self.epsilonDecay() # イプシロンの値を少しずつ小さくする．
         return action
-    
+
     # 以下の関数はイプシロンを少しずつ小さくするためのもの．
     def epsilonDecay(self):
         self.epsilon = self.epsilon * self.epsilonDecayRate
         if self.epsilon < self.minimumEpsilon:
             self.epsilon = self.minimumEpsilon
-    
+
     @tf.function
     def run(self, tx, tt, flag):
         with tf.GradientTape() as tape:
@@ -1359,7 +1361,7 @@ class Agent:
         gradient = tape.gradient(costvalue, self.qModel.trainable_variables) # 勾配の計算．
         self.optimizer.apply_gradients(zip(gradient, self.qModel.trainable_variables)) # 最適化．
         return costvalue
-    
+
     # 以下の関数はQネットワークの学習のため．
     def learn(self, experiences):
         instances = random.sample(experiences, self.minibatchSize) # リプレイバッファからミニバッチサイズ分のデータを抽出．
@@ -1377,7 +1379,7 @@ class Agent:
                 qValues[i][action] = reward + self.gamma * np.max(newQValues[i])
         learncostvalue = self.run(observationInstances, qValues, True)
         return learncostvalue
-    
+
     # 以下の関数はターゲットネットワークの更新（Qネットワークと同じにすること）のため．
     def update(self):
         self.targetModel.set_weights(self.qModel.get_weights())
@@ -1406,7 +1408,7 @@ if __name__ == "__main__":
 
 # 実行した結果，エピソードに対して，ゲームを継続することができたステップ数，エピソード毎の平均報酬とニューラルネットワークのコストが出力されました．ステップ数は学習を経るにつれて増えていると思います．また，平均報酬は常に `1.0` となっているはずです．ゲーム終了までの間，1 単位時間ゲームを継続すると報酬が 1 ポイントもらえるというシステムなので，平均報酬は `1.0` となるのです．また，テストを実行した結果すると棒が倒れずに維持される動画を確認できると思います．GPU の利用や乱数の種の状況によっては異なる結果が得られているかもしれません．
 # 
-# <img src="https://github.com/yamada-kd/binds-training/blob/main/image/cartpole.gif?raw=1" />
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/cartpole.gif?raw=1" />
 # 
 
 # 以下の部分ではハイパーパラメータを設定します．
