@@ -655,13 +655,13 @@ if __name__ == '__main__':
 
 # モデルを生成する以下の部分が前項のコードと異なります．マルチヘッドアテンションのヘッド数とアテンション層の個数を指定する必要があります．
 # 
-# ```Python
+# ```python
 #     model = Network(vocab_size, embed_size, attention_head, attention_layer, output_size).to(device)
 # ```
 
 # 実際のクラスは以下のように書きます．位置エンコードは以前のコード同様に利用する必要があります．
 # 
-# ```Python
+# ```python
 # class Network(nn.Module):
 #     def __init__(self, vocab_size, embed_size, nhead, num_encoder_layers, output_size):
 #         super(Network, self).__init__()
