@@ -895,6 +895,13 @@ if __name__ == "__main__":
 # この OpenAI Gym はその更新もサポートも少なくとも2024年において既に終了しています．現役時には，更新によって頻繁にコマンドが変更され利用する環境によって容易にバグが発生していましたので，強化学習の練習をするためには逆に良いのかもしれません．いつまで利用し続けられるかは不明です．代替品には Gymnasium があります．
 # ```
 
+# この教材ではバージョンが古くなってしまったことによる警告を無視するために以下のコマンドを付加しています．
+# 
+# ```python
+# import warnings
+# warnings.simplefilter("ignore", DeprecationWarning)
+# ```
+
 # ### インストール
 
 # 以下のようなコマンドを打つことで OpenAI Gym をインストールすることができます．グーグルコラボラトリーにはあらかじめインストールされているためこのコマンドは打つ必要はありません．打っても良いです．
@@ -916,7 +923,7 @@ get_ipython().system(' pip install gym')
 from gym import envs
 
 def main():
-    envids = [spec.id for spec in envs.registry.all()]
+    envids = [spec.id for spec in envs.registry.values()]
     print("The number of environments:", len(envs.registry.values())) # 全ての環境の個数を出力．
     for envid in envids:
         print(envid)
@@ -932,13 +939,15 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import gym
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
-    env = gym.make("CartPole-v1", new_step_api=True)
+    env = gym.make("CartPole-v1")
     observation = env.reset() # 環境の初期化，リセット．
     print(1, observation)
     action = env.action_space.sample() # ランダムな行動選択．強化学習をする際はここはエージェントによる行動選択となる．
-    observation, reward, done, truncated, info = env.step(action) # 環境の遷移．現在の状況に対して行動を行って，次の状態，報酬，停止条件の真偽，中断されたかどうか，ゲーム状態を出力．
+    observation, reward, done, info = env.step(action) # 環境の遷移．現在の状況に対して行動を行って，次の状態，報酬，停止条件の真偽，中断されたかどうか，ゲーム状態を出力．
     print(2, observation)
 
 if __name__ == "__main__":
@@ -962,6 +971,8 @@ if __name__ == "__main__":
 
 #!/usr/bin/env python3
 import gym
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
     env = gym.make("CartPole-v1")
@@ -1018,9 +1029,11 @@ import gym
 from IPython import display
 import matplotlib.pyplot as plt
 from matplotlib import animation
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
-    env = gym.make('CartPole-v1')
+    env = gym.make("CartPole-v1")
 
     images = [] # 描画のための記述
     ax = plt.gca() # 描画をきれいにするための記述
@@ -1053,6 +1066,8 @@ import gym
 from IPython import display
 import matplotlib.pyplot as plt
 from matplotlib import animation
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
     env = gym.make("MountainCar-v0")
@@ -1090,9 +1105,11 @@ if __name__ == "__main__":
 import gym
 import matplotlib.pyplot as plt
 from matplotlib import animation
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
-    env = gym.make('CartPole-v1')
+    env = gym.make("CartPole-v1")
 
     images = []
     ax = plt.gca()
@@ -1123,6 +1140,8 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import gym
 import imageio
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
     env = gym.make("MountainCar-v0")
@@ -1161,7 +1180,7 @@ if __name__ == "__main__":
 # \displaystyle Q'(s,a)=Q(s,a)+\alpha(r+\gamma\max Q(s',a')-Q(s,a))
 # $
 # 
-# これにたいしてニューラルネットワークの学習に用いる教師データは $r+\gamma\max Q(s',a')$ の部分です．停止条件に到達した場合は，$s'$ も $a'$ もないので，$r$ のみが教師データになります．深層 Q 学習に登場するニューラルネットワークはこの教師データと同じような出力ができるように成長します．
+# これに対してニューラルネットワークの学習に用いる教師データは $r+\gamma\max Q(s',a')$ の部分です．これは上述のように目標とする価値でしたね．つまりこの目標価値を教師データとします．停止条件に到達した場合は，$s'$ も $a'$ もないので，$r$ のみが教師データになります．深層 Q 学習に登場するニューラルネットワークはこの教師データと同じような出力ができるように成長します．
 
 # ```{note}
 # 強化学習なのに教師あり学習．不思議ですね．摩訶不思議です．
@@ -1169,7 +1188,7 @@ if __name__ == "__main__":
 
 # ### 計算の概要
 
-# 深層 Q 学習がどのように計算されるかについて紹介します．エージェントは 2 個のニューラルネットワークを持ちます．ひとつは Q ネットワークと呼ばれるもので，もうひとつはターゲットネットワークと呼ばれるものです．Q ネットワークは Q 値を学習するためのネットワークです．学習の最中にもニューラルネットワークによって Q 値は常に計算され続けるのですが，その計算にこのネットワークを使うのは良くなさそうです．なぜなら，報酬を教師データとしてその都度成長させられるネットワークを使って，別の状態における Q 値を計算しようとすると，常に別の条件（パラメータ）によって Q 値を計算してしまうからです．よって，パラメータ更新の頻度が少ない別のネットワークを利用して Q 値を計算しますが，それがターゲットネットワークです．
+# 深層 Q 学習がどのように計算されるかについて紹介します．エージェントは2個のニューラルネットワークを持ちます．ひとつは Q ネットワークと呼ばれるもので，もうひとつはターゲットネットワークと呼ばれるものです．Q ネットワークは Q 値を学習するためのネットワークです．学習の最中にもニューラルネットワークによって Q 値は常に計算され続けるのですが，その計算にこのネットワークを使うのは良くなさそうです．なぜなら，報酬を教師データとしてその都度成長させられるネットワークを使って，別の状態における Q 値を計算しようとすると，常に別の条件（パラメータ）によって Q 値を計算してしまうからです．よって，パラメータ更新の頻度が少ない別のネットワークを利用して Q 値を計算しますが，それがターゲットネットワークです．
 # 
 # 1.   環境の初期化をする．
 # 2.   エージェントによる行動選択をする．このときのネットワークにはターゲットネットワークを利用する．
@@ -1208,14 +1227,18 @@ if __name__ == "__main__":
 from IPython import display
 import matplotlib.pyplot as plt
 from matplotlib import animation
-import tensorflow as tf
-import random
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
-from collections import deque
 import gym
+import random
+from collections import deque
 random.seed(0)
 np.random.seed(0)
-tf.random.set_seed(0)
+torch.manual_seed(0)
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def main():
     # ハイパーパラメータの設定．
@@ -1230,7 +1253,7 @@ def main():
 
     # 環境の生成．
     env = gym.make("CartPole-v1")
-    env.seed(0) # 再現性確保のため乱数の種は絶対に指定する．
+    env.reset(seed=0) # 再現性確保のため乱数の種は絶対に指定する．
 
     # 環境情報の取得．
     actionShape = env.action_space.n # ニューラルネットワークの出力サイズを指定するため取得．
@@ -1245,8 +1268,9 @@ def main():
     for episode in range(1, 200+1):
         observation = env.reset()
         rewards, costs = [], [] # エピソード毎に報酬とニューラルネットワークの学習コストを溜めるリスト．
-        while True:
-            action = agent.act(observation) # エージェントによる行動の選択．これはターゲットネットワークによる選択．
+        done = False
+        while not done:
+            action = agent.act(torch.tensor(observation, dtype=torch.float32).unsqueeze(0)) # エージェントによる行動の選択．これはターゲットネットワークによる選択．
             newObservation, reward, done, _ = env.step(action) # 環境を進める．
             rewards.append(reward)
             experiences.append({"observation": observation, "action": action, "reward": reward, "newObservation": newObservation, "done": done}) # 経験を蓄積．
@@ -1254,7 +1278,6 @@ def main():
             if len(experiences) >= minibatchSize: # ミニバッチのサイズに達するまで経験がたまったらニューラルネットワークの学習を開始する．
                 cost = agent.learn(experiences) # Qネットワーク（qModel）の学習．
                 costs.append(cost)
-            if done: break
         if len(experiences) >= minibatchSize:
             agent.update() # エピソードの最後にターゲットネットワーク（targetModel）の更新．
         print("Episode: {:3d}, Number of steps: {:3d}, Mean reward: {:3.1f}, Cost: {:5.3f}".format(episode, len(rewards), np.mean(rewards), np.mean(costs)))
@@ -1265,7 +1288,7 @@ def main():
     frame = plt.imshow(env.render("rgb_array"))
     frames = [[frame]]
     while not done:
-        action = agent.act(observation)
+        action = agent.act(torch.tensor(observation, dtype=torch.float32))
         observation, reward, done, _ = env.step(action)
         frame = plt.imshow(env.render(mode="rgb_array")) # 描画のための記述
         frames.append([frame])
@@ -1281,20 +1304,21 @@ class Agent:
         self.gamma = gamma
         self.actionShape = actionShape
         self.observationShape = observationShape
-        self.qModel = Network(middleUnitSize, self.actionShape, dropoutRate) # Q値をその都度学習するためのネットワーク．
-        self.targetModel = Network(middleUnitSize, self.actionShape, dropoutRate) # Q値を計算するためのネットワーク．エピソードが終わる度にQネットワークと同じパラメータに同期される．
+        self.qModel = Network(self.observationShape[0], middleUnitSize, self.actionShape, dropoutRate) # Q値をその都度学習するためのネットワーク．
+        self.targetModel = Network(self.observationShape[0], middleUnitSize, self.actionShape, dropoutRate) # Q値を計算するためのネットワーク．エピソードが終わる度にQネットワークと同じパラメータに同期される．
         self.minibatchSize = minibatchSize
-        self.mseComputer = tf.keras.losses.MeanSquaredError() # Q値は右に動かすか左に動かすかの値なのでそれと同じになるように二乗誤差をコストとする．元の論文だとフーバーロスを利用．
-        self.optimizer = tf.keras.optimizers.Adam()
+        self.optimizer = optim.Adam(self.qModel.parameters())
+        self.criterion = nn.MSELoss() # Q値は右に動かすか左に動かすかの値なのでそれと同じになるように二乗誤差をコストとする．元の論文だとフーバーロスを利用．
 
     # 以下の関数はイプシロングリーディ法を利用して行動を選択する関数．
     def act(self, observation):
-        if np.random.uniform() < self.epsilon:
-            action = np.random.randint(self.actionShape) # イプシロンの確率でランダムに行動する．
+        if random.random() < self.epsilon:
+            return random.randint(0, self.actionShape -1) # イプシロンの確率でランダムに行動する．
         else:
-            action = np.argmax(self.targetModel(observation.reshape(1,-1), False)[0].numpy()) # 最もQ値が高い行動を選択．予測はターゲットネットワークで行う．
+            self.qModel.eval()
+            with torch.no_grad():
+                return torch.argmax(self.qModel(observation)).item() # 最もQ値が高い行動を選択．予測はターゲットネットワークで行う．
         self.epsilonDecay() # イプシロンの値を少しずつ小さくする．
-        return action
 
     # 以下の関数はイプシロンを少しずつ小さくするためのもの．
     def epsilonDecay(self):
@@ -1302,23 +1326,14 @@ class Agent:
         if self.epsilon < self.minimumEpsilon:
             self.epsilon = self.minimumEpsilon
 
-    @tf.function
-    def run(self, tx, tt, flag):
-        with tf.GradientTape() as tape:
-            self.qModel.trainable = flag # ここで学習させるのはQネットワークの方なのでQネットワークの記述．
-            ty = self.qModel.call(tx, flag)
-            costvalue=self.mseComputer(tt, ty) # コストを計算．
-        gradient = tape.gradient(costvalue, self.qModel.trainable_variables) # 勾配の計算．
-        self.optimizer.apply_gradients(zip(gradient, self.qModel.trainable_variables)) # 最適化．
-        return costvalue
-
     # 以下の関数はQネットワークの学習のため．
     def learn(self, experiences):
+        self.qModel.train()
         instances = random.sample(experiences, self.minibatchSize) # リプレイバッファからミニバッチサイズ分のデータを抽出．
-        observationInstances = np.asarray([instance["observation"] for instance in instances]) # ニューラルネットワークの入力値を取り出しているだけ．
-        qValues = self.targetModel(observationInstances, False).numpy() # Q値を計算（Q値を格納するための変数を作っただけ）．
-        newObservationInstances = np.asarray([instance["newObservation"] for instance in instances]) # ニューラルネットワークの入力値を取り出しているだけ．
-        newQValues = self.targetModel(newObservationInstances, False).numpy() # Q値を計算．
+        observationInstances = torch.tensor([instance["observation"] for instance in instances], dtype=torch.float32) # ニューラルネットワークの入力値を取り出しているだけ．
+        qValues = self.targetModel(observationInstances) # Q値を計算（Q値を格納するための変数を作っただけ）．
+        newObservationInstances = torch.tensor([instance["newObservation"] for instance in instances], dtype=torch.float32) # ニューラルネットワークの入力値を取り出しているだけ．
+        newQValues = self.targetModel(newObservationInstances) # Q値を計算．
         # 以下のforは教師データを作成するための記述．
         for i, instance in enumerate(instances):
             action = instance["action"]
@@ -1326,31 +1341,33 @@ class Agent:
             if instance["done"]:
                 qValues[i][action] = reward
             else:
-                qValues[i][action] = reward + self.gamma * np.max(newQValues[i])
-        learncostvalue = self.run(observationInstances, qValues, True)
-        return learncostvalue
+                qValues[i][action] = reward + self.gamma * torch.max(newQValues[i])
+        ty = self.qModel(observationInstances)
+        learncostvalue = self.criterion(ty, qValues.detach()) # tyは現在のQ値で，qValuesに格納されているのは目標のQ値．
+        self.optimizer.zero_grad()
+        learncostvalue.backward()
+        self.optimizer.step()
+        return learncostvalue.item()
 
     # 以下の関数はターゲットネットワークの更新（Qネットワークと同じにすること）のため．
     def update(self):
-        self.targetModel.set_weights(self.qModel.get_weights())
+        self.targetModel.load_state_dict(self.qModel.state_dict())
 
-class Network(tf.keras.Model):
-    def __init__(self, middleUnitSize, outputSize, dropoutRate):
+class Network(nn.Module):
+    def __init__(self, inputSize, middleUnitSize, outputSize, dropoutRate):
         super(Network, self).__init__()
-        self.w1 = tf.keras.layers.Dense(middleUnitSize)
-        self.w2 = tf.keras.layers.Dense(middleUnitSize)
-        self.w3 = tf.keras.layers.Dense(outputSize)
-        self.a1 = tf.keras.layers.LeakyReLU()
-        self.dropout = tf.keras.layers.Dropout(dropoutRate)
-    def call(self, x, learningFlag):
-        y = self.w1(x)
-        y = self.a1(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.w2(y)
-        y = self.a1(y)
-        y = self.dropout(y, training=learningFlag)
-        y = self.w3(y)
-        return y
+        self.model = nn.Sequential(
+            nn.Linear(inputSize, middleUnitSize),
+            nn.LeakyReLU(),
+            nn.Dropout(dropoutRate),
+            nn.Linear(middleUnitSize, middleUnitSize),
+            nn.LeakyReLU(),
+            nn.Dropout(dropoutRate),
+            nn.Linear(middleUnitSize, outputSize)
+        )
+
+    def forward(self, x):
+        return self.model(x)
 
 if __name__ == "__main__":
     main()
@@ -1380,7 +1397,7 @@ if __name__ == "__main__":
 # ```python
 #     # 環境の生成．
 #     env = gym.make("CartPole-v1")
-#     env.seed(0) # 再現性確保のため乱数の種は絶対に指定する．
+#     env.reset(seed=0) # 再現性確保のため乱数の種は絶対に指定する．
 #     
 #     # 環境情報の取得．
 #     actionShape = env.action_space.n # ニューラルネットワークの出力サイズを指定するため取得．
@@ -1411,11 +1428,11 @@ if __name__ == "__main__":
 #         self.gamma = gamma
 #         self.actionShape = actionShape
 #         self.observationShape = observationShape
-#         self.qModel = Network(middleUnitSize, self.actionShape, dropoutRate) # Q値をその都度学習するためのネットワーク．
-#         self.targetModel = Network(middleUnitSize, self.actionShape, dropoutRate) # Q値を計算するためのネットワーク．エピソードが終わる度にQネットワークと同じパラメータに同期される．
+#         self.qModel = Network(self.observationShape[0], middleUnitSize, self.actionShape, dropoutRate) # Q値をその都度学習するためのネットワーク．
+#         self.targetModel = Network(self.observationShape[0], middleUnitSize, self.actionShape, dropoutRate) # Q値を計算するためのネットワーク．エピソードが終わる度にQネットワークと同じパラメータに同期される．
 #         self.minibatchSize = minibatchSize
-#         self.mseComputer = tf.keras.losses.MeanSquaredError() # Q値は右に動かすか左に動かすかの値なのでそれと同じになるように二乗誤差をコストとする．元の論文だとフーバーロスを利用．
-#         self.optimizer = tf.keras.optimizers.Adam()
+#         self.optimizer = optim.Adam(self.qModel.parameters())
+#         self.criterion = nn.MSELoss() # Q値は右に動かすか左に動かすかの値なのでそれと同じになるように二乗誤差をコストとする．元の論文だとフーバーロスを利用．
 # ```
 # 
 # 以下の部分はイプシロングリーディ法の記述ですが，このコードにおいてはイプシロン減衰も行うのでその記述もあります．
@@ -1423,12 +1440,13 @@ if __name__ == "__main__":
 # ```python
 #     # 以下の関数はイプシロングリーディ法を利用して行動を選択する関数．
 #     def act(self, observation):
-#         if np.random.uniform() < self.epsilon:
-#             action = np.random.randint(self.actionShape) # イプシロンの確率でランダムに行動する．
+#         if random.random() < self.epsilon:
+#             return random.randint(0, self.actionShape -1) # イプシロンの確率でランダムに行動する．
 #         else:
-#             action = np.argmax(self.targetModel(observation.reshape(1,-1), False)[0].numpy()) # 最もQ値が高い行動を選択．予測はターゲットネットワークで行う．
+#             self.qModel.eval()
+#             with torch.no_grad():
+#                 return torch.argmax(self.qModel(observation)).item() # 最もQ値が高い行動を選択．予測はターゲットネットワークで行う．
 #         self.epsilonDecay() # イプシロンの値を少しずつ小さくする．
-#         return action
 #     
 #     # 以下の関数はイプシロンを少しずつ小さくするためのもの．
 #     def epsilonDecay(self):
@@ -1437,30 +1455,17 @@ if __name__ == "__main__":
 #             self.epsilon = self.minimumEpsilon
 # ```
 # 
-# 以下の部分は Subclassing API のいつもの記述です．注意すべき点は，これで学習させられるネットワークは Q ネットワークの方であるということです．
-# 
-# ```python
-#     @tf.function
-#     def run(self, tx, tt, flag):
-#         with tf.GradientTape() as tape:
-#             self.qModel.trainable = flag # ここで学習させるのはQネットワークの方なのでQネットワークの記述．
-#             ty = self.qModel.call(tx, flag)
-#             costvalue=self.mseComputer(tt, ty) # コストを計算．
-#         gradient = tape.gradient(costvalue, self.qModel.trainable_variables) # 勾配の計算．
-#         self.optimizer.apply_gradients(zip(gradient, self.qModel.trainable_variables)) # 最適化．
-#         return costvalue
-# ```
-# 
 # 以下の記述は Q ネットワークのパラメータ更新のための記述です．経験バッファからミニバッチサイズ分のインスタンスを取り出し，そこから状態と次の状態を抽出し，それに対してターゲットネットワークを利用して Q 値を計算します．その Q 値を教師データとして Q ネットワークを学習させます．
 # 
 # ```python
 #     # 以下の関数はQネットワークの学習のため．
 #     def learn(self, experiences):
+#         self.qModel.train()
 #         instances = random.sample(experiences, self.minibatchSize) # リプレイバッファからミニバッチサイズ分のデータを抽出．
-#         observationInstances = np.asarray([instance["observation"] for instance in instances]) # ニューラルネットワークの入力値を取り出しているだけ．
-#         qValues = self.targetModel(observationInstances, False).numpy() # Q値を計算（Q値を格納するための変数を作っただけ）．
-#         newObservationInstances = np.asarray([instance["newObservation"] for instance in instances]) # ニューラルネットワークの入力値を取り出しているだけ．
-#         newQValues = self.targetModel(newObservationInstances, False).numpy() # Q値を計算．
+#         observationInstances = torch.tensor([instance["observation"] for instance in instances], dtype=torch.float32) # ニューラルネットワークの入力値を取り出しているだけ．
+#         qValues = self.targetModel(observationInstances) # Q値を計算（Q値を格納するための変数を作っただけ）．
+#         newObservationInstances = torch.tensor([instance["newObservation"] for instance in instances], dtype=torch.float32) # ニューラルネットワークの入力値を取り出しているだけ．
+#         newQValues = self.targetModel(newObservationInstances) # Q値を計算．
 #         # 以下のforは教師データを作成するための記述．
 #         for i, instance in enumerate(instances):
 #             action = instance["action"]
@@ -1468,9 +1473,13 @@ if __name__ == "__main__":
 #             if instance["done"]:
 #                 qValues[i][action] = reward
 #             else:
-#                 qValues[i][action] = reward + self.gamma * np.max(newQValues[i])
-#         learncostvalue = self.run(observationInstances, qValues, True)
-#         return learncostvalue
+#                 qValues[i][action] = reward + self.gamma * torch.max(newQValues[i])
+#         ty = self.qModel(observationInstances)
+#         learncostvalue = self.criterion(ty, qValues.detach()) # tyは現在のQ値で，qValuesに格納されているのは目標のQ値．
+#         self.optimizer.zero_grad()
+#         learncostvalue.backward()
+#         self.optimizer.step()
+#         return learncostvalue.item()
 # ```
 # 
 # 以下の記述はターゲットネットワークを更新するためのものです．ターゲットネットワークの更新方法は，Q ネットワークのパラメータをそのまま利用するハードアップデートと一部を利用するソフトアップデートがあるのですが，ここではハードアップデートを利用しました．
@@ -1478,17 +1487,18 @@ if __name__ == "__main__":
 # ```python
 #     # 以下の関数はターゲットネットワークの更新（Qネットワークと同じにすること）のため．
 #     def update(self):
-#         self.targetModel.set_weights(self.qModel.get_weights())
+#         self.targetModel.load_state_dict(self.qModel.state_dict())
 # ```
 
 # さらに，`main()` に戻って以下の記述ですが，これが強化学習を進めるためのものです．環境をリセットして，エージェントによる行動の選択，経験バッファに経験を溜めて，Q ネットワークを学習，エピソード終了後にターゲットネットワークを更新します．特に難しいところはないように思います．
 # 
 # ```python
-#     for episode in range(1, 100+1):
+#     for episode in range(1, 200+1):
 #         observation = env.reset()
 #         rewards, costs = [], [] # エピソード毎に報酬とニューラルネットワークの学習コストを溜めるリスト．
-#         while True:
-#             action = agent.act(observation) # エージェントによる行動の選択．これはターゲットネットワークによる選択．
+#         done = False
+#         while not done:
+#             action = agent.act(torch.tensor(observation, dtype=torch.float32).unsqueeze(0)) # エージェントによる行動の選択．これはターゲットネットワークによる選択．
 #             newObservation, reward, done, _ = env.step(action) # 環境を進める．
 #             rewards.append(reward)
 #             experiences.append({"observation": observation, "action": action, "reward": reward, "newObservation": newObservation, "done": done}) # 経験を蓄積．
@@ -1496,7 +1506,6 @@ if __name__ == "__main__":
 #             if len(experiences) >= minibatchSize: # ミニバッチのサイズに達するまで経験がたまったらニューラルネットワークの学習を開始する．
 #                 cost = agent.learn(experiences) # Qネットワーク（qModel）の学習．
 #                 costs.append(cost)
-#             if done: break
 #         if len(experiences) >= minibatchSize:
 #             agent.update() # エピソードの最後にターゲットネットワーク（targetModel）の更新．
 #         print("Episode: {:3d}, Number of steps: {:3d}, Mean reward: {:3.1f}, Cost: {:5.3f}".format(episode, len(rewards), np.mean(rewards), np.mean(costs)))
@@ -1511,7 +1520,7 @@ if __name__ == "__main__":
 #     frame = plt.imshow(env.render("rgb_array"))
 #     frames = [[frame]]
 #     while not done:
-#         action = agent.act(observation)
+#         action = agent.act(torch.tensor(observation, dtype=torch.float32))
 #         observation, reward, done, _ = env.step(action)
 #         frame = plt.imshow(env.render(mode="rgb_array")) # 描画のための記述
 #         frames.append([frame])
