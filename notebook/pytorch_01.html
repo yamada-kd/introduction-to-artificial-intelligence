@@ -723,7 +723,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p class="admonition-title">Note</p>
 <p>これは2行2列の行列の1列目の値を取り出す操作です．</p>
 </div>
-<p>テンソルのサイズの変更には <code class="docutils literal notranslate"><span class="pre">tf.reshape()</span></code> を利用します．</p>
+<p>テンソルのサイズの変更には <code class="docutils literal notranslate"><span class="pre">torch.reshape()</span></code> を利用します．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
@@ -871,7 +871,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>深層学習法におけるアルゴリズムの中身を分解すると行列の掛け算と微分から構成されていることがわかります．PyTorch はこの行列の掛け算と微分を行うライブラリです．自動微分機能を提供します．ここでは勾配の計算を紹介するため，以下の式を考えます．</p>
+<p>ここでは勾配の計算を紹介するため，以下の式を考えます．</p>
 <p><span class="math notranslate nohighlight">\(y = x^2 + 2\)</span></p>
 <p>これに対して以下の偏微分を計算することができます．</p>
 <p><span class="math notranslate nohighlight">\(\dfrac{\partial y}{\partial x} = 2x\)</span></p>
