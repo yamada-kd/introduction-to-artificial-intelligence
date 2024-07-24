@@ -84,6 +84,8 @@ get_ipython().system(' ls /content/data')
 # ## MLP の実装
 
 # この節では MLP を実装します．MLP を実装することに加えて，どのように学習を進めるとより良い人工知能を構築できるのかについて紹介します．
+# 
+# <img src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/mlp_01.svg?raw=1" width="100%" />
 
 # ### 簡単な MLP の実装
 
@@ -261,7 +263,7 @@ def main():
     # データセットの生成
     tx = torch.tensor([[1.1, 2.2, 3.0, 4.0], [2.0, 3.0, 4.0, 1.0], [2.0, 2.0, 3.0, 4.0]], dtype=torch.float32)
 
-    # 関数を定義
+    # 関数の定義
     d1 = nn.Linear(4, 10)
     relu = nn.ReLU()
 
@@ -273,18 +275,15 @@ def main():
     print("2-----------")
     print(relu(d1(tx)))
 
-    # 活性化関数を変更した関数を定義
-    d1 = nn.Linear(4, 10)
-
-    # データセットの最初の値を入力
+    # 活性化関数を使わずにデータセットの最初の値を入力
     print("3-----------")
     print(d1(tx[0:1]))
 
-    # データセットの全部の値を入力
+    # 活性化関数を使わずにデータセットの全部の値を入力
     print("4-----------")
     print(d1(tx))
 
-    # 最初の引数の値を変更した関数を定義
+    # 出力値のベクトルサイズを変更した関数を定義
     d1 = nn.Linear(4, 4)
 
     # データセットの最初の値を入力
@@ -421,7 +420,7 @@ if __name__ == "__main__":
 #     train_dataset, valid_dataset = torch.utils.data.random_split(learn_dataset, [int(len(learn_dataset) * 0.9), int(len(learn_dataset) * 0.1)])
 # ```
 
-# 以下の記述は，データローダーを設定するための記述です．PyTroch ではこのデータローダーという機能を利用してデータを人工知能に読ませます．`batch_size` でしたサイズのデータが第一引数で指定したデータセットより抽出されます．
+# 以下の記述は，データローダーを設定するための記述です．PyTroch ではこのデータローダーという機能を利用してデータを人工知能に読ませます．`batch_size` で設定したサイズのデータが第一引数で指定したデータセットより抽出されます．
 # ```python
 #     # データローダーの設定．
 #     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=MINIBATCHSIZE, shuffle=True)
@@ -452,7 +451,7 @@ if __name__ == "__main__":
 #         return x
 # ```
 
-# 学習ループは以下で占めす通りです．最初に，`mode.train()` を実行し，ドロップアウト等は動作するモードにモデルを設定します．その後，データローダーでデータを読み出し，それらを GPU メモリに送り，ニューラルネットワークのパラメータ更新の計算を行います．バリデーションでは，`model.eval()` にてモデルをドロップアウト等が動作しないモードに変更し，その性能を計測します．
+# 学習ループは以下で示す通りです．最初に，`mode.train()` を実行し，ドロップアウト等は動作するモードにモデルを設定します．その後，データローダーでデータを読み出し，それらを GPU メモリに送り，ニューラルネットワークのパラメータ更新の計算を行います．バリデーションでは，`model.eval()` にてモデルをドロップアウト等が動作しないモードに変更し，その性能を計測します．
 # ```python
 #     # 学習ループ．
 #     for epoch in range(1, MAXEPOCH + 1):
@@ -768,7 +767,7 @@ if __name__ == "__main__":
 #     PATIENCE = 5
 # ```
 
-# 学習ループを以下のようにコードを追加しました．`patiencecounter` はコストが更新されなかった回数を数えるカウンタです．`bestvalue` は最も良いコストの値を記録する変数です．
+# 以下のように学習ループのコードを元のコードに追加しました．`patiencecounter` はコストが更新されなかった回数を数えるカウンタです．`bestvalue` は最も良いコストの値を記録する変数です．
 # ```python
 #     # 学習ループ．
 #     liepoch, litraincost, livalidcost = [], [], []
@@ -939,7 +938,7 @@ if __name__ == "__main__":
 #             torch.save(model.state_dict(), "mlp-mnist-model.pt") # モデルを保存するための記述．
 # ```
 
-# 以下のシェルのコマンドを打つと，ディレクトリが新規に生成されていることを確認できます．
+# 以下のシェルのコマンドを打つと，ディレクトリが新規に生成されていることが確認できます．
 
 # In[ ]:
 
