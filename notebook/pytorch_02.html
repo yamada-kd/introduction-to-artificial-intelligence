@@ -500,6 +500,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="section" id="mlp">
 <h2><span class="section-number">7.2. </span>MLP の実装<a class="headerlink" href="#mlp" title="Permalink to this headline">¶</a></h2>
 <p>この節では MLP を実装します．MLP を実装することに加えて，どのように学習を進めるとより良い人工知能を構築できるのかについて紹介します．</p>
+<a class="reference internal image-reference" href="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/mlp_01.svg?raw=1"><img alt="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/mlp_01.svg?raw=1" src="https://github.com/yamada-kd/introduction-to-artificial-intelligence/blob/main/image/mlp_01.svg?raw=1" style="width: 100%;" /></a>
 <div class="section" id="id4">
 <h3><span class="section-number">7.2.1. </span>簡単な MLP の実装<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>実際に MNIST を処理する MLP を実装する前に，とても簡単なデータを処理するための MLP を実装します．ここでは，以下のようなデータを利用します．これが学習セットです．ここでは MLP の実装の方法を紹介するだけなのでバリデーションセットもテストセットも使用しません．</p>
@@ -676,7 +677,7 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="c1"># データセットの生成</span>
     <span class="n">tx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-    <span class="c1"># 関数を定義</span>
+    <span class="c1"># 関数の定義</span>
     <span class="n">d1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
     <span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
 
@@ -688,18 +689,15 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2-----------&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">relu</span><span class="p">(</span><span class="n">d1</span><span class="p">(</span><span class="n">tx</span><span class="p">)))</span>
 
-    <span class="c1"># 活性化関数を変更した関数を定義</span>
-    <span class="n">d1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-
-    <span class="c1"># データセットの最初の値を入力</span>
+    <span class="c1"># 活性化関数を使わずにデータセットの最初の値を入力</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3-----------&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">d1</span><span class="p">(</span><span class="n">tx</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]))</span>
 
-    <span class="c1"># データセットの全部の値を入力</span>
+    <span class="c1"># 活性化関数を使わずにデータセットの全部の値を入力</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4-----------&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">d1</span><span class="p">(</span><span class="n">tx</span><span class="p">))</span>
 
-    <span class="c1"># 最初の引数の値を変更した関数を定義</span>
+    <span class="c1"># 出力値のベクトルサイズを変更した関数を定義</span>
     <span class="n">d1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
     <span class="c1"># データセットの最初の値を入力</span>
@@ -836,7 +834,7 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">train_dataset</span><span class="p">,</span> <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="n">learn_dataset</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">learn_dataset</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">learn_dataset</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)])</span>
 </pre></div>
 </div>
-<p>以下の記述は，データローダーを設定するための記述です．PyTroch ではこのデータローダーという機能を利用してデータを人工知能に読ませます．<code class="docutils literal notranslate"><span class="pre">batch_size</span></code> でしたサイズのデータが第一引数で指定したデータセットより抽出されます．</p>
+<p>以下の記述は，データローダーを設定するための記述です．PyTroch ではこのデータローダーという機能を利用してデータを人工知能に読ませます．<code class="docutils literal notranslate"><span class="pre">batch_size</span></code> で設定したサイズのデータが第一引数で指定したデータセットより抽出されます．</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># データローダーの設定．</span>
     <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">MINIBATCHSIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">valid_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">),</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -865,7 +863,7 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="k">return</span> <span class="n">x</span>
 </pre></div>
 </div>
-<p>学習ループは以下で占めす通りです．最初に，<code class="docutils literal notranslate"><span class="pre">mode.train()</span></code> を実行し，ドロップアウト等は動作するモードにモデルを設定します．その後，データローダーでデータを読み出し，それらを GPU メモリに送り，ニューラルネットワークのパラメータ更新の計算を行います．バリデーションでは，<code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> にてモデルをドロップアウト等が動作しないモードに変更し，その性能を計測します．</p>
+<p>学習ループは以下で示す通りです．最初に，<code class="docutils literal notranslate"><span class="pre">mode.train()</span></code> を実行し，ドロップアウト等は動作するモードにモデルを設定します．その後，データローダーでデータを読み出し，それらを GPU メモリに送り，ニューラルネットワークのパラメータ更新の計算を行います．バリデーションでは，<code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> にてモデルをドロップアウト等が動作しないモードに変更し，その性能を計測します．</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># 学習ループ．</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">MAXEPOCH</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
         <span class="c1"># トレーニング．</span>
@@ -1176,7 +1174,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="n">PATIENCE</span> <span class="o">=</span> <span class="mi">5</span>
 </pre></div>
 </div>
-<p>学習ループを以下のようにコードを追加しました．<code class="docutils literal notranslate"><span class="pre">patiencecounter</span></code> はコストが更新されなかった回数を数えるカウンタです．<code class="docutils literal notranslate"><span class="pre">bestvalue</span></code> は最も良いコストの値を記録する変数です．</p>
+<p>以下のように学習ループのコードを元のコードに追加しました．<code class="docutils literal notranslate"><span class="pre">patiencecounter</span></code> はコストが更新されなかった回数を数えるカウンタです．<code class="docutils literal notranslate"><span class="pre">bestvalue</span></code> は最も良いコストの値を記録する変数です．</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># 学習ループ．</span>
     <span class="n">liepoch</span><span class="p">,</span> <span class="n">litraincost</span><span class="p">,</span> <span class="n">livalidcost</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
     <span class="n">patiencecounter</span><span class="p">,</span> <span class="n">bestvalue</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100000</span>
@@ -1345,7 +1343,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;mlp-mnist-model.pt&quot;</span><span class="p">)</span> <span class="c1"># モデルを保存するための記述．</span>
 </pre></div>
 </div>
-<p>以下のシェルのコマンドを打つと，ディレクトリが新規に生成されていることを確認できます．</p>
+<p>以下のシェルのコマンドを打つと，ディレクトリが新規に生成されていることが確認できます．</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span> ls
