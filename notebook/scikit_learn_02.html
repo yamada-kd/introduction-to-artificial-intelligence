@@ -559,7 +559,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p><span class="math notranslate nohighlight">\(
 \displaystyle I_k=\sum_{i=1}^{n_k}\|x_i-\mu_k\|_2^2
 \)</span></p>
-<p>K-means ではこの値を最初化するようにクラスタへのインスタンスの割り当てを行います．つまり，K-means では以下の <span class="math notranslate nohighlight">\(E\)</span> を最小化します．</p>
+<p>K-means ではこの値を最小化するようにクラスタへのインスタンスの割り当てを行います．つまり，K-means では以下の <span class="math notranslate nohighlight">\(E\)</span> を最小化します．</p>
 <p><span class="math notranslate nohighlight">\(\displaystyle E=\sum_{i=1}^kI_k\)</span></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -597,7 +597,6 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_blobs</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -631,7 +630,6 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_blobs</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -670,7 +668,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>上の例だと正解のクラスタ数を知っているので <span class="math notranslate nohighlight">\(k\)</span> を上手に設定することができました．実際のデータをクラスタリングしたいときには何個に分割すれば良いか分からない場合が多いと思います．そのときに，<span class="math notranslate nohighlight">\(k\)</span> の値を決定するための指標があります．シルエットスコアと言います．</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>シルエットスコアはクラスタに所属するインスタンス間の平均距離（凝集度と言う）をそのクラスタから最も近いクラスタに存在しているインスタンスとの平均距離（乖離度と言う）から引いた値を凝集度または乖離度の内で大きな値で割った値を全 <span class="math notranslate nohighlight">\(k\)</span> 個のクラスタについて計算して平均をとった値です．</p>
+<p>シルエットスコアはクラスタに所属するインスタンス間の平均距離（凝集度と言う）をそのクラスタから最も近いクラスタに存在しているインスタンスとの平均距離（乖離度と言う）から引いた値を凝集度または乖離度の内で大きな値で割った値を全 <span class="math notranslate nohighlight">\(k\)</span> 個のクラスタについて計算して平均をとった値です．正三角形のそれぞれの頂点付近にインスタンスが散らばった本来は3個に分けるべきデータセットを3個に分けたときと2個に分けたときの数値を想像してみると解りやすいです．きれいに分離されている場合のシルエットスコアは1に近づきます．</p>
 </div>
 <p>シルエットスコアは以下のように計算します．上と同じデータに対して，<span class="math notranslate nohighlight">\(k\)</span> の値を変えて K-means 法を実行した場合のシルエットスコアを出力します．</p>
 <div class="cell docutils container">
@@ -731,12 +729,12 @@ const thebe_selector_output = ".output, .cell_output"
 <p><span class="math notranslate nohighlight">\(
 \displaystyle \mu_k=\frac{1}{n_k}\sum_{i=1}^{n_k}x_i
 \)</span></p>
+<p>ウォード法ではあるクラスタ <span class="math notranslate nohighlight">\(C_l\)</span> のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_l\)</span> と別のクラスタ <span class="math notranslate nohighlight">\(C_m\)</span> のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_m\)</span> を計算します．また，それらのクラスタを連結して新たなクラスタ <span class="math notranslate nohighlight">\(C_n\)</span> を生成した場合のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_n\)</span> の値を計算します．ウォード法では，元のふたつのクラスタ内平方和の和と新たなクラスタのクラスタ内平方和の差 <span class="math notranslate nohighlight">\(E\)</span> を最小化するようにクラスタを連結させます．</p>
+<p><span class="math notranslate nohighlight">\(E=I_n-(I_l+I_m)\)</span></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>クラスタ内平方和は K-means 法の計算でも利用する値です．</p>
 </div>
-<p>ウォード法ではあるクラスタ <span class="math notranslate nohighlight">\(C_l\)</span> のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_l\)</span> と別のクラスタ <span class="math notranslate nohighlight">\(C_m\)</span> のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_m\)</span> を計算します．また，それらのクラスタを連結して新たなクラスタ <span class="math notranslate nohighlight">\(C_n\)</span> を生成した場合のクラスタ内平方和 <span class="math notranslate nohighlight">\(I_n\)</span> の値を計算します．ウォード法では，元のふたつのクラスタ内平方和の和と新たなクラスタのクラスタ内平方和の差 <span class="math notranslate nohighlight">\(E\)</span> を最小化するようにクラスタを連結させます．</p>
-<p><span class="math notranslate nohighlight">\(E=I_n-(I_l+I_m)\)</span></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>クラスタ <span class="math notranslate nohighlight">\(C_l\)</span> とクラスタ <span class="math notranslate nohighlight">\(C_m\)</span> がものすごく離れているとき，<span class="math notranslate nohighlight">\(I_n\)</span> の値は大きくなるため，<span class="math notranslate nohighlight">\(E\)</span> も大きくなります．<span class="math notranslate nohighlight">\(E\)</span> が小さくなるようにクラスタを形成させることは近いクラスタ同士を凝集させるという行為をしているということになります．</p>
