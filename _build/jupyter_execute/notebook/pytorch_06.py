@@ -428,7 +428,6 @@ def main():
     # 学習ループ．
     for epoch in range(1, MaxEpoch+1):
         for real_images, _ in dataloader:
-            MiniBatchSize = len(real_labels)
             real_images = real_images.view(-1, 784).to(device)
 
             for _ in range(CriticLearningNumber):
